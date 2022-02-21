@@ -3,6 +3,7 @@ package net.wangyl.goldenlife
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ImageView
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -12,6 +13,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import net.wangyl.goldenlife.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
 
         binding.navView?.let {
+            it.getHeaderView(0).findViewById<ImageView>(R.id.imageView).background = AppCompatResources.getDrawable(this, R.drawable.avatar_1)
             appBarConfiguration = AppBarConfiguration(
                 setOf(
                     R.id.nav_transform, R.id.nav_reflow, R.id.nav_slideshow, R.id.nav_settings
@@ -63,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         val navView: NavigationView? = findViewById(R.id.nav_view)
         if (navView == null) {
             // The navigation drawer already has the items including the items in the overflow menu
-            // We only inflate the overflow menu if the navigation drawer isn't visible
+            // We only inflate the overflow menu if the navigation drawer isn"t visible
             menuInflater.inflate(R.menu.overflow, menu)
         }
         return result
