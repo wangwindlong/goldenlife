@@ -10,4 +10,10 @@
     <dimen name="middle_progress_width">3.5dp</dimen>
     <dimen name="middle_progress_radius">10dp</dimen>
 
+    <dimen name="separator_margin_start">16dp</dimen>
+    <dimen name="separator_margin_start_icon">72dp</dimen>
+    <dimen name="separator_margin_end">16dp</dimen>
+    <dimen name="separator_thickness">1dp</dimen>
+    <dimen name="toolbar_logo_size">24dp</dimen>
+    <dimen name="toolbar_logo_padding_end">24dp</dimen>
 </resources>

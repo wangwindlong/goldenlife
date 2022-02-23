@@ -16,13 +16,13 @@ class Repository(private val apiService: ApiService) {
         }
     }
 
-    suspend fun getPosts(): List<PostData> {
+    suspend fun getPosts(): Status<List<PostData>> {
         return try {
-            apiService.posts().sortedBy { it.title }
+            Status.Success(apiService.posts().sortedBy { it.title })
         } catch (ignore: IOException) {
-            emptyList()
+            Status.Failure(ignore)
         } catch (ignore: HttpException) {
-            emptyList()
+            Status.Failure(ignore)
         }
     }
 }

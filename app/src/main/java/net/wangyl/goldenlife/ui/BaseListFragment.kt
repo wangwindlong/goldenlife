@@ -7,38 +7,50 @@ import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.GroupieViewHolder
 import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.api.Status
 import net.wangyl.goldenlife.databinding.FragmentCommonListBinding
 import net.wangyl.goldenlife.extension.viewBinding
 import net.wangyl.goldenlife.mvi.BaseListVM
+import net.wangyl.goldenlife.mvi.BaseState
+import net.wangyl.goldenlife.ui.common.SeparatorDecoration
+import net.wangyl.goldenlife.ui.groupie.BaseListItem
 import net.wangyl.goldenlife.ui.widget.ProgressImageButton
 import org.koin.java.KoinJavaComponent.get
+import org.orbitmvi.orbit.syntax.simple.intent
+import org.orbitmvi.orbit.viewmodel.observe
 
 interface RefreshEvent {
     fun refresh(view: View, isManualRefresh: Boolean)
 }
 
-class BaseListFragment<Data:Parcelable>(layoutId: Int) : Fragment(layoutId), RefreshEvent {
+abstract class BaseListFragment<Data : Parcelable>(layoutId: Int = R.layout.fragment_common_list) :
+    Fragment(layoutId), RefreshEvent {
 //    private val refreshViewModel: RefreshViewModel by viewModels()
 //    protected val wtfViewModel: WTFViewModel by viewModels()
 
     lateinit var refreshLayout: SwipeRefreshLayout
+    lateinit var recyclerView: RecyclerView
     lateinit var progressBar: ProgressImageButton
+    private val groupAdapter = GroupAdapter<GroupieViewHolder>()
+
     val listModel by viewModels<BaseListVM<Data>> {
         MyViewModelFactory(this, loader = ::loader)
     }
 
-    suspend fun loader(): Status<List<Data>>{
+    abstract suspend fun loader(): Status<List<Data>>
 
-    }
-
-//    private val binding by viewBinding<FragmentCommonListBinding>()
+    private val binding by viewBinding<FragmentCommonListBinding>()
 
     override fun refresh(view: View, isManualRefresh: Boolean) {
-
+        listModel.intent { loader() }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,6 +58,7 @@ class BaseListFragment<Data:Parcelable>(layoutId: Int) : Fragment(layoutId), Ref
 
         refreshLayout = view.findViewById(R.id.refresh_layout)
         progressBar = view.findViewById(R.id.progress_circular)
+        recyclerView = view.findViewById(R.id.list_view)
 //        refreshLayout = binding.refreshLayout
 //        progressBar = binding.progressCircular
         refreshLayout.setOnRefreshListener {
@@ -58,12 +71,37 @@ class BaseListFragment<Data:Parcelable>(layoutId: Int) : Fragment(layoutId), Ref
 //                emptyView.visibleOrGone = it
 //            })
         }
+
+        recyclerView.apply {
+            adapter = groupAdapter
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            itemAnimator = null
+            SeparatorDecoration(requireActivity(), R.dimen.separator_margin_start_icon, R.dimen.separator_margin_end)
+            addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
+        }
+
+        listModel.observe(viewLifecycleOwner, state = ::render, sideEffect = ::sideEffect)
+
+    }
+
+    fun render(state: BaseState<Data>) {
+        val items = state.values.map { value ->
+            BaseListItem(value, listViewModel)
+        }
+
+        groupAdapter.update(items)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+//        binding = null
     }
 }
 
-class MyViewModelFactory<DataClass:Parcelable>(owner: SavedStateRegistryOwner,
-                         val loader: (suspend () -> Status<List<DataClass>>),
-                         defaultArgs: Bundle? = null
+class MyViewModelFactory<DataClass : Parcelable>(
+    owner: SavedStateRegistryOwner,
+    val loader: (suspend () -> Status<List<DataClass>>),
+    defaultArgs: Bundle? = null
 ) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
 
     override fun <T : ViewModel?> create(
