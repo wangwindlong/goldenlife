@@ -2,6 +2,7 @@ plugins {
     id "com.android.application"
     id "org.jetbrains.kotlin.android"
     id "kotlin-parcelize"
+    id "kotlin-kapt"
 }
 
 android {
@@ -36,6 +37,10 @@ android {
     }
 }
 
+kapt {
+    correctErrorTypes = true
+}
+
 dependencies {
 
     implementation project(":ultimatebarx")
@@ -49,10 +54,15 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
-    implementation "io.insert-koin:koin-android:3.1.5"
-    implementation("com.github.lisawray.groupie:groupie:2.10.0")
-    implementation("com.github.lisawray.groupie:groupie-kotlin-android-extensions:2.10.0")
-    implementation("com.github.lisawray.groupie:groupie-viewbinding:2.10.0")
+    implementation "io.insert-koin:koin-android:$koin_version"
+    implementation "io.insert-koin:koin-androidx-compose:$koin_version"
+//    implementation("com.github.lisawray.groupie:groupie:2.10.0")
+//    implementation("com.github.lisawray.groupie:groupie-kotlin-android-extensions:2.10.0")
+//    implementation("com.github.lisawray.groupie:groupie-viewbinding:2.10.0")
+    implementation "com.airbnb.android:epoxy:$epoxyVersion"
+    // Add the annotation processor if you are using Epoxy's annotations (recommended)
+    annotationProcessor "com.airbnb.android:epoxy-processor:$epoxyVersion"
+
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
 //    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
     implementation("com.squareup.moshi:moshi-kotlin:1.12.0")

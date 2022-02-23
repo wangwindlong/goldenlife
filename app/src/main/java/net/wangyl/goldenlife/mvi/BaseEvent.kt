@@ -3,7 +3,7 @@ package net.wangyl.goldenlife.mvi
 
 interface Event
 
-data class BaseEvent<T>(val value: T):Event {
+data class DertailEvent<T>(val value: T):Event {
 
 }
 

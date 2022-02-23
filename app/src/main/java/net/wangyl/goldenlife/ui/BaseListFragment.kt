@@ -7,23 +7,29 @@ import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.xwray.groupie.GroupAdapter
-import com.xwray.groupie.GroupieViewHolder
 import net.wangyl.goldenlife.R
+import net.wangyl.goldenlife.api.Repository
 import net.wangyl.goldenlife.api.Status
 import net.wangyl.goldenlife.databinding.FragmentCommonListBinding
 import net.wangyl.goldenlife.extension.viewBinding
 import net.wangyl.goldenlife.mvi.BaseListVM
 import net.wangyl.goldenlife.mvi.BaseState
+import net.wangyl.goldenlife.mvi.DertailEvent
+import net.wangyl.goldenlife.mvi.Event
 import net.wangyl.goldenlife.ui.common.SeparatorDecoration
-import net.wangyl.goldenlife.ui.groupie.BaseListItem
 import net.wangyl.goldenlife.ui.widget.ProgressImageButton
 import org.koin.java.KoinJavaComponent.get
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.ParametersDefinition
+import org.koin.core.qualifier.Qualifier
+import org.koin.java.KoinJavaComponent.inject
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.viewmodel.observe
 
@@ -39,7 +45,7 @@ abstract class BaseListFragment<Data : Parcelable>(layoutId: Int = R.layout.frag
     lateinit var refreshLayout: SwipeRefreshLayout
     lateinit var recyclerView: RecyclerView
     lateinit var progressBar: ProgressImageButton
-    private val groupAdapter = GroupAdapter<GroupieViewHolder>()
+//    private val groupAdapter = GroupAdapter<GroupieViewHolder>()
 
     val listModel by viewModels<BaseListVM<Data>> {
         MyViewModelFactory(this, loader = ::loader)
@@ -72,24 +78,39 @@ abstract class BaseListFragment<Data : Parcelable>(layoutId: Int = R.layout.frag
 //            })
         }
 
-        recyclerView.apply {
-            adapter = groupAdapter
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            itemAnimator = null
-            SeparatorDecoration(requireActivity(), R.dimen.separator_margin_start_icon, R.dimen.separator_margin_end)
-            addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
-        }
+//        recyclerView.apply {
+//            adapter = groupAdapter
+//            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+//            itemAnimator = null
+//            SeparatorDecoration(requireActivity(), R.dimen.separator_margin_start_icon, R.dimen.separator_margin_end)
+//            addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
+//        }
 
         listModel.observe(viewLifecycleOwner, state = ::render, sideEffect = ::sideEffect)
 
     }
 
     fun render(state: BaseState<Data>) {
-        val items = state.values.map { value ->
-            BaseListItem(value, listViewModel)
-        }
+//        val items = state.values.map { value ->
+//            BaseListItem(value, listViewModel)
+//        }
+//
+//        groupAdapter.update(items)
+    }
 
-        groupAdapter.update(items)
+    //跳转详情
+    private fun sideEffect(sideEffect: Event) {
+        when (sideEffect) {
+            is DertailEvent<*> -> {
+                findNavController().navigate(R.id.nav_settings)
+//                findNavController().navigate(
+//                    PostListFragmentDirections.actionListFragmentToDetailFragment(
+//                        sideEffect.post
+//                    )
+//                )
+            }
+
+        }
     }
 
     override fun onDestroyView() {
@@ -108,9 +129,15 @@ class MyViewModelFactory<DataClass : Parcelable>(
         key: String,
         modelClass: Class<T>,
         handle: SavedStateHandle
-    ): T = BaseListVM(loader, handle) as T
+    ): T {
+        val repository: Repository = getK()
+        return BaseListVM(loader, handle, repository) as T
+    }
 }
 
+inline fun <reified T> getK(qualifier: Qualifier? = null):T {
+    return get(T::class.java, qualifier)
+}
 
 //inline fun <reified DataClass : Parcelable> Fragment.listViewModel(
 //    noinline loader: suspend () -> Status<List<DataClass>>,

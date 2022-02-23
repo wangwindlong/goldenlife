@@ -11,11 +11,13 @@ import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.api.ApiService
 import net.wangyl.goldenlife.api.Repository
 import net.wangyl.goldenlife.api.Status
-import net.wangyl.goldenlife.databinding.FragmentSlideshowBinding
 import net.wangyl.goldenlife.model.PostData
 import net.wangyl.goldenlife.ui.BaseListFragment
+import net.wangyl.goldenlife.ui.getK
 
-class SlideshowFragment(val repo: Repository) : BaseListFragment<PostData>() {
+class SlideshowFragment : BaseListFragment<PostData>() {
+
+    val repo: Repository = getK()
 
     override suspend fun loader(): Status<List<PostData>> {
         return repo.getPosts()

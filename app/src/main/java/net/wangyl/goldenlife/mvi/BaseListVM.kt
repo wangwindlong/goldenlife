@@ -24,6 +24,10 @@ class BaseListVM<DataClass : Parcelable>(
     ViewModel(), ContainerHost<BaseState<DataClass>, Event> {
 //    BaseEvent<PostData>
 
+    init {
+        Log.d("BaseListVM", "repository=$repository")
+    }
+
     override val container = container<BaseState<DataClass>, Event>(
         initialState = BaseState(),
         savedStateHandle = savedStateHandle,
@@ -46,7 +50,7 @@ class BaseListVM<DataClass : Parcelable>(
     }
 
     fun onItemClicked(post: DataClass) = intent {
-        postSideEffect(BaseEvent(post))
+        postSideEffect(DertailEvent(post))
     }
 
 }
