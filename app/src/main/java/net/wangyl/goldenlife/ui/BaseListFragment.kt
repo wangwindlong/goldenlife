@@ -3,33 +3,42 @@ package net.wangyl.goldenlife.ui
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.annotation.CallSuper
+import androidx.annotation.LayoutRes
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
-import androidx.navigation.findNavController
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.chad.library.adapter.base.BaseDelegateMultiAdapter
+import com.chad.library.adapter.base.delegate.BaseMultiTypeDelegate
+import com.chad.library.adapter.base.viewholder.BaseDataBindingHolder
+import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.api.Repository
 import net.wangyl.goldenlife.api.Status
 import net.wangyl.goldenlife.databinding.FragmentCommonListBinding
+import net.wangyl.goldenlife.databinding.ItemTextViewBinding
 import net.wangyl.goldenlife.extension.viewBinding
+import net.wangyl.goldenlife.model.BaseItem
+import net.wangyl.goldenlife.model.BaseModel
 import net.wangyl.goldenlife.mvi.BaseListVM
 import net.wangyl.goldenlife.mvi.BaseState
 import net.wangyl.goldenlife.mvi.DertailEvent
 import net.wangyl.goldenlife.mvi.Event
-import net.wangyl.goldenlife.ui.common.SeparatorDecoration
 import net.wangyl.goldenlife.ui.widget.ProgressImageButton
-import org.koin.java.KoinJavaComponent.get
-import org.koin.android.ext.android.inject
-import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
-import org.koin.java.KoinJavaComponent.inject
+import org.koin.java.KoinJavaComponent.get
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.viewmodel.observe
 
@@ -37,7 +46,7 @@ interface RefreshEvent {
     fun refresh(view: View, isManualRefresh: Boolean)
 }
 
-abstract class BaseListFragment<Data : Parcelable>(layoutId: Int = R.layout.fragment_common_list) :
+abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragment_common_list) :
     Fragment(layoutId), RefreshEvent {
 //    private val refreshViewModel: RefreshViewModel by viewModels()
 //    protected val wtfViewModel: WTFViewModel by viewModels()
@@ -45,13 +54,57 @@ abstract class BaseListFragment<Data : Parcelable>(layoutId: Int = R.layout.frag
     lateinit var refreshLayout: SwipeRefreshLayout
     lateinit var recyclerView: RecyclerView
     lateinit var progressBar: ProgressImageButton
-//    private val groupAdapter = GroupAdapter<GroupieViewHolder>()
+    var itemLayouts: ArrayList<Pair<Int, Class<*>>> = arrayListOf()
 
     val listModel by viewModels<BaseListVM<Data>> {
         MyViewModelFactory(this, loader = ::loader)
     }
 
+    //    private val groupAdapter = GroupAdapter<GroupieViewHolder>()
+    // 可以直接快速使用，也可以继承BaseBinderAdapter类，重写自己的相关方法
+    private var adapter: BaseDelegateMultiAdapter<Data, BaseViewHolder> =
+        object : BaseDelegateMultiAdapter<Data, BaseViewHolder>() {
+            override fun convert(holder: BaseViewHolder, item: Data) {
+                bindItem(holder, item)
+            }
+
+            override fun convert(holder: BaseViewHolder, item: Data, payloads: List<Any>) {
+                bindItem(holder, item, payloads)
+            }
+
+//            override fun onItemViewHolderCreated(viewHolder: BaseViewHolder, viewType: Int) {
+//                viewHolder.dataBinding = DataBindingUtil.bind(view!!)
+//
+//            }
+        }.apply {
+            setMultiTypeDelegate(object : BaseMultiTypeDelegate<Data>() {
+                override fun getItemType(data: List<Data>, position: Int): Int {
+                    val item = data[position % data.size]
+                    return if (item is BaseItem) item.getItemType() else 0
+                }
+            })
+            setDiffCallback(object : DiffUtil.ItemCallback<Data>() {
+                override fun areItemsTheSame(oldItem: Data, newItem: Data): Boolean {
+                    return oldItem.getItemId() == newItem.getItemId()
+                }
+
+                override fun areContentsTheSame(oldItem: Data, newItem: Data): Boolean {
+                    return (oldItem.getItemContent() == newItem.getItemContent()
+                            && oldItem.equals(newItem))
+                }
+            })
+        }
+
+
+
+    @CallSuper
+    fun getItemLayouts(): List<Pair<Int, Class<*>>> {
+        return ArrayList<Pair<Int, Class<*>>>().apply { add(Pair(R.layout.item_text_view, ItemTextViewBinding::class.java)) }
+    }
+
     abstract suspend fun loader(): Status<List<Data>>
+    abstract fun bindItem(holder: BaseViewHolder, item: BaseModel, payloads: List<Any>? = null)
+
 
     private val binding by viewBinding<FragmentCommonListBinding>()
 
@@ -78,6 +131,17 @@ abstract class BaseListFragment<Data : Parcelable>(layoutId: Int = R.layout.frag
 //            })
         }
 
+        initRV()
+        listModel.observe(viewLifecycleOwner, state = ::render, sideEffect = ::sideEffect)
+
+    }
+
+    private fun initRV() {
+        itemLayouts.clear()
+        itemLayouts.addAll(getItemLayouts())
+
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter = adapter
 //        recyclerView.apply {
 //            adapter = groupAdapter
 //            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -85,9 +149,6 @@ abstract class BaseListFragment<Data : Parcelable>(layoutId: Int = R.layout.frag
 //            SeparatorDecoration(requireActivity(), R.dimen.separator_margin_start_icon, R.dimen.separator_margin_end)
 //            addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
 //        }
-
-        listModel.observe(viewLifecycleOwner, state = ::render, sideEffect = ::sideEffect)
-
     }
 
     fun render(state: BaseState<Data>) {
@@ -96,6 +157,7 @@ abstract class BaseListFragment<Data : Parcelable>(layoutId: Int = R.layout.frag
 //        }
 //
 //        groupAdapter.update(items)
+        adapter.setList(state.values)
     }
 
     //跳转详情
@@ -135,7 +197,12 @@ class MyViewModelFactory<DataClass : Parcelable>(
     }
 }
 
-inline fun <reified T> getK(qualifier: Qualifier? = null):T {
+class MyBaseViewHolder(view: View): BaseViewHolder(view) {
+
+    var dataBinding: ViewDataBinding? = null
+}
+
+inline fun <reified T> getK(qualifier: Qualifier? = null): T {
     return get(T::class.java, qualifier)
 }
 

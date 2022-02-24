@@ -62,6 +62,7 @@ dependencies {
 //    implementation "com.airbnb.android:epoxy:$epoxyVersion"
     // Add the annotation processor if you are using Epoxy's annotations (recommended)
 //    annotationProcessor "com.airbnb.android:epoxy-processor:$epoxyVersion"
+
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7'
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
 //    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
