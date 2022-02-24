@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.api.ApiService
 import net.wangyl.goldenlife.api.Repository
@@ -21,5 +22,13 @@ class SlideshowFragment : BaseListFragment<PostData>() {
 
     override suspend fun loader(): Status<List<PostData>> {
         return repo.getPosts()
+    }
+
+    override fun bindItem(holder: BaseViewHolder, item: Any, payloads: List<Any>?) {
+
+    }
+
+    override fun getItemLayouts(): List<Int> {
+        return emptyList()
     }
 }

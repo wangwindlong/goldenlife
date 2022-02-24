@@ -4,16 +4,18 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
-import androidx.navigation.findNavController
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.chad.library.adapter.base.BaseBinderAdapter
+import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.api.Repository
 import net.wangyl.goldenlife.api.Status
@@ -23,13 +25,9 @@ import net.wangyl.goldenlife.mvi.BaseListVM
 import net.wangyl.goldenlife.mvi.BaseState
 import net.wangyl.goldenlife.mvi.DertailEvent
 import net.wangyl.goldenlife.mvi.Event
-import net.wangyl.goldenlife.ui.common.SeparatorDecoration
 import net.wangyl.goldenlife.ui.widget.ProgressImageButton
-import org.koin.java.KoinJavaComponent.get
-import org.koin.android.ext.android.inject
-import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
-import org.koin.java.KoinJavaComponent.inject
+import org.koin.java.KoinJavaComponent.get
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.viewmodel.observe
 
@@ -46,12 +44,17 @@ abstract class BaseListFragment<Data : Parcelable>(layoutId: Int = R.layout.frag
     lateinit var recyclerView: RecyclerView
     lateinit var progressBar: ProgressImageButton
 //    private val groupAdapter = GroupAdapter<GroupieViewHolder>()
+    private var adapter: BaseBinderAdapter? = BaseBinderAdapter()
+
 
     val listModel by viewModels<BaseListVM<Data>> {
         MyViewModelFactory(this, loader = ::loader)
     }
 
     abstract suspend fun loader(): Status<List<Data>>
+    abstract fun bindItem(holder: BaseViewHolder, item: Any, payloads: List<Any>? = null): Unit
+    @LayoutRes
+    abstract fun getItemLayouts(): List<Int> //item的子布局
 
     private val binding by viewBinding<FragmentCommonListBinding>()
 
