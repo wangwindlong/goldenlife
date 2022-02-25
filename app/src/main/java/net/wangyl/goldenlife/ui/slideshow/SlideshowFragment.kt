@@ -12,8 +12,11 @@ import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.api.ApiService
 import net.wangyl.goldenlife.api.Repository
 import net.wangyl.goldenlife.api.Status
+import net.wangyl.goldenlife.databinding.ItemTextViewBinding
+import net.wangyl.goldenlife.model.BaseModel
 import net.wangyl.goldenlife.model.PostData
 import net.wangyl.goldenlife.ui.BaseListFragment
+import net.wangyl.goldenlife.ui.MyBaseViewHolder
 import net.wangyl.goldenlife.ui.getK
 
 class SlideshowFragment : BaseListFragment<PostData>() {
@@ -24,11 +27,8 @@ class SlideshowFragment : BaseListFragment<PostData>() {
         return repo.getPosts()
     }
 
-    override fun bindItem(holder: BaseViewHolder, item: Any, payloads: List<Any>?) {
-
+    override fun bindItem(holder: MyBaseViewHolder, item: BaseModel, payloads: List<Any>?) {
+        (holder.dataBinding as ItemTextViewBinding).tv.text = item.getItemContent()
     }
 
-    override fun getItemLayouts(): List<Int> {
-        return emptyList()
-    }
 }

@@ -9,7 +9,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include layout="@layout/default_page_background" />
+        <include
+            android:id="@+id/bg_layout"
+            layout="@layout/default_page_background" />
 
         <LinearLayout
             android:layout_width="match_parent"

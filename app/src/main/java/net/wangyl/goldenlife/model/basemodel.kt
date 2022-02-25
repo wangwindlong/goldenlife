@@ -2,6 +2,7 @@ package net.wangyl.goldenlife.model
 
 import android.os.Parcelable
 import net.wangyl.goldenlife.R
+import net.wangyl.goldenlife.ui.defaultItem
 import java.io.Serializable
 
 interface BaseListModel<Key : Any, T> {
@@ -16,7 +17,7 @@ interface BaseModel : Parcelable, Serializable {
 
 //recyclerview 多布局时需要使用到
 interface BaseItem : BaseModel {
-    fun getItemType(): Int = R.layout.item_text_view
+    fun getItemType(): Int = defaultItem
 }
 
 interface ListModel2<T> : BaseListModel<String, T> {}
