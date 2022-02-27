@@ -64,6 +64,7 @@ dependencies {
 //    annotationProcessor "com.airbnb.android:epoxy-processor:$epoxyVersion"
 
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7'
+    implementation "androidx.paging:paging-runtime:$paging_version"
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
 //    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
     implementation("com.squareup.moshi:moshi-kotlin:1.12.0")

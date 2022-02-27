@@ -2,27 +2,29 @@ package net.wangyl.goldenlife.ui
 
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.CallSuper
-import androidx.databinding.DataBindingUtil
+import androidx.core.os.bundleOf
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.chad.library.adapter.base.BaseDelegateMultiAdapter
+import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.delegate.BaseMultiTypeDelegate
+import com.chad.library.adapter.base.listener.OnItemClickListener
 import com.chad.library.adapter.base.listener.OnLoadMoreListener
-import com.chad.library.adapter.base.module.LoadMoreModule
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.api.Repository
@@ -30,17 +32,23 @@ import net.wangyl.goldenlife.api.Status
 import net.wangyl.goldenlife.base.BaseMultiAdapter
 import net.wangyl.goldenlife.base.IBindItem
 import net.wangyl.goldenlife.databinding.FragmentCommonListBinding
+import net.wangyl.goldenlife.extension.setHorizontalSlide
 import net.wangyl.goldenlife.extension.viewBinding
 import net.wangyl.goldenlife.model.BaseItem
 import net.wangyl.goldenlife.model.BaseModel
 import net.wangyl.goldenlife.mvi.BaseListVM
 import net.wangyl.goldenlife.mvi.BaseState
-import net.wangyl.goldenlife.mvi.DertailEvent
+import net.wangyl.goldenlife.mvi.DetailEvent
 import net.wangyl.goldenlife.mvi.Event
+import net.wangyl.goldenlife.ui.settings.SettingsFragment
 import org.koin.core.qualifier.Qualifier
 import org.koin.java.KoinJavaComponent.get
 import org.orbitmvi.orbit.syntax.simple.intent
+import org.orbitmvi.orbit.syntax.simple.postSideEffect
+import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.observe
+import java.lang.Exception
+import java.lang.NullPointerException
 
 interface RefreshEvent {
     fun refresh(view: View, isManualRefresh: Boolean)
@@ -48,20 +56,46 @@ interface RefreshEvent {
 
 val defaultItem = R.layout.item_text_view
 
+
+class PageInfo {
+    var page = 0
+    var pageSize = 10
+    var nextParams = ""
+    fun nextPage() {
+        page++
+    }
+
+    fun reset() {
+        page = 0
+    }
+
+    val isFirstPage: Boolean
+        get() = page == 0
+}
+
 abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragment_common_list) :
     Fragment(layoutId), RefreshEvent, IBindItem<Data, MyBaseViewHolder> {
     private val TAG = javaClass.simpleName
+
 //    private val refreshViewModel: RefreshViewModel by viewModels()
 //    protected val wtfViewModel: WTFViewModel by viewModels()
 
+    val pageInfo = PageInfo()
     lateinit var refreshLayout: SwipeRefreshLayout
     lateinit var recyclerView: RecyclerView
     lateinit var emptyView: View
 
     private var adapter = BaseMultiAdapter(getItemLayouts(), this)
 
+    //    val listModel by viewModels<BaseListVM<Data>> {
+//        MyViewModelFactory(this) {
+//
+//        }
+//    }
     val listModel by viewModels<BaseListVM<Data>> {
-        MyViewModelFactory(this, loader = ::loader)
+        MyViewModelFactory<Data>(this) {
+            refresh(refreshLayout, true)
+        }
     }
 
     //    private val groupAdapter = GroupAdapter<GroupieViewHolder>()
@@ -72,18 +106,25 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
         return ArrayList<Int>().apply { add(defaultItem) }
     }
 
-    abstract suspend fun loader(): Status<List<Data>>
+    abstract suspend fun loader(params: PageInfo): Status<List<Data>>
 
     private val binding by viewBinding<FragmentCommonListBinding>()
 
     override fun refresh(view: View, isManualRefresh: Boolean) {
-        listModel.intent { loader() }
+        refreshLayout.isRefreshing = true
+        adapter.loadMoreModule.isEnableLoadMore = false
+        pageInfo.reset()
+        loadList(pageInfo)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        refreshLayout = view.findViewById(R.id.refresh_layout)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = super.onCreateView(inflater, container, savedInstanceState)
+        Log.d(TAG, "onCreateView")
+        refreshLayout = view!!.findViewById(R.id.refresh_layout)
         recyclerView = view.findViewById(R.id.list_view)
 //        refreshLayout = binding.refreshLayout
 //        progressBar = binding.progressCircular
@@ -91,11 +132,19 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
             refresh(view, true)
         }
 
-        initRV()
+        initRV(view)
         listModel.observe(viewLifecycleOwner, state = ::render, sideEffect = ::sideEffect)
+
+        return view
     }
 
-    private fun initRV() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.d(TAG, "onViewCreated")
+
+    }
+
+    private fun initRV(view: View) {
         emptyView = layoutInflater.inflate(R.layout.layout_empty, view as ViewGroup, false)
         emptyView.findViewById<View>(R.id.refresh_btn).setOnClickListener {
 //            refreshLayout.isRefreshing = true
@@ -114,14 +163,53 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
 //            addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
 //        }
 
-        adapter.loadMoreModule.setOnLoadMoreListener(OnLoadMoreListener { loadMore() })
+        adapter.loadMoreModule.setOnLoadMoreListener {
+            Log.d(TAG, "onloadMore pageinfo=${pageInfo.page}")
+            Toast.makeText(context, "加载更多", Toast.LENGTH_LONG).show()
+            refreshLayout.isRefreshing = true
+            loadList(pageInfo) //请求下一页数据
+        }
         adapter.loadMoreModule.isAutoLoadMore = true
         //当自动加载开启，同时数据不满一屏时，是否继续执行自动加载更多(默认为true)
         adapter.loadMoreModule.isEnableLoadMoreIfNotFullPage = false
+        adapter.setOnItemClickListener(object : OnItemClickListener {
+            override fun onItemClick(adapter: BaseQuickAdapter<*, *>, view: View, position: Int) {
+                listModel.onItemClicked(adapter.data.get(position) as Data)
+            }
+
+        })
     }
 
-    fun loadMore() {
-        Toast.makeText(context, "加载更多", Toast.LENGTH_LONG).show()
+    fun loadList(pageInfo: PageInfo) {
+        Log.d(TAG, "loadList pageinfo=${pageInfo.page}")
+        listModel.intent {
+            //这里的参数使用封装过的类,便于传其他类型的下一页数据
+            val status = loader(pageInfo)
+//            Log.d(TAG, "loadList finished = ${status}")
+            reduce {
+                when (status) {
+                    //需要在原有数据上添加
+                    is Status.Success -> {
+                        val newdata = status.data
+                        val newstate: BaseState<Data>
+                        //如果为第一次加载，则直接返回
+                        if (pageInfo.isFirstPage) {
+                            newstate = state.copy(values = newdata, error = null, isEnd = false)
+                        } else {
+                            //如果长度为0或不足pagesize，则返回已加载完成
+                            newstate = state.copy(
+                                values = state.values + newdata, error = null,
+                                isEnd = newdata.isEmpty() || newdata.size < pageInfo.pageSize
+                            )
+                        }
+                        pageInfo.nextPage()//请求成功计数+1,更新下一页参数 nextParams
+                        newstate
+                    }
+                    //如果加载失败,返回错误信息
+                    is Status.Failure -> state.copy(error = status.exception)
+                }
+            }
+        }
     }
 
     fun render(state: BaseState<Data>) {
@@ -130,18 +218,36 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
 //        }
 //
 //        groupAdapter.update(items)
+        Log.d(TAG, "render pageinfo=${pageInfo.page} itemcounts=${state.values.size}")
+        if (state.error != null) {
+            adapter.loadMoreModule.loadMoreFail()
+            Toast.makeText(context, "加载出错 ${state.error}", Toast.LENGTH_LONG).show()
+        } else {
+            adapter.setList(state.values)
+            if (state.isEnd) {
+                Toast.makeText(context, "已加载完成所有", Toast.LENGTH_SHORT).show()
+                adapter.loadMoreModule.loadMoreEnd()
+            } else {
+                Toast.makeText(context, "已加载完当前页", Toast.LENGTH_SHORT).show()
+                adapter.loadMoreModule.loadMoreComplete()
+            }
+        }
         refreshLayout.isRefreshing = false
-//        adapter.setList(state.values)
-
+        adapter.loadMoreModule.isEnableLoadMore = true
     }
 
     //跳转详情
     private fun sideEffect(sideEffect: Event) {
         when (sideEffect) {
-            is DertailEvent<*> -> {
-                findNavController().navigate(R.id.nav_settings)
+            is DetailEvent<*> -> {
+                Log.d(TAG, "sideEffect event ${sideEffect.value}")
+                findNavController().navigate(
+                    R.id.nav_settings,
+                    bundleOf("item" to (sideEffect.value as BaseModel).getItemId()),
+                    NavOptions.Builder().setHorizontalSlide().build()
+                )
 //                findNavController().navigate(
-//                    PostListFragmentDirections.actionListFragmentToDetailFragment(
+//                    SettingsFragmentDi.actionListFragmentToDetailFragment(
 //                        sideEffect.post
 //                    )
 //                )
@@ -150,18 +256,13 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-//        binding = null
-    }
 }
-
 
 
 class MyViewModelFactory<DataClass : Parcelable>(
     owner: SavedStateRegistryOwner,
-    val loader: (suspend () -> Status<List<DataClass>>),
-    defaultArgs: Bundle? = null
+    defaultArgs: Bundle? = null,
+    val onCreate: (() -> Unit)? = null,
 ) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
 
     override fun <T : ViewModel?> create(
@@ -170,7 +271,7 @@ class MyViewModelFactory<DataClass : Parcelable>(
         handle: SavedStateHandle
     ): T {
         val repository: Repository = getK()
-        return BaseListVM(loader, handle, repository) as T
+        return BaseListVM<DataClass>(handle, repository, onCreate = onCreate) as T
     }
 }
 

@@ -14,7 +14,6 @@ data class PostData(
 //    override fun getItemType(): Int {
 //        return R.layout.item_text_view
 //    }
-
     override fun getItemId(): String {
         return "$id"
     }

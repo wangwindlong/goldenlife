@@ -10,8 +10,10 @@ import kotlinx.parcelize.TypeParceler
 @Parcelize
 //@TypeParceler<ExternalClass<T>, ExternalClassParceler>()
 data class BaseState<T : Parcelable>(
-    val values: List<T> = emptyList(),
-    val value: T? = null
+    val values: List<T> = arrayListOf(),
+    val value: T? = null,
+    val error: Throwable? = null,
+    val isEnd: Boolean = false
 ) : Parcelable
 
 //@Parcelize

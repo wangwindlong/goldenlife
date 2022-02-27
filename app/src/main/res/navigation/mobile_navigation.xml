@@ -27,6 +27,10 @@
         android:id="@+id/nav_settings"
         android:name="net.wangyl.goldenlife.ui.settings.SettingsFragment"
         android:label="@string/menu_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings" >
+        <argument
+            android:name="item"
+            app:argType="string" />
+    </fragment>
 
 </navigation>

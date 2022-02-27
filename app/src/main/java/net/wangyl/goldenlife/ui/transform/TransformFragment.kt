@@ -1,6 +1,7 @@
 package net.wangyl.goldenlife.ui.transform
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,7 +46,13 @@ class TransformFragment : Fragment() {
         transformViewModel.texts.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
+        Log.d("TransformFragment", "onCreateView")
         return root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d("TransformFragment", "onViewCreated")
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onDestroyView() {

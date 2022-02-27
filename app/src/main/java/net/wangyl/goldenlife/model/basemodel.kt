@@ -6,7 +6,7 @@ import net.wangyl.goldenlife.ui.defaultItem
 import java.io.Serializable
 
 interface BaseListModel<Key : Any, T> {
-    val displayList: List<T>?
+    val displayList: T?
     val nextKey: Key?
 }
 
