@@ -1,11 +1,7 @@
-package net.wangyl.goldenlife.mvi
+package net.wangyl.goldenlife.mvi.base
 
-import android.os.Parcel
 import android.os.Parcelable
-import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.parcel.RawValue
-import kotlinx.parcelize.TypeParceler
 
 @Parcelize
 //@TypeParceler<ExternalClass<T>, ExternalClassParceler>()

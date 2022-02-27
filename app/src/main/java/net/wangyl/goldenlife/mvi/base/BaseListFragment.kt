@@ -1,4 +1,4 @@
-package net.wangyl.goldenlife.ui
+package net.wangyl.goldenlife.mvi.base
 
 import android.os.Bundle
 import android.os.Parcelable
@@ -24,31 +24,23 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.delegate.BaseMultiTypeDelegate
 import com.chad.library.adapter.base.listener.OnItemClickListener
-import com.chad.library.adapter.base.listener.OnLoadMoreListener
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.api.Repository
 import net.wangyl.goldenlife.api.Status
-import net.wangyl.goldenlife.base.BaseMultiAdapter
-import net.wangyl.goldenlife.base.IBindItem
+import net.wangyl.goldenlife.mvi.base.BaseMultiAdapter
+import net.wangyl.goldenlife.mvi.base.IBindItem
 import net.wangyl.goldenlife.databinding.FragmentCommonListBinding
+import net.wangyl.goldenlife.extension.getK
 import net.wangyl.goldenlife.extension.setHorizontalSlide
 import net.wangyl.goldenlife.extension.viewBinding
 import net.wangyl.goldenlife.model.BaseItem
 import net.wangyl.goldenlife.model.BaseModel
-import net.wangyl.goldenlife.mvi.BaseListVM
-import net.wangyl.goldenlife.mvi.BaseState
-import net.wangyl.goldenlife.mvi.DetailEvent
-import net.wangyl.goldenlife.mvi.Event
-import net.wangyl.goldenlife.ui.settings.SettingsFragment
-import org.koin.core.qualifier.Qualifier
-import org.koin.java.KoinJavaComponent.get
+import net.wangyl.goldenlife.mvi.base.BaseListVM
+import net.wangyl.goldenlife.mvi.base.BaseState
 import org.orbitmvi.orbit.syntax.simple.intent
-import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.observe
-import java.lang.Exception
-import java.lang.NullPointerException
 
 interface RefreshEvent {
     fun refresh(view: View, isManualRefresh: Boolean)
@@ -289,10 +281,6 @@ class MultiTypeDelegate<Data>(layouts: List<Int>) : BaseMultiTypeDelegate<Data>(
         return if (item is BaseItem) item.getItemType() else defaultItem
     }
 
-}
-
-inline fun <reified T> getK(qualifier: Qualifier? = null): T {
-    return get(T::class.java, qualifier)
 }
 
 //inline fun <reified DataClass : Parcelable> Fragment.listViewModel(

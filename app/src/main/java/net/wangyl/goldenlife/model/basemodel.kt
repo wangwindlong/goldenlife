@@ -1,8 +1,7 @@
 package net.wangyl.goldenlife.model
 
 import android.os.Parcelable
-import net.wangyl.goldenlife.R
-import net.wangyl.goldenlife.ui.defaultItem
+import net.wangyl.goldenlife.mvi.base.defaultItem
 import java.io.Serializable
 
 interface BaseListModel<Key : Any, T> {

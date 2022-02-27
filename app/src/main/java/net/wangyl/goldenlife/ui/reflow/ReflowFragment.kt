@@ -1,12 +1,16 @@
 package net.wangyl.goldenlife.ui.reflow
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.snackbar.Snackbar
 import net.wangyl.goldenlife.databinding.FragmentReflowBinding
 
 class ReflowFragment : Fragment() {
@@ -16,7 +20,8 @@ class ReflowFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-
+    private val viewModel by viewModels<ReflowViewModel>()
+    
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -31,6 +36,33 @@ class ReflowFragment : Fragment() {
         val textView: TextView = binding.textReflow
         reflowViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
+        }
+
+        binding.textReflow.setOnClickListener {
+            viewModel.login("raheem", "android")
+        }
+
+        lifecycleScope.launchWhenCreated {
+            viewModel.loginUIState.collect {
+                Log.d("ReflowFragment", "receive state = ${it}")
+                when (it) {
+                    is ReflowViewModel.LoginUIState.Loading -> {
+//                        progressBar.visibility = View.VISIBLE
+                    }
+
+                    is ReflowViewModel.LoginUIState.Success -> {
+                        Snackbar.make(binding.root, "Successfully logged in", Snackbar.LENGTH_SHORT).show()
+//                        progressBar.visibility = View.GONE
+                    }
+
+                    is ReflowViewModel.LoginUIState.Error -> {
+                        Snackbar.make(binding.root, it.message, Snackbar.LENGTH_SHORT).show()
+//                        progressBar.visibility = View.GONE
+                    }
+
+                    else -> Unit
+                }
+            }
         }
         return root
     }

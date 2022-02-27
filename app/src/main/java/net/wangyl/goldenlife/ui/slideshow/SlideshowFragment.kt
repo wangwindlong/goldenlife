@@ -4,11 +4,11 @@ import androidx.paging.PagingSource
 import net.wangyl.goldenlife.api.Repository
 import net.wangyl.goldenlife.api.Status
 import net.wangyl.goldenlife.databinding.ItemTextViewBinding
+import net.wangyl.goldenlife.extension.getK
 import net.wangyl.goldenlife.model.PostData
-import net.wangyl.goldenlife.ui.BaseListFragment
-import net.wangyl.goldenlife.ui.MyBaseViewHolder
-import net.wangyl.goldenlife.ui.PageInfo
-import net.wangyl.goldenlife.ui.getK
+import net.wangyl.goldenlife.mvi.base.BaseListFragment
+import net.wangyl.goldenlife.mvi.base.MyBaseViewHolder
+import net.wangyl.goldenlife.mvi.base.PageInfo
 
 class SlideshowFragment : BaseListFragment<PostData>() {
 

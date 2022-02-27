@@ -1,4 +1,4 @@
-package net.wangyl.goldenlife.base
+package net.wangyl.goldenlife.mvi.base
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,8 +8,6 @@ import androidx.recyclerview.widget.DiffUtil
 import com.chad.library.adapter.base.BaseDelegateMultiAdapter
 import com.chad.library.adapter.base.module.LoadMoreModule
 import net.wangyl.goldenlife.model.BaseModel
-import net.wangyl.goldenlife.ui.MultiTypeDelegate
-import net.wangyl.goldenlife.ui.MyBaseViewHolder
 import java.lang.NullPointerException
 
 class BaseMultiAdapter<Data : BaseModel>(layouts: List<Int>, val binder: IBindItem<Data, MyBaseViewHolder>):

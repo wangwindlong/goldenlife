@@ -1,4 +1,4 @@
-package net.wangyl.goldenlife.mvi
+package net.wangyl.goldenlife.mvi.base
 
 
 interface Event
