@@ -25,13 +25,13 @@ import net.wangyl.goldenlife.model.ListModel
 import net.wangyl.goldenlife.model.PostData
 
 sealed class Status<T : Any>: ListModel<T> {
+
     data class Success<T : Any>(val data: T) : Status<T>() {
         override val displayList: T
             get() = data
         override val nextKey: Int
             get() = 0
     }
-
     data class Failure<T : Any>(val exception: Exception) : Status<T>() {
         override val displayList: T?
             get() = null

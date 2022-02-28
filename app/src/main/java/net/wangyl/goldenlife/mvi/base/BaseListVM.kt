@@ -20,13 +20,14 @@ class BaseListVM<DataClass : Parcelable>(
 ) :
     ViewModel(), ContainerHost<BaseState<DataClass>, Event> {
 //    BaseEvent<PostData>
+    val pageInfo = PageInfo()
 
     init {
         Log.d("BaseListVM", "repository=$repository")
     }
 
     override val container = container<BaseState<DataClass>, Event>(
-        initialState = BaseState(),
+        initialState = BaseState(isFirst = true),
         savedStateHandle = savedStateHandle,
         settings = Container.Settings(exceptionHandler = exceptionHandler)
     ) {

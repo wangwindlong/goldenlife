@@ -72,7 +72,6 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
 //    private val refreshViewModel: RefreshViewModel by viewModels()
 //    protected val wtfViewModel: WTFViewModel by viewModels()
 
-    val pageInfo = PageInfo()
     lateinit var refreshLayout: SwipeRefreshLayout
     lateinit var recyclerView: RecyclerView
     lateinit var emptyView: View
@@ -86,6 +85,7 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
 //    }
     val listModel by viewModels<BaseListVM<Data>> {
         MyViewModelFactory<Data>(this) {
+            Log.d(TAG, "BaseListVM init call refresh")
             refresh(refreshLayout, true)
         }
     }
@@ -93,7 +93,6 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
     //    private val groupAdapter = GroupAdapter<GroupieViewHolder>()
     // 可以直接快速使用，也可以继承BaseBinderAdapter类，重写自己的相关方法
 
-    @CallSuper
     fun getItemLayouts(): List<Int> {
         return ArrayList<Int>().apply { add(defaultItem) }
     }
@@ -103,10 +102,9 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
     private val binding by viewBinding<FragmentCommonListBinding>()
 
     override fun refresh(view: View, isManualRefresh: Boolean) {
-        refreshLayout.isRefreshing = true
         adapter.loadMoreModule.isEnableLoadMore = false
-        pageInfo.reset()
-        loadList(pageInfo)
+        listModel.pageInfo.reset()
+        loadList(listModel.pageInfo)
     }
 
     override fun onCreateView(
@@ -115,18 +113,18 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
         savedInstanceState: Bundle?
     ): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
-        Log.d(TAG, "onCreateView")
+        Log.d(TAG, "onCreateView pageinfo=${listModel.pageInfo.page}")
         refreshLayout = view!!.findViewById(R.id.refresh_layout)
         recyclerView = view.findViewById(R.id.list_view)
 //        refreshLayout = binding.refreshLayout
 //        progressBar = binding.progressCircular
         refreshLayout.setOnRefreshListener {
+            Log.d(TAG, "onrefresh listener call refresh")
             refresh(view, true)
         }
 
         initRV(view)
         listModel.observe(viewLifecycleOwner, state = ::render, sideEffect = ::sideEffect)
-
         return view
     }
 
@@ -140,6 +138,7 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
         emptyView = layoutInflater.inflate(R.layout.layout_empty, view as ViewGroup, false)
         emptyView.findViewById<View>(R.id.refresh_btn).setOnClickListener {
 //            refreshLayout.isRefreshing = true
+            Log.d(TAG, "fresh button clicked call refresh")
             refresh(it, true)
             Toast.makeText(context, "刷新", Toast.LENGTH_LONG).show()
         }
@@ -156,10 +155,9 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
 //        }
 
         adapter.loadMoreModule.setOnLoadMoreListener {
-            Log.d(TAG, "onloadMore pageinfo=${pageInfo.page}")
+            Log.d(TAG, "onloadMore pageinfo=${listModel.pageInfo.page}")
             Toast.makeText(context, "加载更多", Toast.LENGTH_LONG).show()
-            refreshLayout.isRefreshing = true
-            loadList(pageInfo) //请求下一页数据
+            loadList(listModel.pageInfo) //请求下一页数据
         }
         adapter.loadMoreModule.isAutoLoadMore = true
         //当自动加载开启，同时数据不满一屏时，是否继续执行自动加载更多(默认为true)
@@ -173,11 +171,12 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
     }
 
     fun loadList(pageInfo: PageInfo) {
+        refreshLayout.isRefreshing = true
         Log.d(TAG, "loadList pageinfo=${pageInfo.page}")
         listModel.intent {
             //这里的参数使用封装过的类,便于传其他类型的下一页数据
             val status = loader(pageInfo)
-//            Log.d(TAG, "loadList finished = ${status}")
+            Log.d(TAG, "loadList finished state=${state.isFirst}")
             reduce {
                 when (status) {
                     //需要在原有数据上添加
@@ -186,20 +185,25 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
                         val newstate: BaseState<Data>
                         //如果为第一次加载，则直接返回
                         if (pageInfo.isFirstPage) {
-                            newstate = state.copy(values = newdata, error = null, isEnd = false)
+                            newstate = state.copy(values = newdata, error = null, isFirst = false, isEnd = false, _count = state._count + 1)
                         } else {
                             //如果长度为0或不足pagesize，则返回已加载完成
-                            newstate = state.copy(
-                                values = state.values + newdata, error = null,
-                                isEnd = newdata.isEmpty() || newdata.size < pageInfo.pageSize
-                            )
+                            newstate = state.copy(values = state.values + newdata, error = null, isFirst = false,
+                                isEnd = newdata.isEmpty() || newdata.size < pageInfo.pageSize, _count = state._count + 1)
                         }
                         pageInfo.nextPage()//请求成功计数+1,更新下一页参数 nextParams
                         newstate
                     }
                     //如果加载失败,返回错误信息
-                    is Status.Failure -> state.copy(error = status.exception)
+                    is Status.Failure -> {
+                        if (!pageInfo.isFirstPage) {
+                            adapter.loadMoreModule.loadMoreFail()
+                        }
+                        Toast.makeText(context, "加载出错 ${status.exception}", Toast.LENGTH_LONG).show()
+                        state.copy(error = status.exception, isFirst = false)
+                    }
                 }
+
             }
         }
     }
@@ -210,9 +214,12 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
 //        }
 //
 //        groupAdapter.update(items)
-        Log.d(TAG, "render pageinfo=${pageInfo.page} itemcounts=${state.values.size}")
-        if (state.error != null) {
-            adapter.loadMoreModule.loadMoreFail()
+        Log.d(TAG, "render pageinfo=${listModel.pageInfo.page} itemcounts=${state.values.size} state=${state.isFirst}")
+        if (state.isFirst) { //去掉第一次初始化的回调, 主要为退出页面后再进来会再次调用该方法
+            if (state.values.isNotEmpty()) adapter.setList(state.values)
+            return
+        } else if (state.error != null) {
+            if (!listModel.pageInfo.isFirstPage) adapter.loadMoreModule.loadMoreFail()
             Toast.makeText(context, "加载出错 ${state.error}", Toast.LENGTH_LONG).show()
         } else {
             adapter.setList(state.values)
@@ -221,15 +228,16 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
                 adapter.loadMoreModule.loadMoreEnd()
             } else {
                 Toast.makeText(context, "已加载完当前页", Toast.LENGTH_SHORT).show()
-                adapter.loadMoreModule.loadMoreComplete()
             }
         }
+        adapter.loadMoreModule.loadMoreComplete()
         refreshLayout.isRefreshing = false
         adapter.loadMoreModule.isEnableLoadMore = true
     }
 
     //跳转详情
     private fun sideEffect(sideEffect: Event) {
+        Log.d(TAG, "sideEffect event ${sideEffect}")
         when (sideEffect) {
             is DetailEvent<*> -> {
                 Log.d(TAG, "sideEffect event ${sideEffect.value}")
@@ -248,6 +256,16 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d(TAG, "onDestroyView pageinfo=${listModel.pageInfo.page}")
+        listModel.intent {
+            reduce {
+                Log.d(TAG, "onDestroyView intent count=${state.values.size} isFirst=${state.isFirst}")
+                state.copy(isFirst = true)
+            }
+        }
+    }
 }
 
 
