@@ -22,4 +22,6 @@ class SlideshowFragment : BaseListFragment<PostData>() {
         (holder.dataBinding as ItemTextViewBinding).tv.text = item.getItemContent()
     }
 
+
+
 }

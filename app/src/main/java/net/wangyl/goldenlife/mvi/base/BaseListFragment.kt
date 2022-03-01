@@ -16,6 +16,7 @@ import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavOptions
+import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -98,6 +99,10 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
     }
 
     abstract suspend fun loader(params: PageInfo): Status<List<Data>>
+
+    fun navigateTo(data: Data, id: Int, bundle: Bundle? = null, extras: FragmentNavigator.Extras? = null) {
+        findNavController().navigate(id, bundle, NavOptions.Builder().setHorizontalSlide().build(), extras)
+    }
 
     private val binding by viewBinding<FragmentCommonListBinding>()
 
@@ -195,13 +200,8 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
                         newstate
                     }
                     //如果加载失败,返回错误信息
-                    is Status.Failure -> {
-                        if (!pageInfo.isFirstPage) {
-                            adapter.loadMoreModule.loadMoreFail()
-                        }
-                        Toast.makeText(context, "加载出错 ${status.exception}", Toast.LENGTH_LONG).show()
-                        state.copy(error = status.exception, isFirst = false)
-                    }
+                    is Status.Failure -> state.copy(error = status.exception, isFirst = false)
+
                 }
 
             }
@@ -241,11 +241,9 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
         when (sideEffect) {
             is DetailEvent<*> -> {
                 Log.d(TAG, "sideEffect event ${sideEffect.value}")
-                findNavController().navigate(
-                    R.id.nav_settings,
-                    bundleOf("item" to (sideEffect.value as BaseModel).getItemId()),
-                    NavOptions.Builder().setHorizontalSlide().build()
-                )
+                navigateTo(sideEffect.value as Data, R.id.nav_settings,
+                    bundleOf("item" to sideEffect.value.getItemId()))
+
 //                findNavController().navigate(
 //                    SettingsFragmentDi.actionListFragmentToDetailFragment(
 //                        sideEffect.post
