@@ -15,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
@@ -68,7 +69,7 @@ class PageInfo {
 
 abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragment_common_list) :
     Fragment(layoutId), RefreshEvent, IBindItem<Data, MyBaseViewHolder> {
-    private val TAG = javaClass.simpleName
+    val TAG = javaClass.simpleName
 
 //    private val refreshViewModel: RefreshViewModel by viewModels()
 //    protected val wtfViewModel: WTFViewModel by viewModels()
@@ -86,7 +87,6 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
 //    }
     val listModel by viewModels<BaseListVM<Data>> {
         MyViewModelFactory<Data>(this) {
-            Log.d(TAG, "BaseListVM init call refresh")
             refresh(refreshLayout, true)
         }
     }
@@ -99,10 +99,6 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
     }
 
     abstract suspend fun loader(params: PageInfo): Status<List<Data>>
-
-    fun navigateTo(data: Data, id: Int, bundle: Bundle? = null, extras: FragmentNavigator.Extras? = null) {
-        findNavController().navigate(id, bundle, NavOptions.Builder().setHorizontalSlide().build(), extras)
-    }
 
     private val binding by viewBinding<FragmentCommonListBinding>()
 
@@ -118,13 +114,11 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
         savedInstanceState: Bundle?
     ): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
-        Log.d(TAG, "onCreateView pageinfo=${listModel.pageInfo.page}")
         refreshLayout = view!!.findViewById(R.id.refresh_layout)
         recyclerView = view.findViewById(R.id.list_view)
 //        refreshLayout = binding.refreshLayout
 //        progressBar = binding.progressCircular
         refreshLayout.setOnRefreshListener {
-            Log.d(TAG, "onrefresh listener call refresh")
             refresh(view, true)
         }
 
@@ -134,8 +128,6 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Log.d(TAG, "onViewCreated")
 
     }
 
@@ -143,7 +135,6 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
         emptyView = layoutInflater.inflate(R.layout.layout_empty, view as ViewGroup, false)
         emptyView.findViewById<View>(R.id.refresh_btn).setOnClickListener {
 //            refreshLayout.isRefreshing = true
-            Log.d(TAG, "fresh button clicked call refresh")
             refresh(it, true)
             Toast.makeText(context, "刷新", Toast.LENGTH_LONG).show()
         }
@@ -160,8 +151,6 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
 //        }
 
         adapter.loadMoreModule.setOnLoadMoreListener {
-            Log.d(TAG, "onloadMore pageinfo=${listModel.pageInfo.page}")
-            Toast.makeText(context, "加载更多", Toast.LENGTH_LONG).show()
             loadList(listModel.pageInfo) //请求下一页数据
         }
         adapter.loadMoreModule.isAutoLoadMore = true
@@ -177,7 +166,6 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
 
     fun loadList(pageInfo: PageInfo) {
         refreshLayout.isRefreshing = true
-        Log.d(TAG, "loadList pageinfo=${pageInfo.page}")
         listModel.intent {
             //这里的参数使用封装过的类,便于传其他类型的下一页数据
             val status = loader(pageInfo)
@@ -190,11 +178,22 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
                         val newstate: BaseState<Data>
                         //如果为第一次加载，则直接返回
                         if (pageInfo.isFirstPage) {
-                            newstate = state.copy(values = newdata, error = null, isFirst = false, isEnd = false, _count = state._count + 1)
+                            newstate = state.copy(
+                                values = newdata,
+                                error = null,
+                                isFirst = false,
+                                isEnd = false,
+                                _count = state._count + 1
+                            )
                         } else {
                             //如果长度为0或不足pagesize，则返回已加载完成
-                            newstate = state.copy(values = state.values + newdata, error = null, isFirst = false,
-                                isEnd = newdata.isEmpty() || newdata.size < pageInfo.pageSize, _count = state._count + 1)
+                            newstate = state.copy(
+                                values = state.values + newdata,
+                                error = null,
+                                isFirst = false,
+                                isEnd = newdata.isEmpty() || newdata.size < pageInfo.pageSize,
+                                _count = state._count + 1
+                            )
                         }
                         pageInfo.nextPage()//请求成功计数+1,更新下一页参数 nextParams
                         newstate
@@ -214,7 +213,10 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
 //        }
 //
 //        groupAdapter.update(items)
-        Log.d(TAG, "render pageinfo=${listModel.pageInfo.page} itemcounts=${state.values.size} state=${state.isFirst}")
+        Log.d(
+            TAG,
+            "render pageinfo=${listModel.pageInfo.page} itemcounts=${state.values.size} state=${state.isFirst}"
+        )
         if (state.isFirst) { //去掉第一次初始化的回调, 主要为退出页面后再进来会再次调用该方法
             if (state.values.isNotEmpty()) adapter.setList(state.values)
             return
@@ -236,22 +238,7 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
     }
 
     //跳转详情
-    private fun sideEffect(sideEffect: Event) {
-        Log.d(TAG, "sideEffect event ${sideEffect}")
-        when (sideEffect) {
-            is DetailEvent<*> -> {
-                Log.d(TAG, "sideEffect event ${sideEffect.value}")
-                navigateTo(sideEffect.value as Data, R.id.nav_settings,
-                    bundleOf("item" to sideEffect.value.getItemId()))
-
-//                findNavController().navigate(
-//                    SettingsFragmentDi.actionListFragmentToDetailFragment(
-//                        sideEffect.post
-//                    )
-//                )
-            }
-
-        }
+    open fun sideEffect(event: Event) {
     }
 
     override fun onDestroyView() {
@@ -259,7 +246,10 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
         Log.d(TAG, "onDestroyView pageinfo=${listModel.pageInfo.page}")
         listModel.intent {
             reduce {
-                Log.d(TAG, "onDestroyView intent count=${state.values.size} isFirst=${state.isFirst}")
+                Log.d(
+                    TAG,
+                    "onDestroyView intent count=${state.values.size} isFirst=${state.isFirst}"
+                )
                 state.copy(isFirst = true)
             }
         }

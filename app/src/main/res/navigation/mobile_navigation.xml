@@ -29,8 +29,13 @@
         android:label="@string/menu_settings"
         tools:layout="@layout/fragment_settings" >
         <argument
+            android:name="itemId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
             android:name="item"
-            app:argType="string" />
+            app:argType="net.wangyl.goldenlife.model.PostData" />
     </fragment>
 
 </navigation>

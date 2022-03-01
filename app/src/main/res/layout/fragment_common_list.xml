@@ -13,40 +13,19 @@
             android:id="@+id/bg_layout"
             layout="@layout/default_page_background" />
 
-        <LinearLayout
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <FrameLayout
-                android:id="@+id/toolbar_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/root_layout"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/list_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-                    android:id="@+id/refresh_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+            </androidx.recyclerview.widget.RecyclerView>
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/list_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                    </androidx.recyclerview.widget.RecyclerView>
-
-                </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-            </FrameLayout>
-
-        </LinearLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     </FrameLayout>
 
