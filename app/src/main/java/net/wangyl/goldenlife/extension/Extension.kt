@@ -1,6 +1,8 @@
 package net.wangyl.goldenlife.extension
 
 import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.annotation.StringRes
@@ -38,4 +40,12 @@ fun Activity.toast(@StringRes message: Int) {
 
 fun Activity.toast(message: String?) {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+}
+
+inline fun <reified T> Fragment.startActivity() {
+    startActivity(Intent(context, T::class.java))
+}
+
+inline fun <reified T> Context.startActivity() {
+    startActivity(Intent(this, T::class.java))
 }

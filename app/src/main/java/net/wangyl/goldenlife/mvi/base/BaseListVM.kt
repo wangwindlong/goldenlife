@@ -12,29 +12,8 @@ import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.viewmodel.container
 
-class BaseListVM<DataClass : Parcelable>(
-    savedStateHandle: SavedStateHandle, private val repository: Repository? = null,
-    exceptionHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        Log.e("BaseListVM", "orbit caught the exception ", throwable)
-    }, onCreate: (() -> Unit)? = null
-) :
-    ViewModel(), ContainerHost<BaseState<DataClass>, Event> {
+class BaseListVM<DataClass : Parcelable>(handle: SavedStateHandle) : BaseVM<DataClass>(handle) {
 //    BaseEvent<PostData>
-    val pageInfo = PageInfo()
-
-    init {
-        Log.d("BaseListVM", "repository=$repository")
-    }
-
-    override val container = container<BaseState<DataClass>, Event>(
-        initialState = BaseState(isFirst = true),
-        savedStateHandle = savedStateHandle,
-        settings = Container.Settings(exceptionHandler = exceptionHandler)
-    ) {
-        if (it.values.isEmpty()) {
-            onCreate?.invoke()
-        }
-    }
 
     //增加封装过的参数？确定加载第几页数据，是否要加载下一页数据
 //    private fun loadList() = intent {
@@ -63,8 +42,5 @@ class BaseListVM<DataClass : Parcelable>(
 //        }
 //    }
 
-    fun onItemClicked(post: DataClass) = intent {
-        postSideEffect(DetailEvent(post))
-    }
 
 }

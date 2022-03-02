@@ -6,33 +6,35 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import net.wangyl.goldenlife.api.Repository
+import net.wangyl.goldenlife.extension.getK
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.viewmodel.container
 
-class BaseVM<DataClass : Parcelable>(
-    savedStateHandle: SavedStateHandle, private val repository: Repository? = null,
-    exceptionHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        Log.e("BaseListVM", "orbit caught the exception ", throwable)
-    }, onCreate: (() -> Unit)? = null
-) :
-    ViewModel(), ContainerHost<BaseState<DataClass>, Event> {
-//    BaseEvent<PostData>
+open class BaseVM<Data : Parcelable>(savedStateHandle: SavedStateHandle) : ViewModel(), ContainerHost<BaseState<Data>, Event> {
+    //    BaseEvent<PostData>
+
+    val TAG = javaClass.simpleName
+    private val repository: Repository? = getK()
+    val pageInfo = PageInfo()
+
+    var exceptionHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Log.e(TAG, "orbit caught the exception ", throwable)
+    }
+    open var onInit: (() -> Unit)? = null
 
     init {
-        Log.d("BaseVM", "repository=$repository")
+        Log.d(TAG, "repository=$repository")
     }
 
-    override val container = container<BaseState<DataClass>, Event>(
-        initialState = BaseState(),
+    override val container = container<BaseState<Data>, Event>(
+        initialState = BaseState(isFirst = true),
         savedStateHandle = savedStateHandle,
         settings = Container.Settings(exceptionHandler = exceptionHandler)
     ) {
-        if (it.value == null) {
-            onCreate?.invoke()
-        }
+        onInit?.invoke()
     }
 
     //增加封装过的参数？确定加载第几页数据，是否要加载下一页数据
@@ -62,8 +64,7 @@ class BaseVM<DataClass : Parcelable>(
 //        }
 //    }
 
-    fun onItemClicked(post: DataClass) = intent {
+    fun onItemClicked(post: Data) = intent {
         postSideEffect(DetailEvent(post))
     }
-
 }

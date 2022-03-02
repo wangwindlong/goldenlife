@@ -79,7 +79,7 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
 
     private var adapter = BaseMultiAdapter(getItemLayouts(), this)
 
-    val listModel by listViewModel<Data>(this) {
+    val listModel by mviViewModel<Data>(this) {
         refresh(refreshLayout, true)
     }
 //    val listModel by viewModels<BaseListVM<Data>> {
@@ -175,11 +175,7 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
                         val newstate: BaseState<Data>
                         //如果为第一次加载，则直接返回
                         if (pageInfo.isFirstPage) {
-                            newstate = state.copy(
-                                values = newdata,
-                                error = null,
-                                isFirst = false,
-                                isEnd = false,
+                            newstate = state.copy(values = newdata, error = null, isFirst = false, isEnd = false,
                                 _count = state._count + 1
                             )
                         } else {
@@ -253,21 +249,24 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
     }
 }
 
-
-class MyViewModelFactory<DataClass : Parcelable>(
+fun <DataClass : Parcelable> Fragment.mviViewModel(
     owner: SavedStateRegistryOwner,
     defaultArgs: Bundle? = null,
-    val onCreate: (() -> Unit)? = null,
-) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
-
-    override fun <T : ViewModel?> create(
-        key: String,
-        modelClass: Class<T>,
-        handle: SavedStateHandle
-    ): T {
-        val repository: Repository = getK()
-        return BaseListVM<DataClass>(handle, repository, onCreate = onCreate) as T
-    }
+    onCreate: (() -> Unit)? = null,
+): Lazy<BaseVM<DataClass>> {
+    return this.viewModels(factoryProducer = {
+        object : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
+            override fun <T : ViewModel?> create(
+                key: String,
+                modelClass: Class<T>,
+                handle: SavedStateHandle
+            ): T {
+                return BaseVM<DataClass>(handle).apply {
+                    onInit = onCreate
+                } as T
+            }
+        }
+    })
 }
 
 class MyBaseViewHolder(view: View) : BaseViewHolder(view) {

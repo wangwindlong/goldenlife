@@ -72,9 +72,9 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
 
-    def smart_version = "2.0.5"
-    implementation "io.github.scwang90:refresh-layout-kernel:$smart_version"
-    implementation "io.github.scwang90:refresh-header-classics:$smart_version"
+//    def smart_version = "2.0.5"
+//    implementation "io.github.scwang90:refresh-layout-kernel:$smart_version"
+//    implementation "io.github.scwang90:refresh-header-classics:$smart_version"
 
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7'
     implementation "androidx.paging:paging-runtime:$paging_version"

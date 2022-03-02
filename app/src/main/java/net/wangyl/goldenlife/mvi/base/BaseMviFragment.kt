@@ -29,10 +29,9 @@ open class BaseMviFragment<Data : BaseModel>(layoutId: Int = R.layout.fragment_c
     val TAG = javaClass.simpleName
     private var param1: String? = null
     private var param2: String? = null
-    val vm by viewModels<BaseVM<Data>> {
-        BaseViewModelFactory<Data>(this) {
-//            refresh(refreshLayout, true)
-        }
+    val vm by mviViewModel<Data>(this) {
+        //init
+//        refresh(refreshLayout, true)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,21 +67,5 @@ open class BaseMviFragment<Data : BaseModel>(layoutId: Int = R.layout.fragment_c
                     putString(ARG_PARAM2, param2)
                 }
             }
-    }
-}
-
-class BaseViewModelFactory<DataClass : Parcelable>(
-    owner: SavedStateRegistryOwner,
-    defaultArgs: Bundle? = null,
-    val onCreate: (() -> Unit)? = null,
-) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
-
-    override fun <T : ViewModel?> create(
-        key: String,
-        modelClass: Class<T>,
-        handle: SavedStateHandle
-    ): T {
-        val repository: Repository = getK()
-        return BaseVM<DataClass>(handle, repository, onCreate = onCreate) as T
     }
 }
