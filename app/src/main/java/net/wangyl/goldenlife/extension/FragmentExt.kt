@@ -1,14 +1,24 @@
 package net.wangyl.goldenlife.extension
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.View
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
+import androidx.savedstate.SavedStateRegistryOwner
 import androidx.viewbinding.ViewBinding
 import net.wangyl.goldenlife.R
+import net.wangyl.goldenlife.api.Repository
+import net.wangyl.goldenlife.mvi.base.BaseListVM
 
 //
 //
@@ -17,11 +27,24 @@ import net.wangyl.goldenlife.R
 //}
 
 
-fun NavOptions.Builder.setHorizontalSlide(): NavOptions.Builder {
-    return setEnterAnim(R.anim.h_slide_enter)
-        .setExitAnim(R.anim.h_slide_exit)
-        .setPopEnterAnim(R.anim.h_slide_popenter)
-        .setPopExitAnim(R.anim.h_slide_popexit)
+fun <DataClass : Parcelable> Fragment.listViewModel(
+    owner: SavedStateRegistryOwner,
+    defaultArgs: Bundle? = null,
+    onCreate: (() -> Unit)? = null,
+): Lazy<BaseListVM<DataClass>> {
+    return this.viewModels(factoryProducer = {
+        object : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
+            override fun <T : ViewModel?> create(
+                key: String,
+                modelClass: Class<T>,
+                handle: SavedStateHandle
+            ): T {
+                val repository: Repository = getK()
+                return BaseListVM<DataClass>(handle, repository, onCreate = onCreate) as T
+            }
+
+        }
+    })
 }
 
 fun Fragment.navTo(navId: Int, bundle: Bundle? = null,

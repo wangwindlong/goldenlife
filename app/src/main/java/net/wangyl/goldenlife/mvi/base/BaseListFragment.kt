@@ -15,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
@@ -33,9 +34,7 @@ import net.wangyl.goldenlife.api.Status
 import net.wangyl.goldenlife.mvi.base.BaseMultiAdapter
 import net.wangyl.goldenlife.mvi.base.IBindItem
 import net.wangyl.goldenlife.databinding.FragmentCommonListBinding
-import net.wangyl.goldenlife.extension.getK
-import net.wangyl.goldenlife.extension.setHorizontalSlide
-import net.wangyl.goldenlife.extension.viewBinding
+import net.wangyl.goldenlife.extension.*
 import net.wangyl.goldenlife.model.BaseItem
 import net.wangyl.goldenlife.model.BaseModel
 import net.wangyl.goldenlife.mvi.base.BaseListVM
@@ -80,16 +79,14 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
 
     private var adapter = BaseMultiAdapter(getItemLayouts(), this)
 
-    //    val listModel by viewModels<BaseListVM<Data>> {
-//        MyViewModelFactory(this) {
-//
+    val listModel by listViewModel<Data>(this) {
+        refresh(refreshLayout, true)
+    }
+//    val listModel by viewModels<BaseListVM<Data>> {
+//        MyViewModelFactory<Data>(this) {
+//            refresh(refreshLayout, true)
 //        }
 //    }
-    val listModel by viewModels<BaseListVM<Data>> {
-        MyViewModelFactory<Data>(this) {
-            refresh(refreshLayout, true)
-        }
-    }
 
     //    private val groupAdapter = GroupAdapter<GroupieViewHolder>()
     // 可以直接快速使用，也可以继承BaseBinderAdapter类，重写自己的相关方法
@@ -136,7 +133,7 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
         emptyView.findViewById<View>(R.id.refresh_btn).setOnClickListener {
 //            refreshLayout.isRefreshing = true
             refresh(it, true)
-            Toast.makeText(context, "刷新", Toast.LENGTH_LONG).show()
+            toast("刷新")
         }
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = adapter
@@ -222,14 +219,14 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
             return
         } else if (state.error != null) {
             if (!listModel.pageInfo.isFirstPage) adapter.loadMoreModule.loadMoreFail()
-            Toast.makeText(context, "加载出错 ${state.error}", Toast.LENGTH_LONG).show()
+            toast("加载出错 ${state.error}")
         } else {
             adapter.setList(state.values)
             if (state.isEnd) {
-                Toast.makeText(context, "已加载完成所有", Toast.LENGTH_SHORT).show()
+                toast("已加载完成所有")
                 adapter.loadMoreModule.loadMoreEnd()
             } else {
-                Toast.makeText(context, "已加载完当前页", Toast.LENGTH_SHORT).show()
+                toast("已加载完当前页")
             }
         }
         adapter.loadMoreModule.loadMoreComplete()
@@ -286,8 +283,8 @@ class MultiTypeDelegate<Data>(layouts: List<Int>) : BaseMultiTypeDelegate<Data>(
         val item = data[position % data.size]
         return if (item is BaseItem) item.getItemType() else defaultItem
     }
-
 }
+
 
 //inline fun <reified DataClass : Parcelable> Fragment.listViewModel(
 //    noinline loader: suspend () -> Status<List<DataClass>>,
@@ -302,3 +299,4 @@ class MultiTypeDelegate<Data>(layouts: List<Int>) : BaseMultiTypeDelegate<Data>(
 //        }
 //    })
 //}
+

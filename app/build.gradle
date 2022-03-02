@@ -59,6 +59,7 @@ dependencies {
     implementation "io.insert-koin:koin-android:$koin_version"
     implementation "io.insert-koin:koin-androidx-compose:$koin_version"
     implementation 'com.tencent:mmkv-static:1.2.10'
+    implementation 'com.vmadalin:easypermissions-ktx:1.0.0'
 //    implementation("com.github.lisawray.groupie:groupie:2.10.0")
 //    implementation("com.github.lisawray.groupie:groupie-kotlin-android-extensions:2.10.0")
 //    implementation("com.github.lisawray.groupie:groupie-viewbinding:2.10.0")
