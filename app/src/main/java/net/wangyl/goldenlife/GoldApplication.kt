@@ -6,11 +6,14 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import net.wangyl.goldenlife.api.ApiService
 import net.wangyl.goldenlife.api.Repository
 import net.wangyl.goldenlife.api.Status
+import net.wangyl.goldenlife.mvi.base.BaseListVM
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.compose.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -48,7 +51,7 @@ class GoldApplication:Application() {
         }
         single { ApiService(retrofit = get(BASE_URL_QUALIFIER)) }
 
-//        viewModel { (loader : Loader<Any>) -> BaseListVM(loader, get(), get()) }
+//        viewModel { (oncreate : () -> Unit) -> BaseListVM(get(), get(), onCreate = oncreate) }
 //        viewModel { (itemName: String) -> DetailViewModel(get(), itemName, get()) }
     }
 }

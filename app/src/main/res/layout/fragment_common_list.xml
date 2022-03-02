@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -13,7 +14,8 @@
             android:id="@+id/bg_layout"
             layout="@layout/default_page_background" />
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+
+        <com.scwang.smart.refresh.layout.SmartRefreshLayout
             android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -21,11 +23,11 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            </androidx.recyclerview.widget.RecyclerView>
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+                android:layout_height="match_parent"
+                android:overScrollMode="never"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 
     </FrameLayout>
 
