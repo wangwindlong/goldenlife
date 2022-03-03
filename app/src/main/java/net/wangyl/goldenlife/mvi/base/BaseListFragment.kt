@@ -44,7 +44,7 @@ import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.observe
 
 interface RefreshEvent {
-    fun refresh(view: View, isManualRefresh: Boolean)
+    fun refresh(isManualRefresh: Boolean)
 }
 
 val defaultItem = R.layout.item_text_view
@@ -67,9 +67,7 @@ class PageInfo {
 }
 
 abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragment_common_list) :
-    Fragment(layoutId), RefreshEvent, IBindItem<Data, MyBaseViewHolder> {
-    val TAG = javaClass.simpleName
-
+    BaseMviFragment<Data>(layoutId), IBindItem<Data, MyBaseViewHolder> {
 //    private val refreshViewModel: RefreshViewModel by viewModels()
 //    protected val wtfViewModel: WTFViewModel by viewModels()
 
@@ -80,7 +78,7 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
     private var adapter = BaseMultiAdapter(getItemLayouts(), this)
 
     val listModel by mviViewModel<Data>(this) {
-        refresh(refreshLayout, true)
+        refresh(true)
     }
 //    val listModel by viewModels<BaseListVM<Data>> {
 //        MyViewModelFactory<Data>(this) {
@@ -99,7 +97,7 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
 
     private val binding by viewBinding<FragmentCommonListBinding>()
 
-    override fun refresh(view: View, isManualRefresh: Boolean) {
+    override fun refresh(isManualRefresh: Boolean) {
         adapter.loadMoreModule.isEnableLoadMore = false
         listModel.pageInfo.reset()
         loadList(listModel.pageInfo)
@@ -116,7 +114,7 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
 //        refreshLayout = binding.refreshLayout
 //        progressBar = binding.progressCircular
         refreshLayout.setOnRefreshListener {
-            refresh(view, true)
+            refresh(true)
         }
 
         initRV(view)
@@ -132,7 +130,7 @@ abstract class BaseListFragment<Data : BaseModel>(layoutId: Int = R.layout.fragm
         emptyView = layoutInflater.inflate(R.layout.layout_empty, view as ViewGroup, false)
         emptyView.findViewById<View>(R.id.refresh_btn).setOnClickListener {
 //            refreshLayout.isRefreshing = true
-            refresh(it, true)
+            refresh(true)
             toast("刷新")
         }
         recyclerView.layoutManager = LinearLayoutManager(context)

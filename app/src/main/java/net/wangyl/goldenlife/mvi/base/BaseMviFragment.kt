@@ -25,13 +25,13 @@ private const val ARG_PARAM2 = "param2"
  * Use the [BaseMviFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-open class BaseMviFragment<Data : BaseModel>(layoutId: Int = R.layout.fragment_common_list) : Fragment(layoutId) {
+open class BaseMviFragment<Data : BaseModel>(layoutId: Int = R.layout.fragment_common_list) :
+    Fragment(layoutId), RefreshEvent {
     val TAG = javaClass.simpleName
     private var param1: String? = null
     private var param2: String? = null
     val vm by mviViewModel<Data>(this) {
-        //init
-//        refresh(refreshLayout, true)
+        refresh(true)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,14 +40,6 @@ open class BaseMviFragment<Data : BaseModel>(layoutId: Int = R.layout.fragment_c
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_base, container, false)
     }
 
     companion object {
@@ -67,5 +59,9 @@ open class BaseMviFragment<Data : BaseModel>(layoutId: Int = R.layout.fragment_c
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    override fun refresh(isManualRefresh: Boolean) {
+
     }
 }
