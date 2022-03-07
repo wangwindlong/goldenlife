@@ -10,9 +10,11 @@ import androidx.paging.PagingSource
 import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.api.Repository
 import net.wangyl.goldenlife.api.Status
+import net.wangyl.goldenlife.databinding.FragmentCommonListBinding
 import net.wangyl.goldenlife.databinding.ItemTextViewBinding
 import net.wangyl.goldenlife.extension.getK
 import net.wangyl.goldenlife.extension.navTo
+import net.wangyl.goldenlife.extension.viewBinding
 import net.wangyl.goldenlife.model.PostData
 import net.wangyl.goldenlife.mvi.base.*
 

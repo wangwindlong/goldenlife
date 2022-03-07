@@ -1,6 +1,9 @@
 package net.wangyl.goldenlife
 
+import android.app.Activity
 import android.app.Application
+import android.content.Context
+import android.os.Bundle
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import net.wangyl.goldenlife.api.ApiService
@@ -20,11 +23,39 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.IOException
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 val BASE_URL_QUALIFIER = named("BASE_URL")
 typealias Loader<T> = suspend () -> Status<T>
-class GoldApplication:Application() {
+
+
+//fun getApp(): Context {
+//    return GoldApplication.sInstance
+//}
+
+val Context.myApp: GoldApplication
+    get() = applicationContext as GoldApplication
+
+class GoldApplication : Application(), Application.ActivityLifecycleCallbacks {
+    /**
+     * 管理所有存活的 Activity, 容器中的顺序仅仅是 Activity 的创建顺序, 并不能保证和 Activity 任务栈顺序一致
+     */
+    private val mActivityList: List<Activity> = LinkedList()
+
+    /**
+     * 当前在前台的 Activity
+     */
+    private val mCurrentActivity: Activity? = null
+
+    companion object {
+//        lateinit var sInstance: GoldApplication
+
+    }
+
+    init {
+//        sInstance = this
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -33,26 +64,36 @@ class GoldApplication:Application() {
             androidContext(this@GoldApplication)
             modules(listOf(mainModule))
         }
+
+        registerActivityLifecycleCallbacks(this)
     }
 
-    private val mainModule = module {
-//        single { StreamingClient() }
-        single { Repository(get()) }
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
 
-        factory(BASE_URL_QUALIFIER) { BASE_URL }
-        single { provideMoshi() }
-        single(BASE_URL_QUALIFIER) { provideOkHttpClient() }
-        single(BASE_URL_QUALIFIER) {
-            provideRetrofit(
-                baseUrl = get(BASE_URL_QUALIFIER),
-                moshi = get(),
-                client = get(BASE_URL_QUALIFIER)
-            )
-        }
-        single { ApiService(retrofit = get(BASE_URL_QUALIFIER)) }
+    }
 
-//        viewModel { (oncreate : () -> Unit) -> BaseListVM(get(), get(), onCreate = oncreate) }
-//        viewModel { (itemName: String) -> DetailViewModel(get(), itemName, get()) }
+    override fun onActivityStarted(activity: Activity) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onActivityResumed(activity: Activity) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onActivityPaused(activity: Activity) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onActivityStopped(activity: Activity) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onActivityDestroyed(activity: Activity) {
+        TODO("Not yet implemented")
     }
 }
 
@@ -64,46 +105,4 @@ class GoldApplication:Application() {
 //
 //}
 
-private fun provideMoshi(): Moshi {
-    return Moshi
-        .Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
-}
-
-private fun provideOkHttpClient(type: Int = 0): OkHttpClient {
-    val builder = OkHttpClient.Builder()
-        .connectTimeout(20, TimeUnit.SECONDS)
-        .readTimeout(20, TimeUnit.SECONDS)
-        .writeTimeout(20, TimeUnit.SECONDS)
-        .addInterceptor(
-            HttpLoggingInterceptor()
-                .apply { level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE }
-        )
-    println("provideOkHttpClient called type=$type")
-    if (type == 1) builder.addInterceptor(FilterInterceptor())
-    return builder.build()
-}
-
-class FilterInterceptor : Interceptor {
-
-    @Throws(IOException::class)
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val originalRequest = chain.request()
-        val httpBuilder = originalRequest.url.newBuilder()
-        httpBuilder.addEncodedQueryParameter(KEY, KEY_MAP)
-        val requestBuilder = originalRequest.newBuilder()
-            .url(httpBuilder.build())
-        return chain.proceed(requestBuilder.build())
-    }
-
-}
-
-private fun provideRetrofit(baseUrl: String, moshi: Moshi, client: OkHttpClient): Retrofit {
-    return Retrofit.Builder()
-        .client(client)
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .baseUrl(baseUrl)
-        .build()
-}
 
