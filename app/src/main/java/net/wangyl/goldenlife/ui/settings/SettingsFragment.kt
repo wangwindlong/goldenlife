@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -12,6 +13,7 @@ import androidx.navigation.fragment.navArgs
 import net.wangyl.goldenlife.databinding.FragmentSettingsBinding
 import net.wangyl.goldenlife.model.PostData
 import net.wangyl.goldenlife.mvi.base.BaseMviFragment
+import net.wangyl.goldenlife.utils.manager.EventBusManager
 
 class SettingsFragment : BaseMviFragment<PostData>() {
 
@@ -33,7 +35,10 @@ class SettingsFragment : BaseMviFragment<PostData>() {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textSettings
+        val textView: Button = binding.textSettings
+        textView.setOnClickListener {
+            EventBusManager.get().post("${textView.text}")
+        }
         settingsViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }

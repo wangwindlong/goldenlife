@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
 import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.api.Repository
+import net.wangyl.goldenlife.base.BaseFragment
 import net.wangyl.goldenlife.extension.getK
 import net.wangyl.goldenlife.model.BaseModel
 import net.wangyl.goldenlife.model.PostData
@@ -25,8 +26,8 @@ private const val ARG_PARAM2 = "param2"
  * Use the [BaseMviFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-open class BaseMviFragment<Data : BaseModel> : Fragment(), RefreshEvent {
-    val TAG = javaClass.simpleName
+open class BaseMviFragment<Data : BaseModel> : BaseFragment(), RefreshEvent {
+
     private var param1: String? = null
     private var param2: String? = null
     val vm by mviViewModel<Data>(this) {

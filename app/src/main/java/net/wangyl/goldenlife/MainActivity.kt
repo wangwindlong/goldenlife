@@ -15,6 +15,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import net.wangyl.goldenlife.databinding.ActivityMainBinding
+import net.wangyl.goldenlife.model.PostData
 
 class MainActivity : AppCompatActivity() {
 
@@ -76,7 +77,10 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.nav_settings -> {
                 val navController = findNavController(R.id.nav_host_fragment_content_main)
-                navController.navigate(R.id.nav_settings)
+                navController.navigate(R.id.nav_settings, Bundle().apply {
+                    putString("itemId", "testid")
+                    putParcelable("item", PostData(1, 2, "3", "4"))
+                })
             }
         }
         return super.onOptionsItemSelected(item)
