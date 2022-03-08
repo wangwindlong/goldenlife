@@ -1,6 +1,5 @@
 package net.wangyl.goldenlife.api
 
-import net.wangyl.goldenlife.model.ListModel
 import net.wangyl.goldenlife.model.PostData
 import retrofit2.Retrofit
 import retrofit2.create
