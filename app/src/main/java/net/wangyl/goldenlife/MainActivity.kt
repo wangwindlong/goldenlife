@@ -7,15 +7,17 @@ import android.widget.ImageView
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.navigation.set
 import net.wangyl.goldenlife.databinding.ActivityMainBinding
 import net.wangyl.goldenlife.model.PostData
+import net.wangyl.goldenlife.ui.nav.NavHostFragment
+import net.wangyl.goldenlife.ui.nav.StickyNavigator
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment =
             (supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment?)!!
         val navController = navHostFragment.navController
+//        navController.navigatorProvider.set("fragment",  StickyNavigator(this, navHostFragment.childFragmentManager, R.id.nav_host_fragment_content_main))
+//        navController.setGraph(R.navigation.mobile_navigation)
 
         binding.navView?.let {
             it.getHeaderView(0).findViewById<ImageView>(R.id.imageView).background = AppCompatResources.getDrawable(this, R.drawable.avatar_1)

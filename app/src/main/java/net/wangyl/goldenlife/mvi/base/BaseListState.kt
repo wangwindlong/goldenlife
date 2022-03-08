@@ -9,7 +9,6 @@ data class BaseState<T : Parcelable>(
     val values: List<T> = arrayListOf(),
     val value: T? = null,
     val error: Throwable? = null,
-    val isFirst: Boolean = false, //是否是第一次初始化
     val isEnd: Boolean = false,
     val _count: Long = 0
 ) : Parcelable

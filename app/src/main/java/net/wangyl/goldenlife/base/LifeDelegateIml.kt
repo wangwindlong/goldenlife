@@ -19,7 +19,7 @@ class LifeDelegateIml(val fm: FragmentManager, val iBase: IBase) : ILifeDelegate
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Timber.i("onCreate ibase class= ", iBase.javaClass)
+        Timber.i("onCreate ibase class= ", iBase::class.java)
         if (iBase.useEventBus()) {
             EventBusManager.get().register(iBase)
         }

@@ -5,13 +5,12 @@ import android.app.Application.ActivityLifecycleCallbacks
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import net.wangyl.goldenlife.BuildConfig
+import net.wangyl.goldenlife.extension.getK
 import net.wangyl.goldenlife.utils.manager.AppManager
 import timber.log.Timber
 
 
 class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
-
-    val mFragmentLifeCycler = FragmentLifecycle.instance
 
     companion object {
         val instance = ActivityLifeCycler.holder
@@ -44,7 +43,8 @@ class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
         AppManager.get().pushActivity(activity)
         //mFragmentLifecycle 为 Fragment 生命周期实现类, 用于框架内部对每个 Fragment 的必要操作, 如给每个 Fragment 配置 FragmentDelegate
         //注册框架内部已实现的 Fragment 生命周期逻辑
-        (activity as? FragmentActivity)?.supportFragmentManager?.registerFragmentLifecycleCallbacks(mFragmentLifeCycler, true)
+        (activity as? FragmentActivity)?.supportFragmentManager?.registerFragmentLifecycleCallbacks(
+            getK(), true)
     }
 
     override fun onActivityStarted(activity: Activity) {

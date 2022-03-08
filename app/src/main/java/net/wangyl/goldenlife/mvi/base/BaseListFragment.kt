@@ -1,47 +1,27 @@
 package net.wangyl.goldenlife.mvi.base
 
 import android.os.Bundle
-import android.os.Parcelable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.annotation.CallSuper
-import androidx.core.os.bundleOf
 import androidx.databinding.ViewDataBinding
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
-import androidx.navigation.NavOptions
-import androidx.navigation.fragment.FragmentNavigator
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.savedstate.SavedStateRegistryOwner
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.delegate.BaseMultiTypeDelegate
 import com.chad.library.adapter.base.listener.OnItemClickListener
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import net.wangyl.goldenlife.R
-import net.wangyl.goldenlife.api.Repository
 import net.wangyl.goldenlife.api.Status
-import net.wangyl.goldenlife.mvi.base.BaseMultiAdapter
-import net.wangyl.goldenlife.mvi.base.IBindItem
-import net.wangyl.goldenlife.databinding.FragmentCommonListBinding
-import net.wangyl.goldenlife.extension.*
+import net.wangyl.goldenlife.extension.toast
 import net.wangyl.goldenlife.model.BaseItem
 import net.wangyl.goldenlife.model.BaseModel
-import net.wangyl.goldenlife.mvi.base.BaseListVM
-import net.wangyl.goldenlife.mvi.base.BaseState
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.observe
+import timber.log.Timber
 
 interface RefreshEvent {
     fun refresh(isManualRefresh: Boolean)
@@ -74,12 +54,13 @@ abstract class BaseListFragment<Data : BaseModel> :
     lateinit var refreshLayout: SwipeRefreshLayout
     lateinit var recyclerView: RecyclerView
     lateinit var emptyView: View
+    private var initialised: Boolean = false
 
     private var adapter = BaseMultiAdapter(getItemLayouts(), this)
 
-    override fun onVMInit() {
-        refresh(true)
-    }
+//    override fun onVMInit() {
+//        refresh(true)
+//    }
 
     //    private val groupAdapter = GroupAdapter<GroupieViewHolder>()
 
@@ -151,14 +132,15 @@ abstract class BaseListFragment<Data : BaseModel> :
             }
 
         })
+        refresh(true)
     }
 
     fun loadList(pageInfo: PageInfo) {
         refreshLayout.isRefreshing = true
-        vm.intent {
+        vm.intent(registerIdling = false) {
             //这里的参数使用封装过的类,便于传其他类型的下一页数据
             val status = loader(pageInfo)
-            Log.d(TAG, "loadList finished state=${state.isFirst}")
+            Timber.d("loadList finished state=${state}")
             reduce {
                 when (status) {
                     //需要在原有数据上添加
@@ -167,7 +149,7 @@ abstract class BaseListFragment<Data : BaseModel> :
                         val newstate: BaseState<Data>
                         //如果为第一次加载，则直接返回
                         if (pageInfo.isFirstPage) {
-                            newstate = state.copy(values = newdata, error = null, isFirst = false, isEnd = false,
+                            newstate = state.copy(values = newdata, error = null, isEnd = false,
                                 _count = state._count + 1
                             )
                         } else {
@@ -175,7 +157,6 @@ abstract class BaseListFragment<Data : BaseModel> :
                             newstate = state.copy(
                                 values = state.values + newdata,
                                 error = null,
-                                isFirst = false,
                                 isEnd = newdata.isEmpty() || newdata.size < pageInfo.pageSize,
                                 _count = state._count + 1
                             )
@@ -184,7 +165,7 @@ abstract class BaseListFragment<Data : BaseModel> :
                         newstate
                     }
                     //如果加载失败,返回错误信息
-                    is Status.Failure -> state.copy(error = status.exception, isFirst = false)
+                    is Status.Failure -> state.copy(error = status.exception)
 
                 }
 
@@ -198,14 +179,14 @@ abstract class BaseListFragment<Data : BaseModel> :
 //        }
 //
 //        groupAdapter.update(items)
-        Log.d(
-            TAG,
-            "render pageinfo=${vm.pageInfo.page} itemcounts=${state.values.size} state=${state.isFirst}"
-        )
-        if (state.isFirst) { //去掉第一次初始化的回调, 主要为退出页面后再进来会再次调用该方法
-            if (state.values.isNotEmpty()) adapter.setList(state.values)
+        Timber.d("render pageinfo=${vm.pageInfo.page} itemcounts=${state.values.size} initialised=${initialised}")
+        if (!initialised) { //去掉第一次初始化的回调, 主要为退出页面后再进来会再次调用该方法
+            initialised = true
+            adapter.setList(state.values)
+            refreshLayout.isRefreshing = state.values.isEmpty()
             return
-        } else if (state.error != null) {
+        }
+        if (state.error != null) {
             if (!vm.pageInfo.isFirstPage) adapter.loadMoreModule.loadMoreFail()
             toast("加载出错 ${state.error}")
         } else {
@@ -229,37 +210,19 @@ abstract class BaseListFragment<Data : BaseModel> :
     override fun onDestroyView() {
         super.onDestroyView()
         Log.d(TAG, "onDestroyView pageinfo=${vm.pageInfo.page}")
-        vm.intent {
-            reduce {
-                Log.d(
-                    TAG,
-                    "onDestroyView intent count=${state.values.size} isFirst=${state.isFirst}"
-                )
-                state.copy(isFirst = true)
-            }
-        }
+//        vm.intent {
+//            reduce {
+//                Log.d(
+//                    TAG,
+//                    "onDestroyView intent count=${state.values.size} isFirst=${state.isFirst}"
+//                )
+//                state.copy(isFirst = true)
+//            }
+//        }
     }
 }
 
-fun <DataClass : Parcelable> Fragment.mviViewModel(
-    owner: SavedStateRegistryOwner,
-    defaultArgs: Bundle? = null,
-    onCreate: (() -> Unit)? = null,
-): Lazy<BaseVM<DataClass>> {
-    return this.viewModels(factoryProducer = {
-        object : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
-            override fun <T : ViewModel?> create(
-                key: String,
-                modelClass: Class<T>,
-                handle: SavedStateHandle
-            ): T {
-                return BaseVM<DataClass>(handle).apply {
-                    onInit = onCreate
-                } as T
-            }
-        }
-    })
-}
+
 
 class MyBaseViewHolder(view: View) : BaseViewHolder(view) {
     var dataBinding: ViewDataBinding? = null

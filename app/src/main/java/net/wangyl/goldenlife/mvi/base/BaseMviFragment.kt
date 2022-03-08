@@ -30,15 +30,12 @@ open class BaseMviFragment<Data : BaseModel> : BaseFragment(), RefreshEvent {
 
     private var param1: String? = null
     private var param2: String? = null
-    val vm by mviViewModel<Data>(this) {
-        onVMInit()
+    val vm by mviViewModel<BaseVM<Data>, Data>(this) {
+//        this.onVMInit()
     }
 
-    open fun onVMInit() {
 
-    }
-
-    open fun getLayoutId() :Int {
+    open fun getLayoutId(): Int {
         return R.layout.fragment_common_list
     }
 
@@ -72,4 +69,28 @@ open class BaseMviFragment<Data : BaseModel> : BaseFragment(), RefreshEvent {
     override fun refresh(isManualRefresh: Boolean) {
 
     }
+}
+
+inline fun <reified VM : BaseVM<DataClass>, DataClass : Parcelable> Fragment.mviViewModel(
+    owner: SavedStateRegistryOwner,
+    defaultArgs: Bundle? = null,
+    noinline onCreate: (VM.() -> Unit)? = null,
+): Lazy<VM> {
+    return this.viewModels(factoryProducer = {
+        object : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
+            override fun <T : ViewModel?> create(
+                key: String,
+                modelClass: Class<T>,
+                handle: SavedStateHandle
+            ): T {
+                val clz = VM::class.java
+                val mCreate = clz.getDeclaredConstructor(handle::class.java)
+                mCreate.isAccessible = true
+                return mCreate.newInstance(handle) as T
+//                return VM(handle).apply {
+//                    onInit = onCreate
+//                } as T
+            }
+        }
+    })
 }

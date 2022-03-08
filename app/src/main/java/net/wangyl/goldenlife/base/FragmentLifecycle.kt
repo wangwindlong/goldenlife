@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import timber.log.Timber
 
+
+
 class FragmentLifecycle private constructor(): FragmentManager.FragmentLifecycleCallbacks() {
 
     companion object {
@@ -24,38 +26,47 @@ class FragmentLifecycle private constructor(): FragmentManager.FragmentLifecycle
 
     override fun onFragmentCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
         (f as? IBase)?.getDelegate(fm)?.onCreate(savedInstanceState)
+        Timber.d("FragmentLifecycle onFragmentCreated f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
     }
 
     override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
         (f as? IBase)?.getDelegate(fm)?.onCreateView(v, savedInstanceState)
+        Timber.d("FragmentLifecycle onFragmentViewCreated f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
     }
 
     override fun onFragmentStarted(fm: FragmentManager, f: Fragment) {
         (f as? IBase)?.getDelegate(fm)?.onStart()
+        Timber.d("FragmentLifecycle onFragmentStarted f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
     }
 
     override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
         (f as? IBase)?.getDelegate(fm)?.onResume()
+        Timber.d("FragmentLifecycle onFragmentResumed f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
     }
 
     override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
         (f as? IBase)?.getDelegate(fm)?.onPause()
+        Timber.d("FragmentLifecycle onFragmentPaused f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
     }
 
     override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
         (f as? IBase)?.getDelegate(fm)?.onStop()
+        Timber.d("FragmentLifecycle onFragmentStopped f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
     }
 
     override fun onFragmentSaveInstanceState(fm: FragmentManager, f: Fragment, outState: Bundle) {
         (f as? IBase)?.getDelegate(fm)?.onSaveInstanceState(outState)
+        Timber.d("FragmentLifecycle onFragmentSaveInstanceState f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
     }
 
     override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
         (f as? IBase)?.getDelegate(fm)?.onDestroy()
+        Timber.d("FragmentLifecycle onFragmentDestroyed f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
     }
 
     override fun onFragmentDetached(fm: FragmentManager, f: Fragment) {
         (f as? IBase)?.getDelegate(fm)?.onDetach()
+        Timber.d("FragmentLifecycle onFragmentDetached f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
     }
 
 

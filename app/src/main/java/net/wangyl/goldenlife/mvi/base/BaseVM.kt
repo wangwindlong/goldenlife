@@ -23,18 +23,18 @@ open class BaseVM<Data : Parcelable>(savedStateHandle: SavedStateHandle) : ViewM
     var exceptionHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Log.e(TAG, "orbit caught the exception ", throwable)
     }
-    open var onInit: (() -> Unit)? = null
+    open var onInit: (ViewModel.() -> Unit)? = null
 
     init {
         Log.d(TAG, "repository=$repository")
     }
 
     override val container = container<BaseState<Data>, Event>(
-        initialState = BaseState(isFirst = true),
+        initialState = BaseState(),
         savedStateHandle = savedStateHandle,
         settings = Container.Settings(exceptionHandler = exceptionHandler)
     ) {
-        onInit?.invoke()
+        onInit?.invoke(this)
     }
 
     //增加封装过的参数？确定加载第几页数据，是否要加载下一页数据

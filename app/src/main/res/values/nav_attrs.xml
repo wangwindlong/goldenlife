@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="nav_host_fragment_container" type="id"/>
+    <declare-styleable name="StickyNavigator">
+        <!-- The id of the child radio button that should be checked by default
+             within this radio group. -->
+        <attr name="android:name"/>
+    </declare-styleable>
+    <declare-styleable name="StickyNavHostFragment">
+        <attr format="boolean" name="defaultNavHost"/>
+    </declare-styleable>
+    <declare-styleable name="StickyDialogFragmentNavigator">
+        <attr name="android:name"/>
+    </declare-styleable>
+</resources>

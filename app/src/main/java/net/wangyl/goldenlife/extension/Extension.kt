@@ -10,7 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
+import net.wangyl.goldenlife.GoldApp
 import net.wangyl.goldenlife.R
+import org.koin.android.ext.android.inject
 import org.koin.core.qualifier.Qualifier
 import org.koin.java.KoinJavaComponent
 
@@ -27,19 +29,19 @@ fun NavOptions.Builder.setHorizontalSlide(): NavOptions.Builder {
 
 
 fun Fragment.toast(@StringRes message: Int) {
-    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    Toast.makeText(GoldApp.sInstance, message, Toast.LENGTH_SHORT).show()
 }
 
 fun Fragment.toast(message: String?) {
-    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    Toast.makeText(GoldApp.sInstance, message, Toast.LENGTH_SHORT).show()
 }
 
 fun Activity.toast(@StringRes message: Int) {
-    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    Toast.makeText(GoldApp.sInstance, message, Toast.LENGTH_SHORT).show()
 }
 
 fun Activity.toast(message: String?) {
-    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    Toast.makeText(GoldApp.sInstance, message, Toast.LENGTH_SHORT).show()
 }
 
 inline fun <reified T> Fragment.startActivity() {

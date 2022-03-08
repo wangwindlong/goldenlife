@@ -1,26 +1,19 @@
 package net.wangyl.goldenlife.ui.slideshow
 
-import android.os.Bundle
 import android.util.Log
 import androidx.core.os.bundleOf
-import androidx.navigation.NavController
-import androidx.navigation.NavOptions
-import androidx.navigation.fragment.FragmentNavigator
-import androidx.paging.PagingSource
 import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.api.Repository
 import net.wangyl.goldenlife.api.Status
-import net.wangyl.goldenlife.databinding.FragmentCommonListBinding
 import net.wangyl.goldenlife.databinding.ItemTextViewBinding
-import net.wangyl.goldenlife.extension.getK
 import net.wangyl.goldenlife.extension.navTo
-import net.wangyl.goldenlife.extension.viewBinding
 import net.wangyl.goldenlife.model.PostData
 import net.wangyl.goldenlife.mvi.base.*
+import org.koin.android.ext.android.inject
 
 class SlideshowFragment : BaseListFragment<PostData>() {
 
-    val repo: Repository = getK()
+    val repo: Repository by inject()
 
     override suspend fun loader(params: PageInfo): Status<List<PostData>> {
         return repo.getPosts()

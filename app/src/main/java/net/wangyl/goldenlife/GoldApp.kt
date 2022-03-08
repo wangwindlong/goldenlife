@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import net.wangyl.goldenlife.api.Status
 import net.wangyl.goldenlife.base.ActivityLifeCycler
+import net.wangyl.goldenlife.extension.getK
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.qualifier.named
@@ -16,24 +17,24 @@ typealias Loader<T> = suspend () -> Status<T>
 //    return GoldApplication.sInstance
 //}
 
-val Context.myApp: GoldApplication
-    get() = applicationContext as GoldApplication
+val Context.myApp: GoldApp
+    get() = applicationContext as GoldApp
 
-class GoldApplication : Application() {
+class GoldApp : Application() {
 
     companion object {
-        lateinit var sInstance: GoldApplication
+        lateinit var sInstance: GoldApp
     }
 
     override fun onCreate() {
         super.onCreate()
 
         startKoin {
-            androidContext(this@GoldApplication)
+            androidContext(this@GoldApp)
             modules(listOf(mainModule))
         }
         sInstance = this
-        registerActivityLifecycleCallbacks(ActivityLifeCycler.instance)
+        registerActivityLifecycleCallbacks(getK())
     }
 }
 

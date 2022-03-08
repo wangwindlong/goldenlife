@@ -1,9 +1,13 @@
 package net.wangyl.goldenlife
 
+import android.app.Application
+import androidx.fragment.app.FragmentManager
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import net.wangyl.goldenlife.api.ApiService
 import net.wangyl.goldenlife.api.Repository
+import net.wangyl.goldenlife.base.ActivityLifeCycler
+import net.wangyl.goldenlife.base.FragmentLifecycle
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -17,6 +21,7 @@ import java.util.concurrent.TimeUnit
 val mainModule = module {
 //        single { StreamingClient() }
     single { Repository(get()) }
+//    single<Application> { get() }
 
     factory(BASE_URL_QUALIFIER) { BASE_URL }
     single { provideMoshi() }
@@ -29,6 +34,8 @@ val mainModule = module {
         )
     }
     single { ApiService(retrofit = get(BASE_URL_QUALIFIER)) }
+    single<FragmentManager.FragmentLifecycleCallbacks> { FragmentLifecycle.instance }
+    single<Application.ActivityLifecycleCallbacks> { ActivityLifeCycler.instance }
 
 //        viewModel { (oncreate : () -> Unit) -> BaseListVM(get(), get(), onCreate = oncreate) }
 //        viewModel { (itemName: String) -> DetailViewModel(get(), itemName, get()) }
