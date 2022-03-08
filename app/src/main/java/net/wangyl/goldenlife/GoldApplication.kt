@@ -21,14 +21,8 @@ val Context.myApp: GoldApplication
 
 class GoldApplication : Application() {
 
-
     companion object {
-//        lateinit var sInstance: GoldApplication
-
-    }
-
-    init {
-//        sInstance = this
+        lateinit var sInstance: GoldApplication
     }
 
     override fun onCreate() {
@@ -38,7 +32,7 @@ class GoldApplication : Application() {
             androidContext(this@GoldApplication)
             modules(listOf(mainModule))
         }
-
+        sInstance = this
         registerActivityLifecycleCallbacks(ActivityLifeCycler.instance)
     }
 }
