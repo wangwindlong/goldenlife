@@ -16,3 +16,5 @@ dependencyResolutionManagement {
 rootProject.name = "GoldenLife"
 include ":app"
 include ":ultimatebarx"
+include ":vbpd-noreflection"
+include ":vbpd-full"

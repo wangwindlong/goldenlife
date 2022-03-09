@@ -3,6 +3,7 @@ package net.wangyl.goldenlife.base
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.View
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.zackratos.ultimatebarx.ultimatebarx.navigationBar
 import com.zackratos.ultimatebarx.ultimatebarx.statusBar
@@ -10,8 +11,12 @@ import net.wangyl.goldenlife.R
 import org.greenrobot.eventbus.Subscribe
 import timber.log.Timber
 
-class BaseActivity: FragmentActivity(), IBase {
+const val TAG_FRAGNAME = "fragment_classname"
+
+open class BaseActivity : FragmentActivity(), IBase {
     val TAG = javaClass.simpleName
+    var fragName: String? = ""
+    private var mBackListener: OnBackPressedListener? = null
     private var _delegate: ILifeDelegate? = null
 
     override fun getDelegate(): ILifeDelegate? {
@@ -21,28 +26,28 @@ class BaseActivity: FragmentActivity(), IBase {
         } else _delegate
     }
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        setContentView(initLayoutId())
+        super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_base_fragment)
+        fragName = (savedInstanceState ?: intent.extras)?.getString(TAG_FRAGNAME)
+        Timber.d("onCreate fragName= $fragName , savedInstanceState=$savedInstanceState, intent.extras=${intent.extras}")
 
-        if (findViewById<View>(R.id.fragment_container) != null) {
-
+        findViewById<View>(R.id.fragment_container)?.let { _ ->
             // However, if we're being restored from a previous state,
             // then we don't need to do anything and should return or else
             // we could end up with overlapping fragments.
             if (savedInstanceState != null) {
                 return
             }
-//            contentFragment = createFragment()
-//            if (contentFragment == null) return
-//            // In case this activity was started with special instructions from an Intent,
-//            // pass the Intent's extras to the fragment as arguments
-//            contentFragment!!.arguments = intent.extras
-//
-//            // Add the fragment to the 'fragment_container' FrameLayout
-//            supportFragmentManager.beginTransaction()
-//                .add(R.id.fragment_container, contentFragment!!).commitAllowingStateLoss()
+            createFragment()?.let {
+                // In case this activity was started with special instructions from an Intent,
+                // pass the Intent's extras to the fragment as arguments
+                it.arguments = intent.extras
+                // Add the fragment to the 'fragment_container' FrameLayout
+                supportFragmentManager.beginTransaction()
+                    .add(R.id.fragment_container, it).commitAllowingStateLoss()
+            }
         }
         if (fullScreen()) {
             statusBar { transparent() }
@@ -50,12 +55,53 @@ class BaseActivity: FragmentActivity(), IBase {
         }
     }
 
+
+    open fun initLayoutId() : Int {
+        return R.layout.activity_base_fragment
+    }
+
+    open fun createFragment(): Fragment? {
+        return if (fragName?.isNotEmpty() == true) {
+            try {
+                val frag = supportFragmentManager.fragmentFactory.instantiate(classLoader, fragName!!)
+                if (frag is OnBackPressedListener) {
+                    mBackListener = frag
+                }
+                frag
+            } catch (e: Exception) {
+                null
+            }
+        } else null
+    }
+
     override fun fullScreen(): Boolean {
         return true
+    }
+
+    override fun onBackPressed() {
+        if (mBackListener?.doBack() == true) {
+            return
+        }
+        if (supportFragmentManager.backStackEntryCount <= 0) {
+            super.onBackPressed()
+
+        } else {
+            supportFragmentManager.popBackStackImmediate()
+        }
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mBackListener = null
     }
 
     @Subscribe
     open fun onReceive(data: MsgEvent<Any>) {
         Timber.d("$TAG received data: ${data.from}， ${data.msg}")
     }
+}
+
+interface OnBackPressedListener {
+    fun doBack() : Boolean
 }

@@ -20,12 +20,24 @@
             android:exported="true"
             android:resizeableActivity="true"
             android:theme="@style/Theme.GoldenLife.NoActionBar"
-            tools:targetApi="24">
+            tools:targetApi="24"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.SimpleActivity"
+            android:exported="true"
+            android:theme="@style/Theme.GoldenLife.NoActionBar"
+            >
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
         </activity>
 
 <!--        <provider-->

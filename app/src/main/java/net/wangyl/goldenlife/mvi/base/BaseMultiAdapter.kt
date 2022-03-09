@@ -7,7 +7,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import com.chad.library.adapter.base.BaseDelegateMultiAdapter
 import com.chad.library.adapter.base.module.LoadMoreModule
-import net.wangyl.goldenlife.model.BaseModel
+import net.wangyl.goldenlife.base.BaseModel
 import java.lang.NullPointerException
 
 class BaseMultiAdapter<Data : BaseModel>(layouts: List<Int>, val binder: IBindItem<Data, MyBaseViewHolder>):

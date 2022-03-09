@@ -12,6 +12,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import net.wangyl.goldenlife.databinding.FragmentReflowBinding
+import net.wangyl.goldenlife.extension.goActivity
+import net.wangyl.goldenlife.ui.frag.ViewPagerFragment
 
 class ReflowFragment : Fragment() {
 
@@ -34,13 +36,16 @@ class ReflowFragment : Fragment() {
         val root: View = binding.root
 
         val textView: TextView = binding.textReflow
+        textView.setOnClickListener {
+            goActivity(ViewPagerFragment::class.java.name)
+        }
         reflowViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
 
-        binding.textReflow.setOnClickListener {
-            viewModel.login("raheem", "android")
-        }
+//        binding.textReflow.setOnClickListener {
+//            viewModel.login("raheem", "android")
+//        }
 
         lifecycleScope.launchWhenCreated {
             viewModel.loginUIState.collect {

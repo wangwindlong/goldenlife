@@ -6,17 +6,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
 import net.wangyl.goldenlife.R
-import net.wangyl.goldenlife.api.Repository
+import net.wangyl.goldenlife.base.BaseBindFragment
 import net.wangyl.goldenlife.base.BaseFragment
-import net.wangyl.goldenlife.extension.getK
-import net.wangyl.goldenlife.model.BaseModel
-import net.wangyl.goldenlife.model.PostData
+import net.wangyl.goldenlife.base.BaseModel
 import net.wangyl.goldenlife.utils.manager.EventBusManager
 
 private const val ARG_PARAM1 = "param1"
@@ -27,18 +26,13 @@ private const val ARG_PARAM2 = "param2"
  * Use the [BaseMviFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-open class BaseMviFragment<Data : BaseModel> : BaseFragment(), RefreshEvent {
+open class BaseMviFragment<Data : BaseModel> : BaseFragment() {
 
     val eventBus = EventBusManager.get()
     private var param1: String? = null
     private var param2: String? = null
     val vm by mviViewModel<BaseVM<Data>, Data>(this) {
 //        this.onVMInit()
-    }
-
-
-    open fun getLayoutId(): Int {
-        return R.layout.fragment_common_list
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,13 +43,6 @@ open class BaseMviFragment<Data : BaseModel> : BaseFragment(), RefreshEvent {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(getLayoutId(), container, false)
-    }
 
     companion object {
         @JvmStatic

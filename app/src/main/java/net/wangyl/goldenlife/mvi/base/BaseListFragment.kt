@@ -16,8 +16,8 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.api.Status
 import net.wangyl.goldenlife.extension.toast
-import net.wangyl.goldenlife.model.BaseItem
-import net.wangyl.goldenlife.model.BaseModel
+import net.wangyl.goldenlife.base.BaseItem
+import net.wangyl.goldenlife.base.BaseModel
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.observe
@@ -106,7 +106,7 @@ abstract class BaseListFragment<Data : BaseModel> :
         emptyView.findViewById<View>(R.id.refresh_btn).setOnClickListener {
 //            refreshLayout.isRefreshing = true
             refresh(true)
-            toast("刷新")
+//            toast("刷新")
         }
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = adapter
@@ -188,14 +188,14 @@ abstract class BaseListFragment<Data : BaseModel> :
         }
         if (state.error != null) {
             if (!vm.pageInfo.isFirstPage) adapter.loadMoreModule.loadMoreFail()
-            toast("加载出错 ${state.error}")
+//            toast("加载出错 ${state.error}")
         } else {
             adapter.setList(state.values)
             if (state.isEnd) {
-                toast("已加载完成所有")
+//                toast("已加载完成所有")
                 adapter.loadMoreModule.loadMoreEnd()
             } else {
-                toast("已加载完当前页")
+//                toast("已加载完当前页")
             }
         }
         adapter.loadMoreModule.loadMoreComplete()

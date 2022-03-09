@@ -56,11 +56,13 @@ class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
 //                navigationBar { transparent() }
             }
         }
-        if (f is AppCompatActivity && f.findViewById<View>(R.id.toolbar) != null) {
+        if (f is AppCompatActivity) {
             f.findViewById<Toolbar>(R.id.toolbar)?.let {
                 f.setSupportActionBar(it)
                 f.supportActionBar?.setDisplayShowTitleEnabled(true)
+//                it.setTitle(f.title)
                 //初始化其他事件，返回，actionbar等
+
             }
         }
     }
@@ -96,7 +98,7 @@ class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
 
     override fun onActivityDestroyed(f: Activity) {
         AppManager.get().popActivity(f)
-        (f as? IBase)?.getDelegate()?.onDetach()
+        (f as? IBase)?.getDelegate()?.onDestroy()
         Timber.d("onActivityDestroyed ")
     }
 }

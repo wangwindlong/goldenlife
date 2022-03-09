@@ -1,0 +1,43 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
+
+ext {
+    groupId = 'com.github.kirich1409'
+    artifactId = "viewbindingpropertydelegate"
+}
+
+//apply from: rootProject.file('publishing.gradle')
+
+android {
+    compileSdkVersion rootProject.ext.compileSdk
+    buildToolsVersion rootProject.ext.buildTools
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdk
+        targetSdkVersion rootProject.ext.targetSdk
+
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    // For Kotlin projects
+    kotlinOptions {
+        jvmTarget = "1.8"
+        kotlinOptions.freeCompilerArgs +=
+                ['-module-name', "com.github.kirich1409.ViewBindingPropertyDelegate"]
+    }
+}
+
+dependencies {
+    implementation rootProject.ext.dependencies.coreKtx
+    implementation rootProject.ext.dependencies.fragmentKtx
+    compileOnly rootProject.ext.dependencies.viewBinding
+    implementation rootProject.ext.dependencies.recyclerview
+    api project(':vbpd-noreflection')
+}

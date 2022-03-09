@@ -1,4 +1,4 @@
-package net.wangyl.goldenlife.model
+package net.wangyl.goldenlife.base
 
 import android.os.Parcelable
 import net.wangyl.goldenlife.mvi.base.defaultItem

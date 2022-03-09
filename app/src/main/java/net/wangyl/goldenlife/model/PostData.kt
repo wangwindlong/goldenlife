@@ -1,8 +1,7 @@
 package net.wangyl.goldenlife.model
 
-import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
-import net.wangyl.goldenlife.R
+import kotlinx.parcelize.Parcelize
+import net.wangyl.goldenlife.base.BaseItem
 
 @Parcelize
 data class PostData(

@@ -20,9 +20,7 @@
 
 package net.wangyl.goldenlife.api
 
-import net.wangyl.goldenlife.model.BaseListModel
-import net.wangyl.goldenlife.model.ListModel
-import net.wangyl.goldenlife.model.PostData
+import net.wangyl.goldenlife.base.ListModel
 
 sealed class Status<T : Any>: ListModel<T> {
 

@@ -18,5 +18,6 @@ interface IBase {
     fun fullScreen() : Boolean = false
     fun setData(data: Any?) = Unit
     fun getDelegate(): ILifeDelegate?
+//    fun initTitle(): CharSequence? = ""
 
 }
