@@ -20,53 +20,53 @@ class FragmentLifecycle private constructor(): FragmentManager.FragmentLifecycle
     }
 
     override fun onFragmentAttached(fm: FragmentManager, f: Fragment, context: Context) {
-        (f as? IBase)?.getDelegate(fm)?.onAttach(context)
-        Timber.d("FragmentLifecycle onFragmentAttached f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
+        (f as? IBase)?.getDelegate()?.onAttach(context)
+        Timber.d("FragmentLifecycle onFragmentAttached f=$f  delegate=${(f as? IBase)?.getDelegate()}")
     }
 
     override fun onFragmentCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
-        (f as? IBase)?.getDelegate(fm)?.onCreate(savedInstanceState)
-        Timber.d("FragmentLifecycle onFragmentCreated f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
+        (f as? IBase)?.getDelegate()?.onCreate(savedInstanceState)
+        Timber.d("FragmentLifecycle onFragmentCreated f=$f  delegate=${(f as? IBase)?.getDelegate()}")
     }
 
     override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
-        (f as? IBase)?.getDelegate(fm)?.onCreateView(v, savedInstanceState)
-        Timber.d("FragmentLifecycle onFragmentViewCreated f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
+        (f as? IBase)?.getDelegate()?.onCreateView(v, savedInstanceState)
+        Timber.d("FragmentLifecycle onFragmentViewCreated f=$f  delegate=${(f as? IBase)?.getDelegate()}")
     }
 
     override fun onFragmentStarted(fm: FragmentManager, f: Fragment) {
-        (f as? IBase)?.getDelegate(fm)?.onStart()
-        Timber.d("FragmentLifecycle onFragmentStarted f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
+        (f as? IBase)?.getDelegate()?.onStart()
+        Timber.d("FragmentLifecycle onFragmentStarted f=$f  delegate=${(f as? IBase)?.getDelegate()}")
     }
 
     override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
-        (f as? IBase)?.getDelegate(fm)?.onResume()
-        Timber.d("FragmentLifecycle onFragmentResumed f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
+        (f as? IBase)?.getDelegate()?.onResume()
+        Timber.d("FragmentLifecycle onFragmentResumed f=$f  delegate=${(f as? IBase)?.getDelegate()}")
     }
 
     override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
-        (f as? IBase)?.getDelegate(fm)?.onPause()
-        Timber.d("FragmentLifecycle onFragmentPaused f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
+        (f as? IBase)?.getDelegate()?.onPause()
+        Timber.d("FragmentLifecycle onFragmentPaused f=$f  delegate=${(f as? IBase)?.getDelegate()}")
     }
 
     override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
-        (f as? IBase)?.getDelegate(fm)?.onStop()
-        Timber.d("FragmentLifecycle onFragmentStopped f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
+        (f as? IBase)?.getDelegate()?.onStop()
+        Timber.d("FragmentLifecycle onFragmentStopped f=$f  delegate=${(f as? IBase)?.getDelegate()}")
     }
 
     override fun onFragmentSaveInstanceState(fm: FragmentManager, f: Fragment, outState: Bundle) {
-        (f as? IBase)?.getDelegate(fm)?.onSaveInstanceState(outState)
-        Timber.d("FragmentLifecycle onFragmentSaveInstanceState f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
+        (f as? IBase)?.getDelegate()?.onSaveInstanceState(outState)
+        Timber.d("FragmentLifecycle onFragmentSaveInstanceState f=$f  delegate=${(f as? IBase)?.getDelegate()}")
     }
 
     override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
-        (f as? IBase)?.getDelegate(fm)?.onDestroy()
-        Timber.d("FragmentLifecycle onFragmentDestroyed f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
+        (f as? IBase)?.getDelegate()?.onDestroy()
+        Timber.d("FragmentLifecycle onFragmentDestroyed f=$f  delegate=${(f as? IBase)?.getDelegate()}")
     }
 
     override fun onFragmentDetached(fm: FragmentManager, f: Fragment) {
-        (f as? IBase)?.getDelegate(fm)?.onDetach()
-        Timber.d("FragmentLifecycle onFragmentDetached f=$f  delegate=${(f as? IBase)?.getDelegate(fm)}")
+        (f as? IBase)?.getDelegate()?.onDetach()
+        Timber.d("FragmentLifecycle onFragmentDetached f=$f  delegate=${(f as? IBase)?.getDelegate()}")
     }
 
 

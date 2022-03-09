@@ -3,8 +3,12 @@ package net.wangyl.goldenlife.base
 import android.app.Activity
 import android.app.Application.ActivityLifecycleCallbacks
 import android.os.Bundle
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentActivity
 import net.wangyl.goldenlife.BuildConfig
+import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.extension.getK
 import net.wangyl.goldenlife.utils.manager.AppManager
 import timber.log.Timber
@@ -39,33 +43,60 @@ class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
     }
 
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        AppManager.get().pushActivity(activity)
+    override fun onActivityCreated(f: Activity, savedInstanceState: Bundle?) {
+        AppManager.get().pushActivity(f)
         //mFragmentLifecycle 为 Fragment 生命周期实现类, 用于框架内部对每个 Fragment 的必要操作, 如给每个 Fragment 配置 FragmentDelegate
         //注册框架内部已实现的 Fragment 生命周期逻辑
-        (activity as? FragmentActivity)?.supportFragmentManager?.registerFragmentLifecycleCallbacks(
+        (f as? FragmentActivity)?.supportFragmentManager?.registerFragmentLifecycleCallbacks(
             getK(), true)
+        (f as? IBase)?.getDelegate()?.apply {
+            onCreate(savedInstanceState)
+            if (f.fullScreen()) {
+//                statusBar { transparent() }
+//                navigationBar { transparent() }
+            }
+        }
+        if (f is AppCompatActivity && f.findViewById<View>(R.id.toolbar) != null) {
+            f.findViewById<Toolbar>(R.id.toolbar)?.let {
+                f.setSupportActionBar(it)
+                f.supportActionBar?.setDisplayShowTitleEnabled(true)
+                //初始化其他事件，返回，actionbar等
+            }
+        }
     }
 
-    override fun onActivityStarted(activity: Activity) {
-
+    override fun onActivityStarted(f: Activity) {
+        (f as? IBase)?.getDelegate()?.onStart()
+        Timber.d("onActivityStarted")
     }
 
-    override fun onActivityResumed(activity: Activity) {
-
+    override fun onActivityResumed(f: Activity) {
+        AppManager.get().setCurrentActivity(f)
+        (f as? IBase)?.getDelegate()?.onResume()
+        Timber.d("onActivityResumed")
     }
 
-    override fun onActivityPaused(activity: Activity) {
-
+    override fun onActivityPaused(f: Activity) {
+        (f as? IBase)?.getDelegate()?.onPause()
+        Timber.d("onActivityPaused")
     }
 
-    override fun onActivityStopped(activity: Activity) {
+    override fun onActivityStopped(f: Activity) {
+        if (AppManager.get().getCurrentActivity() === f) {
+            AppManager.get().setCurrentActivity(null)
+        }
+        (f as? IBase)?.getDelegate()?.onStop()
+        Timber.d("onActivityStopped")
     }
 
-    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+    override fun onActivitySaveInstanceState(f: Activity, outState: Bundle) {
+        (f as? IBase)?.getDelegate()?.onSaveInstanceState(outState)
+        Timber.d("onActivitySaveInstanceState")
     }
 
-    override fun onActivityDestroyed(activity: Activity) {
-        AppManager.get().popActivity(activity)
+    override fun onActivityDestroyed(f: Activity) {
+        AppManager.get().popActivity(f)
+        (f as? IBase)?.getDelegate()?.onDetach()
+        Timber.d("onActivityDestroyed ")
     }
 }

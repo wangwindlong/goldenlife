@@ -13,11 +13,10 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.set
 import net.wangyl.goldenlife.databinding.ActivityMainBinding
 import net.wangyl.goldenlife.model.PostData
-import net.wangyl.goldenlife.ui.nav.NavHostFragment
-import net.wangyl.goldenlife.ui.nav.StickyNavigator
 
 class MainActivity : AppCompatActivity() {
 

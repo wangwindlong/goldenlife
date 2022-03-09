@@ -17,6 +17,7 @@ import net.wangyl.goldenlife.base.BaseFragment
 import net.wangyl.goldenlife.extension.getK
 import net.wangyl.goldenlife.model.BaseModel
 import net.wangyl.goldenlife.model.PostData
+import net.wangyl.goldenlife.utils.manager.EventBusManager
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -28,6 +29,7 @@ private const val ARG_PARAM2 = "param2"
  */
 open class BaseMviFragment<Data : BaseModel> : BaseFragment(), RefreshEvent {
 
+    val eventBus = EventBusManager.get()
     private var param1: String? = null
     private var param2: String? = null
     val vm by mviViewModel<BaseVM<Data>, Data>(this) {
@@ -78,7 +80,7 @@ inline fun <reified VM : BaseVM<DataClass>, DataClass : Parcelable> Fragment.mvi
 ): Lazy<VM> {
     return this.viewModels(factoryProducer = {
         object : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
-            override fun <T : ViewModel?> create(
+            override fun <T : ViewModel> create(
                 key: String,
                 modelClass: Class<T>,
                 handle: SavedStateHandle

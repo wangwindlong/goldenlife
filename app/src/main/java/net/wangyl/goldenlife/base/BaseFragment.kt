@@ -13,15 +13,15 @@ open class BaseFragment : Fragment(), IBase {
     open val TAG = javaClass.simpleName
     var _delegate: ILifeDelegate? = null
 
-    override fun getDelegate(fm: FragmentManager): ILifeDelegate? {
+    override fun getDelegate(): ILifeDelegate? {
         return if (_delegate == null) {
-            _delegate = LifeDelegateIml(fm, this)
+            _delegate = LifeDelegateIml(this)
             _delegate
         } else _delegate
     }
 
     @Subscribe
-    open fun test(data: String) {
-        Timber.d("$TAG received data: $data")
+    open fun test(data: MsgEvent<Any>) {
+        Timber.d("$TAG received data: ${data.from}， ${data.msg}")
     }
 }

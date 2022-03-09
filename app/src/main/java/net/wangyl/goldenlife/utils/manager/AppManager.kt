@@ -1,7 +1,7 @@
 package net.wangyl.goldenlife.utils.manager
 
 import android.app.Activity
-import java.lang.ref.WeakReference
+import timber.log.Timber
 import java.util.*
 
 class AppManager private constructor() {
@@ -28,7 +28,7 @@ class AppManager private constructor() {
     /**
      * 当前在前台的 Activity
      */
-    private val mCurrentActivity: Activity? = null
+    private var mCurrentActivity: Activity? = null
 
     /**
      * @param activity 作用说明 ：添加一个activity到管理里
@@ -48,5 +48,19 @@ class AppManager private constructor() {
 //        LOGD(TAG, "activityList:size:" + mActivitys.size)
     }
 
+    fun getCurrentActivity(): Activity? {
+        return mCurrentActivity
+    }
 
+    fun setCurrentActivity(currentActivity: Activity?) {
+        mCurrentActivity = currentActivity
+    }
+
+    fun getTopActivity(): Activity? {
+        if (mActivitys == null) {
+            Timber.w("mActivityList == null when getTopActivity()")
+            return null
+        }
+        return if (mActivitys.size > 0) mActivitys.get(mActivitys.size - 1) else null
+    }
 }

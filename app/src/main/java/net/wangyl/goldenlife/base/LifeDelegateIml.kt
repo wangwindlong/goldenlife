@@ -12,14 +12,13 @@ import java.lang.reflect.Method
 /**
  * 生命周期的默认代理实现类，添加eventbus之类
  */
-class LifeDelegateIml(val fm: FragmentManager, val iBase: IBase) : ILifeDelegate {
+class LifeDelegateIml(private val iBase: IBase) : ILifeDelegate {
 
     override fun onAttach(context: Context) {
 
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Timber.i("onCreate ibase class= ", iBase::class.java)
         if (iBase.useEventBus()) {
             EventBusManager.get().register(iBase)
         }
@@ -56,10 +55,6 @@ class LifeDelegateIml(val fm: FragmentManager, val iBase: IBase) : ILifeDelegate
     }
 
     override fun onDetach() {
-    }
-
-    override fun isAdded(): Boolean {
-        return iBase.isAdded()
     }
 
 }

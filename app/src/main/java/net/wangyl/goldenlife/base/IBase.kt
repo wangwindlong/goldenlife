@@ -15,8 +15,8 @@ interface IBase {
 
     fun initData(savedInstanceState: Bundle?) = Unit
     fun useEventBus() : Boolean = true
+    fun fullScreen() : Boolean = false
     fun setData(data: Any?) = Unit
-    fun isAdded(): Boolean
-    fun getDelegate(fm: FragmentManager): ILifeDelegate?
+    fun getDelegate(): ILifeDelegate?
 
 }

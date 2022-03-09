@@ -32,5 +32,5 @@ interface ILifeDelegate {
     /**
      * Return true if the fragment is currently added to its activity.
      */
-    fun isAdded(): Boolean
+//    fun isAdded(): Boolean
 }

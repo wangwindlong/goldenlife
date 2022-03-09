@@ -23,4 +23,7 @@
     <declare-styleable name="ShrinkLayout">
         <attr name="shrink_id" format="integer"/>
     </declare-styleable>
+
+    <attr name="primaryTextSelector" format="reference" />
+    <attr name="secondPrimaryTextSelector" format="reference" />
 </resources>

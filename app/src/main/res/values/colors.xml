@@ -13,4 +13,24 @@
     <color name="divider_color">#66000000</color>
     <color name="color_light_blue">#00DDB6</color>
     <color name="txt_color">#48495F</color>
+
+    <color name="divider">#1f000000</color> <!-- 12% black -->
+    <color name="transparent">#00000000</color> <!-- 12% black -->
+    <color name="page_indicator_dark">#80333333</color>
+    <color name="page_indicator_dark_selected">#ff333333</color>
+    <color name="selected_comment_background">#ffffffff</color>
+    <color name="error">#ffdd2c00</color>
+    <color name="delete">#fff44336</color>
+    <color name="shadow">#4c000000</color>
+
+    <color name="neutral_pressed">#33999999</color>
+    <color name="date_picker_text_normal">#ff999999</color>
+    <color name="date_picker_text_disabled">#cccccc</color>
+
+    <color name="calendar_header">#999999</color>
+    <color name="date_picker_view_animator">#f2f2f2</color>
+    <color name="calendar_selected_date_text">#ffd1d2d4</color>
+    <color name="gray_font">#acacac</color>
+    <color name="colorPrimaryText_light">#de000000</color>
+    <color name="container_bg">#f0f0f0</color>
 </resources>
