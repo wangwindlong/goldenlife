@@ -1,4 +1,4 @@
-package net.wangyl.goldenlife.mvi.base
+package net.wangyl.goldenlife.mvi.orbit
 
 import android.os.Bundle
 import android.util.Log
@@ -15,7 +15,6 @@ import com.chad.library.adapter.base.listener.OnItemClickListener
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.api.Status
-import net.wangyl.goldenlife.extension.toast
 import net.wangyl.goldenlife.base.BaseItem
 import net.wangyl.goldenlife.base.BaseModel
 import org.orbitmvi.orbit.syntax.simple.intent

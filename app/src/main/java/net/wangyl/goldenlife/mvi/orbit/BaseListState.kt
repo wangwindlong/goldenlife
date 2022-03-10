@@ -1,4 +1,4 @@
-package net.wangyl.goldenlife.mvi.base
+package net.wangyl.goldenlife.mvi.orbit
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

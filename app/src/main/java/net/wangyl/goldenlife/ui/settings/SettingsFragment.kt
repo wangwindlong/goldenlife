@@ -6,15 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import net.wangyl.goldenlife.base.MsgEvent
 import net.wangyl.goldenlife.databinding.FragmentSettingsBinding
 import net.wangyl.goldenlife.model.PostData
-import net.wangyl.goldenlife.mvi.base.BaseMviFragment
-import net.wangyl.goldenlife.utils.manager.EventBusManager
+import net.wangyl.goldenlife.mvi.orbit.BaseMviFragment
 
 class SettingsFragment : BaseMviFragment<PostData>() {
 

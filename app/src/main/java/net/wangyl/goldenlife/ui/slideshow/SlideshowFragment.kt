@@ -8,8 +8,9 @@ import net.wangyl.goldenlife.api.Status
 import net.wangyl.goldenlife.databinding.ItemTextViewBinding
 import net.wangyl.goldenlife.extension.navTo
 import net.wangyl.goldenlife.model.PostData
-import net.wangyl.goldenlife.mvi.base.*
+import net.wangyl.goldenlife.mvi.orbit.*
 import org.koin.android.ext.android.inject
+import timber.log.Timber
 
 class SlideshowFragment : BaseListFragment<PostData>() {
 
@@ -26,7 +27,7 @@ class SlideshowFragment : BaseListFragment<PostData>() {
     override fun sideEffect(event: Event) {
         when (event) {
             is DetailEvent<*> -> {
-                Log.d(TAG, "navigateTo event ${event.value}")
+                Timber.d("navigateTo event ${event.value}")
                 navTo(R.id.nav_settings, bundleOf("itemId" to (event.value as PostData).getItemId(),
                 "item" to event.value)//.apply { putParcelable("item", event.value)  }
                 )

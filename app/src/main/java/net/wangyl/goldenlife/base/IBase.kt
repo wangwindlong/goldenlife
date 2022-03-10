@@ -17,7 +17,7 @@ interface IBase {
     fun useEventBus() : Boolean = true
     fun fullScreen() : Boolean = false
     fun setData(data: Any?) = Unit
-    fun getDelegate(): ILifeDelegate?
+    fun baseDelegate(): ILifeDelegate?
 //    fun initTitle(): CharSequence? = ""
 
 }

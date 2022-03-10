@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import net.wangyl.goldenlife.R
-import net.wangyl.goldenlife.mvi.base.RefreshEvent
+import net.wangyl.goldenlife.mvi.orbit.RefreshEvent
 import org.greenrobot.eventbus.Subscribe
 import timber.log.Timber
 
@@ -14,7 +14,7 @@ open class BaseFragment : Fragment(), IBase, RefreshEvent {
     val TAG = javaClass.simpleName
     private var _delegate: ILifeDelegate? = null
 
-    override fun getDelegate(): ILifeDelegate? {
+    override fun baseDelegate(): ILifeDelegate? {
         return if (_delegate == null) {
             _delegate = LifeDelegateIml(this)
             _delegate

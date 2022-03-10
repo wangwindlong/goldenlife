@@ -1,19 +1,13 @@
-package net.wangyl.goldenlife.mvi.base
+package net.wangyl.goldenlife.mvi.orbit
 
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
-import net.wangyl.goldenlife.R
-import net.wangyl.goldenlife.base.BaseBindFragment
 import net.wangyl.goldenlife.base.BaseFragment
 import net.wangyl.goldenlife.base.BaseModel
 import net.wangyl.goldenlife.utils.manager.EventBusManager

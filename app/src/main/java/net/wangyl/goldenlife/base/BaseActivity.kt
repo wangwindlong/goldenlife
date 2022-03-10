@@ -3,6 +3,7 @@ package net.wangyl.goldenlife.base
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.zackratos.ultimatebarx.ultimatebarx.navigationBar
@@ -13,13 +14,13 @@ import timber.log.Timber
 
 const val TAG_FRAGNAME = "fragment_classname"
 
-open class BaseActivity : FragmentActivity(), IBase {
+open class BaseActivity : AppCompatActivity(), IBase {
     val TAG = javaClass.simpleName
     var fragName: String? = ""
     private var mBackListener: OnBackPressedListener? = null
     private var _delegate: ILifeDelegate? = null
 
-    override fun getDelegate(): ILifeDelegate? {
+    override fun baseDelegate(): ILifeDelegate? {
         return if (_delegate == null) {
             _delegate = LifeDelegateIml(this)
             _delegate
@@ -55,7 +56,6 @@ open class BaseActivity : FragmentActivity(), IBase {
         }
     }
 
-
     open fun initLayoutId() : Int {
         return R.layout.activity_base_fragment
     }
@@ -84,11 +84,9 @@ open class BaseActivity : FragmentActivity(), IBase {
         }
         if (supportFragmentManager.backStackEntryCount <= 0) {
             super.onBackPressed()
-
         } else {
             supportFragmentManager.popBackStackImmediate()
         }
-
     }
 
     override fun onDestroy() {

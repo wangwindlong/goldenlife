@@ -3,7 +3,6 @@ package net.wangyl.goldenlife.base
 import android.app.Activity
 import android.app.Application.ActivityLifecycleCallbacks
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentActivity
@@ -49,37 +48,37 @@ class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
         //注册框架内部已实现的 Fragment 生命周期逻辑
         (f as? FragmentActivity)?.supportFragmentManager?.registerFragmentLifecycleCallbacks(
             getK(), true)
-        (f as? IBase)?.getDelegate()?.apply {
+        (f as? IBase)?.baseDelegate()?.apply {
             onCreate(savedInstanceState)
             if (f.fullScreen()) {
 //                statusBar { transparent() }
 //                navigationBar { transparent() }
             }
         }
-        if (f is AppCompatActivity) {
-            f.findViewById<Toolbar>(R.id.toolbar)?.let {
-                f.setSupportActionBar(it)
-                f.supportActionBar?.setDisplayShowTitleEnabled(true)
+        f.findViewById<Toolbar>(R.id.toolbar)?.let {
+            (f as? AppCompatActivity)?.setSupportActionBar(it)
+            (f as? AppCompatActivity)?.supportActionBar?.setDisplayShowTitleEnabled(true)
 //                it.setTitle(f.title)
-                //初始化其他事件，返回，actionbar等
-
+            //初始化其他事件，返回，actionbar等
+            it.setNavigationOnClickListener {
+                f.onBackPressed()
             }
         }
     }
 
     override fun onActivityStarted(f: Activity) {
-        (f as? IBase)?.getDelegate()?.onStart()
+        (f as? IBase)?.baseDelegate()?.onStart()
         Timber.d("onActivityStarted")
     }
 
     override fun onActivityResumed(f: Activity) {
         AppManager.get().setCurrentActivity(f)
-        (f as? IBase)?.getDelegate()?.onResume()
+        (f as? IBase)?.baseDelegate()?.onResume()
         Timber.d("onActivityResumed")
     }
 
     override fun onActivityPaused(f: Activity) {
-        (f as? IBase)?.getDelegate()?.onPause()
+        (f as? IBase)?.baseDelegate()?.onPause()
         Timber.d("onActivityPaused")
     }
 
@@ -87,18 +86,18 @@ class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
         if (AppManager.get().getCurrentActivity() === f) {
             AppManager.get().setCurrentActivity(null)
         }
-        (f as? IBase)?.getDelegate()?.onStop()
+        (f as? IBase)?.baseDelegate()?.onStop()
         Timber.d("onActivityStopped")
     }
 
     override fun onActivitySaveInstanceState(f: Activity, outState: Bundle) {
-        (f as? IBase)?.getDelegate()?.onSaveInstanceState(outState)
+        (f as? IBase)?.baseDelegate()?.onSaveInstanceState(outState)
         Timber.d("onActivitySaveInstanceState")
     }
 
     override fun onActivityDestroyed(f: Activity) {
         AppManager.get().popActivity(f)
-        (f as? IBase)?.getDelegate()?.onDestroy()
+        (f as? IBase)?.baseDelegate()?.onDestroy()
         Timber.d("onActivityDestroyed ")
     }
 }

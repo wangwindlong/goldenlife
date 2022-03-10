@@ -26,7 +26,7 @@
             app:titleMargins="0dp"
             app:colorPrimaryDark="@color/black"
             app:titleCentered="true"
-            app:navigationIcon="@drawable/ic_arrow_back"
+            app:navigationIcon="@mipmap/ic_arrow_back"
             app:title="@string/app_name"
             app:titleTextColor="@color/black"
             >

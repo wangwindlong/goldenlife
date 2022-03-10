@@ -1,4 +1,4 @@
-package net.wangyl.goldenlife.mvi.base
+package net.wangyl.goldenlife.mvi.orbit
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import net.wangyl.goldenlife.base.BaseModel

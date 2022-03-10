@@ -3,21 +3,21 @@ package net.wangyl.goldenlife.extension
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
+import android.content.res.Resources
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
-import androidx.navigation.fragment.FragmentNavigator
-import androidx.navigation.fragment.findNavController
 import net.wangyl.goldenlife.GoldApp
 import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.base.TAG_FRAGNAME
 import net.wangyl.goldenlife.ui.SimpleActivity
-import org.koin.android.ext.android.inject
 import org.koin.core.qualifier.Qualifier
 import org.koin.java.KoinJavaComponent
 import timber.log.Timber
+
+//</editor-fold>
+private val density = Resources.getSystem().displayMetrics.density
 
 inline fun <reified T> getK(qualifier: Qualifier? = null): T {
     return KoinJavaComponent.get(T::class.java, qualifier)
@@ -36,6 +36,15 @@ fun goIntent(ctx: Context?, fragName: String, extra: Intent? = null): Intent {
         extra?.let { putExtras(it) }
         putExtra(TAG_FRAGNAME, fragName)
     }
+}
+
+fun Int.px(): Int {
+    return (this / density).toInt()
+}
+
+//使用值对应的dp
+fun Int.dp(): Int {
+    return (0.5f + this * density).toInt()
 }
 
 fun Activity.goActivity(frag: Class<Fragment>, extra: Intent? = null) {

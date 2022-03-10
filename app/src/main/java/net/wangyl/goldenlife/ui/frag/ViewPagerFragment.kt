@@ -12,8 +12,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.base.BaseBindFragment
 import net.wangyl.goldenlife.databinding.FragmentViewpagerBinding
-import net.wangyl.goldenlife.model.PostData
-import net.wangyl.goldenlife.mvi.base.BaseMviFragment
+import net.wangyl.goldenlife.ui.slideshow.SlideshowFragment
 
 class ViewPagerFragment : BaseBindFragment<FragmentViewpagerBinding>() {
 
@@ -21,11 +20,10 @@ class ViewPagerFragment : BaseBindFragment<FragmentViewpagerBinding>() {
         return R.layout.fragment_viewpager
     }
 
-
     override fun initView(v: View?) {
         binding.viewPager.adapter = object : FragmentStateAdapter(this) {
             override fun createFragment(position: Int): Fragment {
-                return CardFragment.create(Card.DECK[position])
+                return SlideshowFragment()
             }
 
             override fun getItemCount(): Int {
