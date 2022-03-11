@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import net.wangyl.goldenlife.databinding.FragmentReflowBinding
 import net.wangyl.goldenlife.extension.goActivity
+import net.wangyl.goldenlife.ui.frag.TabViewPagerFragment
 import net.wangyl.goldenlife.ui.frag.ViewPagerFragment
 
 class ReflowFragment : Fragment() {
@@ -37,7 +38,7 @@ class ReflowFragment : Fragment() {
 
         val textView: TextView = binding.textReflow
         textView.setOnClickListener {
-            goActivity(ViewPagerFragment::class.java.name)
+            goActivity(TabViewPagerFragment::class.java.name)
         }
         reflowViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
