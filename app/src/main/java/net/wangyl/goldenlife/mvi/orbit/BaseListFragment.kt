@@ -92,12 +92,12 @@ abstract class BaseListFragment<Data : BaseModel> :
         }
 
         initRV(view)
-        vm.observe(viewLifecycleOwner, state = ::render, sideEffect = ::sideEffect)
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
+    override fun loadData() {
+        vm.observe(viewLifecycleOwner, state = ::render, sideEffect = ::sideEffect)
+        refresh(true)
     }
 
     private fun initRV(view: View) {
@@ -131,7 +131,6 @@ abstract class BaseListFragment<Data : BaseModel> :
             }
 
         })
-        refresh(true)
     }
 
     fun loadList(pageInfo: PageInfo) {

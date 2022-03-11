@@ -1,5 +1,6 @@
 package net.wangyl.goldenlife.base
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,13 @@ import timber.log.Timber
 open class BaseFragment : Fragment(), IBase, RefreshEvent {
     val TAG = javaClass.simpleName
     private var _delegate: ILifeDelegate? = null
+    private var isInitData: Boolean =
+        false            // flag bit to determine whether the data is initialized
+    private var isVisibleToUser: Boolean =
+        false       // flags to determine whether fragments are visible
+    private var isPrepareView: Boolean =
+        false         // flag bit to determine that view has been loaded to avoid null pointer operations
+
 
     override fun baseDelegate(): ILifeDelegate? {
         return if (_delegate == null) {
@@ -22,16 +30,22 @@ open class BaseFragment : Fragment(), IBase, RefreshEvent {
         } else _delegate
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            lazyInitData()
+        }
+    }
+
     override fun initData(savedInstanceState: Bundle?) {
 //        savedInstanceState?.apply {
 //            toolBar = this.getInt("toolbar_state", toolBar)
 //        }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Timber.d("FragmentLifecycle onCreate before super create ")
-        super.onCreate(savedInstanceState)
-        Timber.d("FragmentLifecycle onCreate after super create")
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        lazyInitData() // Load lazily
     }
 
     override fun onCreateView(
@@ -42,14 +56,49 @@ open class BaseFragment : Fragment(), IBase, RefreshEvent {
         return createView(inflater, container)
     }
 
-    open fun createView(inflater: LayoutInflater, container: ViewGroup?) : View? {
+    /**
+     * 子类复写创建view
+     */
+    open fun createView(inflater: LayoutInflater, container: ViewGroup?): View? {
         return inflater.inflate(getLayoutId(), container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         initView(view, savedInstanceState)
+        isPrepareView = true // At this point the view has been loaded and set to true
     }
 
+    override fun onResume() {
+        super.onResume()
+        isVisibleToUser = true
+        lazyInitData() // Load lazily
+    }
+
+    override fun onPause() {
+        super.onPause()
+        isVisibleToUser = false
+    }
+
+    private fun lazyInitData() {
+        if (!isInitData && isVisibleToUser && isPrepareView) {
+            loadData()
+            isInitData = true // Has the data flag been loaded and reassigned to true
+        } else if (!isInitData && parentFragment == null && isPrepareView) {
+            loadData()
+            isInitData = true
+        }
+    }
+
+    /**
+     * 延迟加载数据，子类复写
+     */
+    open fun loadData() {
+    }
+
+    /**
+     * 初始化view的操作
+     */
     open fun initView(v: View?, savedInstanceState: Bundle? = null) {
 //        UltimateBarX.statusBar(this)
 //            .fitWindow(true)
@@ -59,9 +108,7 @@ open class BaseFragment : Fragment(), IBase, RefreshEvent {
 //            .apply()
     }
 
-    open fun getLayoutId(): Int {
-        return R.layout.fragment_common_list
-    }
+    open fun getLayoutId(): Int = R.layout.fragment_common_list
 
     @Subscribe
     open fun receiveMsg(data: MsgEvent<Any>) {

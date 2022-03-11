@@ -31,6 +31,7 @@ const val FLAG_TABBAR_BOTTOM = 0x000010 //是否在底部显示tabbar，默认�
 class TabViewPagerFragment : BaseFragment() {
     var tabBar = 0x000001  //tablayout在顶部
     val fragments = arrayListOf<FragmentData>()
+    val offscreenCount = 40
 
     override fun initData(savedInstanceState: Bundle?) {
         super.initData(savedInstanceState)
@@ -52,7 +53,7 @@ class TabViewPagerFragment : BaseFragment() {
         }
         //初始化viewpager2
         val viewPager2 = ViewPager2(requireContext()).apply { id = R.id.viewpager }
-        viewPager2.offscreenPageLimit = 6
+        viewPager2.offscreenPageLimit = offscreenCount
         viewPager2.layoutParams =  ConstraintLayout.LayoutParams(0, 0).apply {
             leftToLeft = PARENT_ID
             rightToRight = PARENT_ID

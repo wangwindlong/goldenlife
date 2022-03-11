@@ -14,6 +14,7 @@ interface IBase {
 //        savedInstanceState: Bundle?
 //    ): View?
 
+    //初始化arguments 数据，不加载数据
     fun initData(savedInstanceState: Bundle?) = Unit
     fun useEventBus() : Boolean = true
     fun setupToolbar(toolbar: Toolbar?) = Unit
