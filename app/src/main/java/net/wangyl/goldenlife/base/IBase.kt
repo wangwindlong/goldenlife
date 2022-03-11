@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentManager
 
 interface IBase {
@@ -15,7 +16,7 @@ interface IBase {
 
     fun initData(savedInstanceState: Bundle?) = Unit
     fun useEventBus() : Boolean = true
-    fun fullScreen() : Boolean = false
+    fun setupToolbar(toolbar: Toolbar?) = Unit
     fun setData(data: Any?) = Unit
     fun baseDelegate(): ILifeDelegate?
 //    fun initTitle(): CharSequence? = ""

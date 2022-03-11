@@ -18,6 +18,10 @@ import androidx.navigation.fragment.findNavController
 
 fun Fragment.navTo(navId: Int, bundle: Bundle? = null,
                    navOptions: NavOptions? = NavOptions.Builder().setHorizontalSlide().build(),
-                   extras: FragmentNavigator.Extras? = null) {
-    findNavController().navigate(navId, bundle, navOptions, extras)
+                   extras: FragmentNavigator.Extras? = null, fallback: (() -> Unit)? = null) {
+    try {
+        findNavController().navigate(navId, bundle, navOptions, extras)
+    } catch (e: IllegalStateException) {
+        fallback?.invoke()
+    }
 }

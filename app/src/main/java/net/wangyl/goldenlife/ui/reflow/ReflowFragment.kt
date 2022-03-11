@@ -1,5 +1,6 @@
 package net.wangyl.goldenlife.ui.reflow
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,10 +12,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
+import net.wangyl.goldenlife.base.FragmentData
 import net.wangyl.goldenlife.databinding.FragmentReflowBinding
 import net.wangyl.goldenlife.extension.goActivity
-import net.wangyl.goldenlife.ui.frag.TabViewPagerFragment
-import net.wangyl.goldenlife.ui.frag.ViewPagerFragment
+import net.wangyl.goldenlife.ui.frag.*
+import net.wangyl.goldenlife.ui.slideshow.SlideshowFragment
+import timber.log.Timber
 
 class ReflowFragment : Fragment() {
 
@@ -24,7 +27,7 @@ class ReflowFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
     private val viewModel by viewModels<ReflowViewModel>()
-    
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -38,7 +41,8 @@ class ReflowFragment : Fragment() {
 
         val textView: TextView = binding.textReflow
         textView.setOnClickListener {
-            goActivity(TabViewPagerFragment::class.java.name)
+            goActivity(TabViewPagerFragment::class.java.name,
+                Intent().putParcelableArrayListExtra(TAG_FRAGS, testFragments()))
         }
         reflowViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
@@ -50,7 +54,7 @@ class ReflowFragment : Fragment() {
 
         lifecycleScope.launchWhenCreated {
             viewModel.loginUIState.collect {
-                Log.d("ReflowFragment", "receive state = ${it}")
+                Timber.d("ReflowFragment", "receive state = ${it}")
                 when (it) {
                     is ReflowViewModel.LoginUIState.Loading -> {
 //                        progressBar.visibility = View.VISIBLE
@@ -71,6 +75,16 @@ class ReflowFragment : Fragment() {
             }
         }
         return root
+    }
+
+    private fun testFragments() : ArrayList<FragmentData> {
+        val list = arrayListOf<FragmentData>()
+       for (i in 1..10) {
+           Timber.d("testFragments i=$i")
+           list.add(FragmentData(SlideshowFragment::class.java.name, "标题_$i",
+               Intent().putExtra("args_1", "args1")))
+        }
+        return list
     }
 
     override fun onDestroyView() {

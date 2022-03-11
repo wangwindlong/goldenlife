@@ -5,40 +5,19 @@
     android:id="@+id/main_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:windowBackground"
-    android:fitsSystemWindows="true"
-    >
+    android:background="?android:windowBackground">
 
-    <LinearLayout
+    <include layout="@layout/action_bar_title" />
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:background="@color/container_bg"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        />
+    <!--@string/appbar_scrolling_view_behavior-->
+    <!--app:layout_behavior="com.yxg.worker.behavior.FixScrollingFooterBehavior"-->
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appbar"
-            style="@style/HeaderBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:colorBackground"
-            android:orientation="vertical">
-
-            <include layout="@layout/action_bar_title" />
-            <!--<com.google.android.material.appbar.CollapsingToolbarLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--&gt;-->
-
-            <!--</com.google.android.material.appbar.CollapsingToolbarLayout>-->
-        </com.google.android.material.appbar.AppBarLayout>
-
-        <FrameLayout
-            android:id="@+id/fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/container_bg" />
-        <!--@string/appbar_scrolling_view_behavior-->
-        <!--app:layout_behavior="com.yxg.worker.behavior.FixScrollingFooterBehavior"-->
-
-    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

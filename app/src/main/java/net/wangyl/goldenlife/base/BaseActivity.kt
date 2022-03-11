@@ -1,13 +1,11 @@
 package net.wangyl.goldenlife.base
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import com.zackratos.ultimatebarx.ultimatebarx.navigationBar
-import com.zackratos.ultimatebarx.ultimatebarx.statusBar
+import com.zackratos.ultimatebarx.ultimatebarx.java.UltimateBarX
 import net.wangyl.goldenlife.R
 import org.greenrobot.eventbus.Subscribe
 import timber.log.Timber
@@ -19,6 +17,7 @@ open class BaseActivity : AppCompatActivity(), IBase {
     var fragName: String? = ""
     private var mBackListener: OnBackPressedListener? = null
     private var _delegate: ILifeDelegate? = null
+    private var mToolbar: Toolbar? = null
 
     override fun baseDelegate(): ILifeDelegate? {
         return if (_delegate == null) {
@@ -28,8 +27,8 @@ open class BaseActivity : AppCompatActivity(), IBase {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setContentView(initLayoutId())
         super.onCreate(savedInstanceState)
+        setContentView(initLayoutId())
 
         fragName = (savedInstanceState ?: intent.extras)?.getString(TAG_FRAGNAME)
         Timber.d("onCreate fragName= $fragName , savedInstanceState=$savedInstanceState, intent.extras=${intent.extras}")
@@ -50,10 +49,12 @@ open class BaseActivity : AppCompatActivity(), IBase {
                     .add(R.id.fragment_container, it).commitAllowingStateLoss()
             }
         }
-        if (fullScreen()) {
-            statusBar { transparent() }
-            navigationBar { transparent() }
-        }
+        mToolbar = findViewById(R.id.toolbar)
+
+//        if (fullScreen()) {
+//            statusBar { transparent() }
+//            navigationBar { transparent() }
+//        }
     }
 
     open fun initLayoutId() : Int {
@@ -74,8 +75,16 @@ open class BaseActivity : AppCompatActivity(), IBase {
         } else null
     }
 
-    override fun fullScreen(): Boolean {
-        return true
+    override fun setupToolbar(toolbar: Toolbar?) {
+        toolbar?.let {
+            mToolbar = it
+//            it.visibility = View.GONE
+            UltimateBarX.statusBarOnly(this)
+                .transparent()
+                .fitWindow(true)
+                .light(true)
+                .apply()
+        }
     }
 
     override fun onBackPressed() {

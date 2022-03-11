@@ -20,7 +20,7 @@ class ViewPagerFragment : BaseBindFragment<FragmentViewpagerBinding>() {
         return R.layout.fragment_viewpager
     }
 
-    override fun initView(v: View?) {
+    override fun initView(v: View?, savedInstanceState: Bundle?) {
         binding.viewPager.adapter = object : FragmentStateAdapter(this) {
             override fun createFragment(position: Int): Fragment {
                 return SlideshowFragment()

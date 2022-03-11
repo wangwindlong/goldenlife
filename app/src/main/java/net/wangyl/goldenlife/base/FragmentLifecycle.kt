@@ -25,7 +25,10 @@ class FragmentLifecycle private constructor(): FragmentManager.FragmentLifecycle
     }
 
     override fun onFragmentCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
-        (f as? IBase)?.baseDelegate()?.onCreate(savedInstanceState)
+        (f as? IBase)?.apply {
+            baseDelegate()?.onCreate(savedInstanceState)
+            initData(savedInstanceState ?: f.arguments)
+        }
         Timber.d("FragmentLifecycle onFragmentCreated f=$f ")
     }
 

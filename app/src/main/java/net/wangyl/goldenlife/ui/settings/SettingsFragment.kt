@@ -12,11 +12,12 @@ import net.wangyl.goldenlife.base.MsgEvent
 import net.wangyl.goldenlife.databinding.FragmentSettingsBinding
 import net.wangyl.goldenlife.model.PostData
 import net.wangyl.goldenlife.mvi.orbit.BaseMviFragment
+import timber.log.Timber
 
 class SettingsFragment : BaseMviFragment<PostData>() {
 
     private var _binding: FragmentSettingsBinding? = null
-    private val args: SettingsFragmentArgs by navArgs()
+//    private val args: SettingsFragmentArgs by navArgs()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -40,8 +41,8 @@ class SettingsFragment : BaseMviFragment<PostData>() {
         settingsViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
-        Log.d(TAG, "onCreateView arguments itemId= ${arguments?.get("itemId")}, item= ${arguments?.get("item")}")
-        Log.d(TAG, "onCreateView args itemId= ${args.itemId}, item= ${args.item}")
+        Timber.d("onCreateView arguments itemId= ${arguments?.get("itemId")}, item= ${arguments?.get("item")}")
+//        Log.d(TAG, "onCreateView args itemId= ${args.itemId}, item= ${args.item}")
         return root
     }
 

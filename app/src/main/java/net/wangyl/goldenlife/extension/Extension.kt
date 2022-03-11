@@ -7,9 +7,11 @@ import android.content.res.Resources
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavOptions
 import net.wangyl.goldenlife.GoldApp
 import net.wangyl.goldenlife.R
+import net.wangyl.goldenlife.base.FragmentData
 import net.wangyl.goldenlife.base.TAG_FRAGNAME
 import net.wangyl.goldenlife.ui.SimpleActivity
 import org.koin.core.qualifier.Qualifier
@@ -38,6 +40,14 @@ fun goIntent(ctx: Context?, fragName: String, extra: Intent? = null): Intent {
     }
 }
 
+
+fun Context.createFragment(fm: FragmentManager, data: FragmentData) : Fragment {
+    return fm.fragmentFactory.instantiate(classLoader, data.name).apply {
+        arguments = data.extra?.extras
+    }
+}
+
+
 fun Int.px(): Int {
     return (this / density).toInt()
 }
@@ -56,11 +66,11 @@ fun Activity.goActivity(fragName: String, extra: Intent? = null) {
 }
 
 fun Fragment.goActivity(frag: Class<Fragment>, extra: Intent? = null) {
-    startActivity(goIntent(context, frag.name, Intent().replaceExtras(arguments)))
+    startActivity(goIntent(context, frag.name, extra ?: Intent().replaceExtras(arguments)))
 }
 
 fun Fragment.goActivity(fragName: String, extra: Intent? = null) {
-    startActivity(goIntent(context, fragName, Intent().replaceExtras(arguments)))
+    startActivity(goIntent(context, fragName, extra ?: Intent().replaceExtras(arguments)))
 }
 
 fun Fragment.toast(@StringRes message: Int) {

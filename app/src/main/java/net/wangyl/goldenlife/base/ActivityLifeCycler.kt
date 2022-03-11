@@ -43,19 +43,29 @@ class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
 
 
     override fun onActivityCreated(f: Activity, savedInstanceState: Bundle?) {
+        Timber.d("onActivityCreated")
         AppManager.get().pushActivity(f)
         //mFragmentLifecycle 为 Fragment 生命周期实现类, 用于框架内部对每个 Fragment 的必要操作, 如给每个 Fragment 配置 FragmentDelegate
         //注册框架内部已实现的 Fragment 生命周期逻辑
         (f as? FragmentActivity)?.supportFragmentManager?.registerFragmentLifecycleCallbacks(
             getK(), true)
-        (f as? IBase)?.baseDelegate()?.apply {
-            onCreate(savedInstanceState)
-            if (f.fullScreen()) {
+        (f as? IBase)?.baseDelegate()?.let {
+            it.onCreate(savedInstanceState)
+//            if (f.fullScreen()) {
 //                statusBar { transparent() }
 //                navigationBar { transparent() }
-            }
+//            }
         }
-        f.findViewById<Toolbar>(R.id.toolbar)?.let {
+
+    }
+
+    override fun onActivityStarted(f: Activity) {
+        val toolbar: Toolbar? = f.findViewById(R.id.toolbar)
+        (f as? IBase)?.baseDelegate()?.let {
+            it.onStart()
+            f.setupToolbar(toolbar)
+        }
+        toolbar?.let {
             (f as? AppCompatActivity)?.setSupportActionBar(it)
             (f as? AppCompatActivity)?.supportActionBar?.setDisplayShowTitleEnabled(true)
 //                it.setTitle(f.title)
@@ -64,10 +74,6 @@ class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
                 f.onBackPressed()
             }
         }
-    }
-
-    override fun onActivityStarted(f: Activity) {
-        (f as? IBase)?.baseDelegate()?.onStart()
         Timber.d("onActivityStarted")
     }
 

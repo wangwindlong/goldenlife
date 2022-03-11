@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.zackratos.ultimatebarx.ultimatebarx.java.UltimateBarX
 import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.mvi.orbit.RefreshEvent
 import org.greenrobot.eventbus.Subscribe
@@ -21,22 +22,41 @@ open class BaseFragment : Fragment(), IBase, RefreshEvent {
         } else _delegate
     }
 
+    override fun initData(savedInstanceState: Bundle?) {
+//        savedInstanceState?.apply {
+//            toolBar = this.getInt("toolbar_state", toolBar)
+//        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Timber.d("FragmentLifecycle onCreate before super create ")
+        super.onCreate(savedInstanceState)
+        Timber.d("FragmentLifecycle onCreate after super create")
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val v = createView(inflater, container)
-        initView(v)
-        return v
+        return createView(inflater, container)
     }
 
     open fun createView(inflater: LayoutInflater, container: ViewGroup?) : View? {
         return inflater.inflate(getLayoutId(), container, false)
     }
 
-    open fun initView(v: View?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        initView(view, savedInstanceState)
+    }
 
+    open fun initView(v: View?, savedInstanceState: Bundle? = null) {
+//        UltimateBarX.statusBar(this)
+//            .fitWindow(true)
+//            .colorRes(R.color.grey_100)
+//            .light(true)
+//            .lvlColorRes(R.color.colorPrimaryText_light)
+//            .apply()
     }
 
     open fun getLayoutId(): Int {

@@ -3,36 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/appbar"
     style="@style/HeaderBar"
-    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:colorBackground"
-    android:orientation="vertical"
     >
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:layout_collapseMode="pin"
-            app:layout_collapseParallaxMultiplier="0.7"
-            app:contentInsetLeft="0dp"
-            app:contentInsetStart="0dp"
-            app:logo="@null"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
-            android:theme="@style/ToolBarStyle"
-            app:titleMarginStart="0dp"
-            app:titleMargins="0dp"
-            app:colorPrimaryDark="@color/black"
-            app:titleCentered="true"
-            app:navigationIcon="@mipmap/ic_arrow_back"
-            app:title="@string/app_name"
-            app:titleTextColor="@color/black"
-            >
-<!--                app:titleTextAppearance="@style/Theme.IOSched.Sessions"-->
-
-
-        </com.google.android.material.appbar.MaterialToolbar>
+    <include layout="@layout/layout_toolbar" />
 
 </com.google.android.material.appbar.AppBarLayout>

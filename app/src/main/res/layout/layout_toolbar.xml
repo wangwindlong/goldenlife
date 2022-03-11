@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.appbar.MaterialToolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="?attr/colorPrimary"
+    android:theme="@style/ToolBarStyle"
+    app:colorPrimaryDark="@color/black"
+    app:contentInsetLeft="0dp"
+    app:contentInsetStart="0dp"
+    app:layout_collapseMode="pin"
+    app:layout_collapseParallaxMultiplier="0.7"
+    app:logo="@null"
+    app:navigationIcon="@mipmap/ic_arrow_back"
+    app:popupTheme="@style/AppTheme.PopupOverlay"
+    app:title="@string/app_name"
+    app:titleCentered="true"
+    app:titleMarginStart="0dp"
+    app:titleMargins="0dp"
+    app:titleTextColor="@color/black" />
+    <!-- app:titleTextAppearance="@style/Theme.IOSched.Sessions"-->
+
