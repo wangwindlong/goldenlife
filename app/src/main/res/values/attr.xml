@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="ProgressTextButton">
-        <attr name="ptb_progress_width" format="dimension" />
-        <attr name="ptb_progress_stroke_width" format="dimension" />
-    </declare-styleable>
+<!--    <declare-styleable name="ProgressTextButton">-->
+<!--        <attr name="ptb_progress_width" format="dimension" />-->
+<!--        <attr name="ptb_progress_stroke_width" format="dimension" />-->
+<!--    </declare-styleable>-->
 
-    <declare-styleable name="ProgressImageButton">
-        <attr name="pib_progress_width" format="dimension" />
-        <attr name="pib_progress_stroke_width" format="dimension" />
-    </declare-styleable>
+<!--    <declare-styleable name="ProgressImageButton">-->
+<!--        <attr name="pib_progress_width" format="dimension" />-->
+<!--        <attr name="pib_progress_stroke_width" format="dimension" />-->
+<!--    </declare-styleable>-->
 
-    <declare-styleable name="TagsFlowView">
-        <attr name="tfv_style" format="enum">
-            <enum name="normal" value="0"/>
-            <enum name="small" value="1"/>
-        </attr>
-        <attr name="tfv_cell_clickable" format="boolean"/>
-        <attr name="tfv_max_lines" format="integer"/>
-    </declare-styleable>
+<!--    <declare-styleable name="TagsFlowView">-->
+<!--        <attr name="tfv_style" format="enum">-->
+<!--            <enum name="normal" value="0"/>-->
+<!--            <enum name="small" value="1"/>-->
+<!--        </attr>-->
+<!--        <attr name="tfv_cell_clickable" format="boolean"/>-->
+<!--        <attr name="tfv_max_lines" format="integer"/>-->
+<!--    </declare-styleable>-->
 
-    <declare-styleable name="ShrinkLayout">
-        <attr name="shrink_id" format="integer"/>
-    </declare-styleable>
+<!--    <declare-styleable name="ShrinkLayout">-->
+<!--        <attr name="shrink_id" format="integer"/>-->
+<!--    </declare-styleable>-->
 
-    <attr name="primaryTextSelector" format="reference" />
-    <attr name="secondPrimaryTextSelector" format="reference" />
+<!--    <attr name="primaryTextSelector" format="reference" />-->
+<!--    <attr name="secondPrimaryTextSelector" format="reference" />-->
 </resources>

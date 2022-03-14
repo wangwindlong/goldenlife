@@ -2,7 +2,6 @@ package net.wangyl.goldenlife.ui.reflow
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,10 +11,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
-import net.wangyl.goldenlife.base.FragmentData
+import kotlinx.coroutines.flow.collect
+import net.wangyl.base.data.FragmentData
+import net.wangyl.base.TAG_FRAGS
+import net.wangyl.base.TabViewPagerFragment
 import net.wangyl.goldenlife.databinding.FragmentReflowBinding
-import net.wangyl.goldenlife.extension.goActivity
-import net.wangyl.goldenlife.ui.frag.*
+import net.wangyl.base.extension.goActivity
 import net.wangyl.goldenlife.ui.slideshow.SlideshowFragment
 import timber.log.Timber
 
@@ -41,7 +42,8 @@ class ReflowFragment : Fragment() {
 
         val textView: TextView = binding.textReflow
         textView.setOnClickListener {
-            goActivity(TabViewPagerFragment::class.java.name,
+            goActivity(
+                TabViewPagerFragment::class.java.name,
                 Intent().putParcelableArrayListExtra(TAG_FRAGS, testFragments()))
         }
         reflowViewModel.text.observe(viewLifecycleOwner) {
@@ -81,8 +83,12 @@ class ReflowFragment : Fragment() {
         val list = arrayListOf<FragmentData>()
        for (i in 1..10) {
            Timber.d("testFragments i=$i")
-           list.add(FragmentData(SlideshowFragment::class.java.name, "标题_$i",
-               Intent().putExtra("args_1", "args1")))
+           list.add(
+               FragmentData(
+                   SlideshowFragment::class.java.name, "标题_$i",
+                   Intent().putExtra("args_1", "args1")
+               )
+           )
         }
         return list
     }

@@ -30,7 +30,7 @@
 //import com.bumptech.glide.request.RequestOptions
 //import com.xwray.groupie.viewbinding.BindableItem
 //import net.wangyl.goldenlife.R
-//import net.wangyl.goldenlife.mvi.base.BaseListVM
+//import net.wangyl.base.mvi.base.BaseListVM
 //
 //data class BaseListItem<Model : Parcelable, Binding : ViewBinding>(
 //    private val model: Model,

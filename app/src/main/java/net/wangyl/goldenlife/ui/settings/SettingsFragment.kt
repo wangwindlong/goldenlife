@@ -1,17 +1,16 @@
 package net.wangyl.goldenlife.ui.settings
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.navArgs
-import net.wangyl.goldenlife.base.MsgEvent
+import net.wangyl.base.data.MsgEvent
 import net.wangyl.goldenlife.databinding.FragmentSettingsBinding
 import net.wangyl.goldenlife.model.PostData
-import net.wangyl.goldenlife.mvi.orbit.BaseMviFragment
+import net.wangyl.base.mvi.orbit.BaseMviFragment
+import net.wangyl.base.manager.postEvent
 import timber.log.Timber
 
 class SettingsFragment : BaseMviFragment<PostData>() {
@@ -36,7 +35,7 @@ class SettingsFragment : BaseMviFragment<PostData>() {
 
         val textView: Button = binding.textSettings
         textView.setOnClickListener {
-            eventBus.post(MsgEvent("test", "${textView.text}"))
+            postEvent(MsgEvent("test", "${textView.text}"))
         }
         settingsViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it

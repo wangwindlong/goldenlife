@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="base_fab_margin">16dp</dimen>
+    <dimen name="base_fragment_horizontal_margin">16dp</dimen>
+    <dimen name="base_item_transform_image_length">48dp</dimen>
+    <dimen name="base_reflow_text_block_max_percent">1</dimen>
+    <dimen name="base_reflow_text_block_horizontal_gap">8dp</dimen>
+    <dimen name="base_reflow_text_title_size">22sp</dimen>
+    <dimen name="base_reflow_text_description_size">13sp</dimen>
+
+    <dimen name="base_middle_progress_width">3.5dp</dimen>
+    <dimen name="base_middle_progress_radius">10dp</dimen>
+
+    <dimen name="base_separator_margin_start">16dp</dimen>
+    <dimen name="base_separator_margin_start_icon">72dp</dimen>
+    <dimen name="base_separator_margin_end">16dp</dimen>
+    <dimen name="base_separator_thickness">1dp</dimen>
+    <dimen name="base_toolbar_logo_size">24dp</dimen>
+    <dimen name="base_toolbar_logo_padding_end">24dp</dimen>
+
+    <dimen name="base_headerbar_elevation">4dp</dimen>
+</resources>

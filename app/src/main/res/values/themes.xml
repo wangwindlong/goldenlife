@@ -47,9 +47,9 @@
         <item name="colorAccent">@color/colorAccent</item>
 
         <!-- For selection -->
-        <item name="selectableItemBackground">@drawable/selector_item_light</item>
-        <item name="secondPrimaryTextSelector">@drawable/second_primary_text_selector_light</item>
-        <item name="primaryTextSelector">@drawable/primary_text_selector_light</item>
+        <item name="selectableItemBackground">@drawable/base_selector_item_light</item>
+        <item name="base_secondPrimaryTextSelector">@drawable/base_second_primary_text_selector_light</item>
+        <item name="base_primaryTextSelector">@drawable/base_primary_text_selector_light</item>
 
         <!-- Spinner -->
     </style>

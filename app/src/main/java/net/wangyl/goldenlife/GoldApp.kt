@@ -2,9 +2,8 @@ package net.wangyl.goldenlife
 
 import android.app.Application
 import android.content.Context
-import net.wangyl.goldenlife.api.Status
-import net.wangyl.goldenlife.base.ActivityLifeCycler
-import net.wangyl.goldenlife.extension.getK
+import net.wangyl.base.data.Status
+import net.wangyl.base.extension.getK
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.qualifier.named

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="base_ProgressTextButton">
+        <attr name="base_ptb_progress_width" format="dimension" />
+        <attr name="base_ptb_progress_stroke_width" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="base_ProgressImageButton">
+        <attr name="base_pib_progress_width" format="dimension" />
+        <attr name="base_pib_progress_stroke_width" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="base_TagsFlowView">
+        <attr name="base_tfv_style" format="enum">
+            <enum name="normal" value="0"/>
+            <enum name="small" value="1"/>
+        </attr>
+        <attr name="base_tfv_cell_clickable" format="boolean"/>
+        <attr name="base_tfv_max_lines" format="integer"/>
+    </declare-styleable>
+
+    <declare-styleable name="base_ShrinkLayout">
+        <attr name="base_shrink_id" format="integer"/>
+    </declare-styleable>
+
+    <attr name="base_primaryTextSelector" format="reference" />
+    <attr name="base_secondPrimaryTextSelector" format="reference" />
+</resources>

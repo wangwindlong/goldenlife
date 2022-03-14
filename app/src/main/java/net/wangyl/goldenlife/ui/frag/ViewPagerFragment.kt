@@ -10,11 +10,11 @@ import androidx.core.text.BidiFormatter
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import net.wangyl.goldenlife.R
-import net.wangyl.goldenlife.base.BaseBindFragment
+import net.wangyl.base.BaseBindFragment
 import net.wangyl.goldenlife.databinding.FragmentViewpagerBinding
 import net.wangyl.goldenlife.ui.slideshow.SlideshowFragment
 
-class ViewPagerFragment : BaseBindFragment<FragmentViewpagerBinding>() {
+class ViewPagerFragment : net.wangyl.base.BaseBindFragment<FragmentViewpagerBinding>() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_viewpager

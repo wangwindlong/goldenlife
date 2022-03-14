@@ -1,7 +1,7 @@
 package net.wangyl.goldenlife.model
 
 import kotlinx.parcelize.Parcelize
-import net.wangyl.goldenlife.base.BaseItem
+import net.wangyl.base.data.BaseItem
 
 @Parcelize
 data class PostData(

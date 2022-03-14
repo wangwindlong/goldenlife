@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="base_viewpager" type="id"/>
+    <item name="base_tablayout" type="id"/>
+    <item name="base_toolbar" type="id"/>
+    <item name="base_appbar" type="id"/>
+    <item name="base_fragment_container" type="id"/>
+    <item name="base_refresh_btn" type="id"/>
+
+</resources>

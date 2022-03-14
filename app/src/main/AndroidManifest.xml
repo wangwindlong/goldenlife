@@ -30,7 +30,7 @@
         </activity>
 
         <activity
-            android:name=".ui.SimpleActivity"
+            android:name="net.wangyl.base.SimpleActivity"
             android:exported="true"
             android:theme="@style/Theme.GoldenLife.NoActionBar"
             >

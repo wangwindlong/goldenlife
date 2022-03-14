@@ -6,16 +6,13 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import net.wangyl.goldenlife.api.ApiService
 import net.wangyl.goldenlife.api.Repository
-import net.wangyl.goldenlife.base.ActivityLifeCycler
-import net.wangyl.goldenlife.base.FragmentLifecycle
+import net.wangyl.base.ActivityLifeCycler
+import net.wangyl.base.FragmentLifecycle
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
-import org.koin.core.qualifier.named
-import org.koin.dsl.bind
 import org.koin.dsl.module
-import org.koin.dsl.single
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.IOException
@@ -38,9 +35,9 @@ val mainModule = module {
     }
     single { ApiService(retrofit = get(BASE_URL_QUALIFIER)) }
     //此处可以用 bind FragmentLifecycle::class，就不需要自己实现单例模式了
-    single<FragmentManager.FragmentLifecycleCallbacks> { FragmentLifecycle.instance }
+    single<FragmentManager.FragmentLifecycleCallbacks> { net.wangyl.base.FragmentLifecycle.instance }
 //    single<ActivityLifeCycler>(named("test")) bind ActivityLifeCycler::class //此时不需要实现单例模式
-    single<Application.ActivityLifecycleCallbacks> { ActivityLifeCycler.instance }
+    single<Application.ActivityLifecycleCallbacks> { net.wangyl.base.ActivityLifeCycler.instance }
 
 //        viewModel { (oncreate : () -> Unit) -> BaseListVM(get(), get(), onCreate = oncreate) }
 //        viewModel { (itemName: String) -> DetailViewModel(get(), itemName, get()) }

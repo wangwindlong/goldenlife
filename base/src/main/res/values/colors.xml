@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="base_purple_200">#FFBB86FC</color>
+    <color name="base_purple_700">#FF3700B3</color>
+    <color name="base_teal_700">#FF018786</color>
+    <color name="base_black">#FF000000</color>
+    <color name="base_white">#FFFFFFFF</color>
+    <color name="base_colorAccent">#FF000000</color>
+
+    <color name="base_dimmer">#66000000</color>
+
+    <color name="base_divider_color">#66000000</color>
+    <color name="base_color_light_blue">#00DDB6</color>
+    <color name="base_txt_color">#48495F</color>
+
+    <color name="base_divider">#1f000000</color> <!-- 12% black -->
+    <color name="base_transparent">#00000000</color> <!-- 12% black -->
+    <color name="base_page_indicator_dark">#80333333</color>
+    <color name="base_page_indicator_dark_selected">#ff333333</color>
+    <color name="base_selected_comment_background">#ffffffff</color>
+    <color name="base_error">#ffdd2c00</color>
+    <color name="base_delete">#fff44336</color>
+    <color name="base_shadow">#4c000000</color>
+
+    <color name="base_neutral_pressed">#33999999</color>
+    <color name="base_date_picker_text_normal">#ff999999</color>
+    <color name="base_date_picker_text_disabled">#cccccc</color>
+
+    <color name="base_calendar_header">#999999</color>
+    <color name="base_date_picker_view_animator">#f2f2f2</color>
+    <color name="base_calendar_selected_date_text">#ffd1d2d4</color>
+    <color name="base_gray_font">#acacac</color>
+    <color name="base_colorPrimaryText_light">#de000000</color>
+    <color name="base_container_bg">#f0f0f0</color>
+
+
+    <color name="base_grey_100"> #F5F5F5</color>
+    <color name="base_grey_300"> #E0E0E0</color>
+    <color name="base_red_100">#F4C7C3</color>
+    <color name="base_red_300">#E67C73</color>
+    <color name="base_red_500">#DB4437</color>
+    <color name="base_red_700">#C53929</color>
+    <color name="base_blue_100">#C6DAFC</color>
+    <color name="base_blue_300">#7BAAF7</color>
+    <color name="base_blue_500">#4285F4</color>
+    <color name="base_blue_700">#3367D6</color>
+    <color name="base_green_100">#B7E1CD</color>
+    <color name="base_green_300">#57BB8A</color>
+    <color name="base_green_500">#0F9D58</color>
+    <color name="base_green_700">#0B8043</color>
+    <color name="base_yellow_100">#FCE8B2</color>
+    <color name="base_yellow_300">#F7CB4D</color>
+    <color name="base_yellow_500">#F4B400</color>
+    <color name="base_yellow_700">#F09300</color>
+
+    <color name="base_magnolia_50">#efe5fd</color>
+    <color name="base_magnolia_100">#d4bff9</color>
+    <color name="base_purple_500">#6200EE</color>
+    <color name="base_teal_200">#03DAC5</color>
+    <color name="base_teal_300">#4DB6AC</color>
+</resources>
