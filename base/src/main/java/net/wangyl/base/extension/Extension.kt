@@ -6,17 +6,23 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.res.Resources
 import android.view.View
+import android.view.ViewManager
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavOptions
 import net.wangyl.base.R
 import net.wangyl.base.SimpleActivity
 import net.wangyl.base.data.FragmentData
+import net.wangyl.base.enums.LoadingState
 import org.koin.core.qualifier.Qualifier
 import org.koin.java.KoinJavaComponent
 import timber.log.Timber
+import java.time.Duration
 
 //</editor-fold>
 private val density = Resources.getSystem().displayMetrics.density
@@ -57,13 +63,17 @@ fun View.gone() {
     this.visibility = View.GONE
 }
 
-fun Int.px(): Int {
+fun Int.px2dp(): Int {
     return (this / density).toInt()
 }
 
 //使用值对应的dp
-fun Int.dp(): Int {
-    return (0.5f + this * density).toInt()
+fun Int.toPx(): Float {
+    return 0.5f + this * density
+}
+
+fun Int.dp2px(): Int {
+    return this.toPx().toInt()
 }
 
 fun Activity.goActivity(frag: Class<Fragment>, extra: Intent? = null) {
@@ -82,20 +92,20 @@ fun Fragment.goActivity(fragName: String, extra: Intent? = null) {
     startActivity(goIntent(context, fragName, extra ?: Intent().replaceExtras(arguments)))
 }
 
-fun Fragment.toast(@StringRes message: Int) {
-    Toast.makeText(context?.applicationContext, message, Toast.LENGTH_SHORT).show()
+fun Fragment.toast(@StringRes message: Int, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(context?.applicationContext, message, duration).show()
 }
 
-fun Fragment.toast(message: String?) {
-    Toast.makeText(context?.applicationContext, message, Toast.LENGTH_SHORT).show()
+fun Fragment.toast(message: String?, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(context?.applicationContext, message, duration).show()
 }
 
-fun Activity.toast(@StringRes message: Int) {
-    Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+fun Activity.toast(@StringRes message: Int, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(applicationContext, message, duration).show()
 }
 
-fun Activity.toast(message: String?) {
-    Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+fun Activity.toast(message: String?, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(applicationContext, message, duration).show()
 }
 
 inline fun <reified T> Fragment.startActivity() {

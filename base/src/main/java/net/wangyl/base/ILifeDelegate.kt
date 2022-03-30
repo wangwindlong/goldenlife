@@ -4,6 +4,9 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 
+/**
+ * fragment 和 activity 生命周期代理类，实现类为 LifeDelegateIml
+ */
 interface ILifeDelegate {
     fun onAttach(context: Context)
 

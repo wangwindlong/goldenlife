@@ -8,8 +8,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import net.wangyl.base.interf.StateContainer
+import net.wangyl.base.interf.StateHost
+import net.wangyl.base.interf.initDefault
 
-class ReflowViewModel : ViewModel() {
+class ReflowViewModel : ViewModel(), StateHost {
+
+    override val stateContainer: StateContainer = initDefault()
 
     private val _text = MutableLiveData<String>().apply {
         value = "This is reflow Fragment"
@@ -38,4 +43,6 @@ class ReflowViewModel : ViewModel() {
         object Loading : LoginUIState()
         object Empty : LoginUIState()
     }
+
+
 }

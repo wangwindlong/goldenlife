@@ -11,11 +11,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.databinding.ViewDataBinding
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
@@ -26,11 +23,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import net.wangyl.base.adapter.BasePagedAdapter
 import net.wangyl.base.adapter.ErrorLoadStateAdapter
-import net.wangyl.base.data.BaseItem
 import net.wangyl.base.data.BaseModel
 import net.wangyl.base.data.MsgEvent
-import net.wangyl.base.data.Status
-import net.wangyl.base.databinding.BasePagingBinding
 import net.wangyl.base.extension.gone
 import net.wangyl.base.extension.toast
 import net.wangyl.base.extension.visible
@@ -244,6 +238,7 @@ abstract class BasePagingFragment<Model : BaseModel, BD : ViewDataBinding> : Bas
     }
 }
 
+@Suppress("UNCHECKED_CAST")
 open class PagingViewModel : ViewModel() {
     fun <Key : Any, T: BaseModel> loadData(
         page: Key, pageSize: Int, fetchAction: FetchAction<Key, T>

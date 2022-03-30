@@ -17,7 +17,7 @@ import com.google.android.material.tabs.TabLayout.MODE_AUTO
 import com.google.android.material.tabs.TabLayoutMediator
 import net.wangyl.base.data.FragmentData
 import net.wangyl.base.extension.createFragment
-import net.wangyl.base.extension.dp
+import net.wangyl.base.extension.dp2px
 
 const val TAG_FRAGS = "tab_frags" //是否显示tabbar
 const val FLAG_TABBAR = 0x000001 //是否显示tabbar
@@ -57,7 +57,7 @@ class TabViewPagerFragment : BaseFragment() {
             background = ColorDrawable(ContextCompat.getColor(requireContext(), R.color.base_blue_500))
             tabMode = MODE_AUTO
         }
-        val params: ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(MATCH_PARENT, 45.dp())
+        val params: ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(MATCH_PARENT, 45.dp2px())
         params.startToStart = PARENT_ID
         params.endToEnd = PARENT_ID
 //        params.marginStart = 18.dp()

@@ -6,6 +6,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import net.wangyl.base.extension.getK
+import org.orbitmvi.orbit.Container
+import org.orbitmvi.orbit.ContainerHost
+import org.orbitmvi.orbit.syntax.simple.intent
+import org.orbitmvi.orbit.syntax.simple.postSideEffect
+import org.orbitmvi.orbit.viewmodel.container
 import timber.log.Timber
 
 //import org.orbitmvi.orbit.Container
@@ -14,30 +19,34 @@ import timber.log.Timber
 //import org.orbitmvi.orbit.syntax.simple.postSideEffect
 //import org.orbitmvi.orbit.viewmodel.container
 
-//open class BaseVM<Data : Parcelable>(savedStateHandle: SavedStateHandle) : ViewModel(), ContainerHost<BaseState<Data>, Event> {
-open class BaseVM<Data : Parcelable>(savedStateHandle: SavedStateHandle) : ViewModel() {
+open class BaseVM<Data : Parcelable>(savedStateHandle: SavedStateHandle) : ViewModel(),
+    ContainerHost<BaseState<Data>, Event> {
+//open class BaseVM<Data : Parcelable>(savedStateHandle: SavedStateHandle) : ViewModel() {
     //    BaseEvent<PostData>
 
     val TAG = javaClass.simpleName
-//    private val repository: Repository? = getK()
+
+    //    private val repository: Repository? = getK()
     val pageInfo = PageInfo()
 
     var exceptionHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-       Timber.e( "orbit caught the exception ", throwable)
+        Timber.e("orbit caught the exception ", throwable)
     }
     open var onInit: (ViewModel.() -> Unit)? = null
-
-    init {
-//        Log.d(TAG, "repository=$repository")
+    private val _container: Container<BaseState<Data>, Event> = container<BaseState<Data>, Event>(
+        initialState = BaseState(),
+        savedStateHandle = savedStateHandle,
+        settings = Container.Settings(exceptionHandler = exceptionHandler)
+    ) {
+        Timber.d("container oninit = $this")
+        onInit?.invoke(this)
     }
 
-//    override val container = container<BaseState<Data>, Event>(
-//        initialState = BaseState(),
-//        savedStateHandle = savedStateHandle,
-//        settings = Container.Settings(exceptionHandler = exceptionHandler)
-//    ) {
-//        onInit?.invoke(this)
-//    }
+    init {
+        Timber.d("init BaseVM _container = $_container")
+    }
+
+    override val container: Container<BaseState<Data>, Event> = _container
 
     //增加封装过的参数？确定加载第几页数据，是否要加载下一页数据
 //    private fun loadList() = intent {
@@ -66,10 +75,10 @@ open class BaseVM<Data : Parcelable>(savedStateHandle: SavedStateHandle) : ViewM
 //        }
 //    }
 
-    fun onItemClicked(post: Data) = {
-
-    }
-//    fun onItemClicked(post: Data) = intent {
-//        postSideEffect(DetailEvent(post))
+    //    fun onItemClicked(post: Data) = {
+//
 //    }
+    fun onItemClicked(post: Data) = intent {
+        postSideEffect(DetailEvent(post))
+    }
 }

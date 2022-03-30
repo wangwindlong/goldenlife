@@ -14,9 +14,14 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.set
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import net.wangyl.base.extension.getK
 import net.wangyl.goldenlife.databinding.ActivityMainBinding
 import net.wangyl.goldenlife.model.PostData
+import net.wangyl.goldenlife.model.RSSData
+import net.wangyl.goldenlife.model.UserSession
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,6 +38,10 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
+        val test = "{\"seq\":0,\"status\":0,\"content\":{\"session_id\":\"2ch1ssqq8kv1fbif4k7c6cmd64\",\"config\":{\"icons_dir\":\"feed-icons\",\"icons_url\":\"feed-icons\",\"daemon_is_running\":false,\"custom_sort_types\":[],\"num_feeds\":6},\"api_level\":18}}"
+        val jsonType = object : TypeToken<RSSData<UserSession>>() {}.type
+        val json: RSSData<UserSession> = getK<Gson>().fromJson(test, jsonType)
+        Timber.d("convert test json=$json")
 
         val navHostFragment =
             (supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment?)!!

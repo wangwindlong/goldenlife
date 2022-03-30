@@ -15,7 +15,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import net.wangyl.base.data.BaseItem
 import net.wangyl.base.data.BaseModel
 import net.wangyl.base.R
-import net.wangyl.base.data.Status
+import net.wangyl.base.data.ApiResponse
 import timber.log.Timber
 
 val defaultItem = R.layout.base_item_text_view
@@ -58,7 +58,7 @@ abstract class BaseMviListFragment<Data : BaseModel> :
         return ArrayList<Int>().apply { add(defaultItem) }
     }
 
-    abstract suspend fun loader(params: PageInfo): Status<List<Data>>
+    abstract suspend fun loader(params: PageInfo): ApiResponse<List<Data>>
 
 //    private val binding by viewBinding<FragmentCommonListBinding>()
 

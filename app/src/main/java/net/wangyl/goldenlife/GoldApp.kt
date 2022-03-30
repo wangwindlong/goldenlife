@@ -2,14 +2,18 @@ package net.wangyl.goldenlife
 
 import android.app.Application
 import android.content.Context
-import net.wangyl.base.data.Status
+import android.os.Bundle
+import com.livefront.bridge.Bridge
+import com.livefront.bridge.SavedStateHandler
+import icepick.Icepick
+import me.jessyan.retrofiturlmanager.RetrofitUrlManager
+import net.wangyl.base.data.ApiResponse
 import net.wangyl.base.extension.getK
-import org.koin.android.ext.koin.androidContext
-import org.koin.core.context.startKoin
+import net.wangyl.goldenlife.Constants.TEST_DOMAIN_NAME
 import org.koin.core.qualifier.named
 
 val BASE_URL_QUALIFIER = named("BASE_URL")
-typealias Loader<T> = suspend () -> Status<T>
+typealias Loader<T> = suspend () -> ApiResponse<T>
 
 
 //fun getApp(): Context {
@@ -28,12 +32,24 @@ class GoldApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        startKoin {
-            androidContext(this@GoldApp)
-            modules(listOf(mainModule))
-        }
+//        startKoin {
+//            androidContext(this@GoldApp)
+//            modules(listOf(mainModule))
+//        }
         sInstance = this
         registerActivityLifecycleCallbacks(getK())
+//        registerActivityLifecycleCallbacks(LoadingActivityLifecycle())
+        Bridge.initialize(applicationContext, object : SavedStateHandler {
+            override fun saveInstanceState(target: Any, state: Bundle) {
+                Icepick.saveInstanceState(target, state)
+            }
+
+            override fun restoreInstanceState(target: Any, state: Bundle?) {
+                Icepick.restoreInstanceState(target, state)
+            }
+        })
+        RetrofitUrlManager.getInstance().setDebug(BuildConfig.DEBUG)
+        RetrofitUrlManager.getInstance().putDomain(TEST_DOMAIN_NAME, TT_BASE_URL)
     }
 }
 

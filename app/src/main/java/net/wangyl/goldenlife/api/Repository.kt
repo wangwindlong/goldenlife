@@ -1,9 +1,6 @@
 package net.wangyl.goldenlife.api
 
-import net.wangyl.base.data.Status
 import net.wangyl.goldenlife.model.PostData
-import retrofit2.HttpException
-import java.io.IOException
 
 class Repository(private val apiService: ApiService) {
 

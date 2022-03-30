@@ -11,6 +11,8 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+        maven {url "https://clojars.org/repo/"}
+//        maven { url 'https://maven.fabric.io/public' }
     }
 }
 rootProject.name = "GoldenLife"
@@ -19,3 +21,4 @@ include ":app"
 include ":vbpd-noreflection"
 include ":vbpd-full"
 include ':base'
+include ':manager'

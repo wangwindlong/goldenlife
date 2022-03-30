@@ -1,22 +1,12 @@
 package net.wangyl.goldenlife.ui.slideshow
 
-import android.os.Bundle
-import android.view.View
-import androidx.core.os.bundleOf
 import androidx.paging.PagingSource
 import net.wangyl.base.BasePagingFragment
 import net.wangyl.base.adapter.BasePagedAdapter
-import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.api.Repository
-import net.wangyl.base.data.Status
 import net.wangyl.base.databinding.BaseItemTextViewBinding
-import net.wangyl.base.databinding.BasePagingBinding
-import net.wangyl.base.extension.navTo
 import net.wangyl.goldenlife.model.PostData
-import net.wangyl.base.mvi.orbit.*
-import net.wangyl.goldenlife.ui.settings.SettingsFragment
 import org.koin.android.ext.android.inject
-import timber.log.Timber
 
 class SlideshowFragment : BasePagingFragment<PostData, BaseItemTextViewBinding>() {
 

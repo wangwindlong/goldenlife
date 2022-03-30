@@ -10,7 +10,8 @@ data class PostData(
     val title: String,
     val body: String
 ) : BaseItem {
-//    override fun getItemType(): Int {
+
+    //    override fun getItemType(): Int {
 //        return R.layout.item_text_view
 //    }
     override fun getItemId(): String {
@@ -22,3 +23,4 @@ data class PostData(
     }
 
 }
+

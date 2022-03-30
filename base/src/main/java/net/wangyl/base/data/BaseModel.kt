@@ -10,6 +10,7 @@ interface BaseListModel<Key, T> {
 }
 
 interface BaseModel : Parcelable, Serializable {
+//    val success: Boolean
     fun getItemId(): String = ""
     fun getItemContent(): String = ""
 }
