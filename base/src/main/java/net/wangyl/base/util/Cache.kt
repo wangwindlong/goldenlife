@@ -1,7 +1,10 @@
 package net.wangyl.base.util
 
 import androidx.collection.LruCache
+import net.wangyl.base.Configs
+import net.wangyl.base.http.BaseRepository
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
@@ -33,13 +36,7 @@ class Cache<K : Any, V : Any>(
   }
 
   operator fun set(key: K, value: V) {
-    cache.put(
-      key,
-      Value(
-        value,
-        timeSource.markNow() + entryLifetime
-      )
-    )
+    cache.put(key, Value(value, timeSource.markNow() + entryLifetime))
   }
 
   private data class Value<V : Any>(
@@ -49,5 +46,40 @@ class Cache<K : Any, V : Any>(
 
   private object DefaultSizeCalculator : (Any, Any) -> Int {
     override fun invoke(p1: Any, p2: Any): Int = 1
+  }
+
+  companion object {
+    data class RequestCacheKey(
+      val method: String,
+      val queryItems: Map<String, String>,
+    )
+
+    val cache = Cache<RequestCacheKey, Any>(
+      maxSize = Configs.API_MAX,
+      entryLifetime = Configs.API_EXPIRE.seconds
+    )
+
+    @JvmStatic
+    fun buildKey(method: String, queryItems: Map<String, Any?>): RequestCacheKey {
+      return RequestCacheKey(
+        method = method,
+        queryItems = queryItems.entries
+          .mapNotNull { (k, v) ->
+            if (v == null) null
+            else k to v.toString()
+          }
+          .toMap()
+      )
+    }
+
+    @JvmStatic
+    fun getCache() {
+
+    }
+
+    @JvmStatic
+    fun saveCache() {
+
+    }
   }
 }

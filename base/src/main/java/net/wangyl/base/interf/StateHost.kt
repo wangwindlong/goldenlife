@@ -11,6 +11,9 @@ import net.wangyl.base.enums.LoadingState
 import net.wangyl.base.enums.LoginState
 import net.wangyl.base.extension.getK
 import net.wangyl.base.http.*
+import net.wangyl.base.util.Cache
+import net.wangyl.base.util.Cache.Companion.buildKey
+import net.wangyl.base.util.Cache.Companion.cache
 import timber.log.Timber
 
 
@@ -98,9 +101,20 @@ inline fun <reified T> StateHost.apiCall(
     showDialog: Boolean = true,
     crossinline block: suspend BaseRepository.(Map<String, Any?>) -> ApiResponse<T>
 ) = flow {
+    var cacheKey: Cache.Companion.RequestCacheKey? = null
+    if (method != null && params.isNotEmpty()) {
+        cacheKey = buildKey(method, params)
+        val data = cache[cacheKey]
+        if (data is T) {
+            emit(ApiResponse.ApiSuccess(data, true))
+            return@flow
+        }
+    }
     stateContainer.loadingState.value = if (showDialog) LoadingState.LOADING else LoadingState.IDLE
-    //因为retrofit支持异步切换
-    emit(repository.apiCall {  block(params) })
+    //因为retrofit suspend时支持异步切换，所以直接在主线程调用
+    emit(repository.apiCall {  block(params) }.also {
+        cacheKey?.let { key -> cache[key] = it.data as Any }
+    })
     stateContainer.loadingState.postValue(LoadingState.FINISHED)
 }.onCompletion {
     Timber.d("apiCall onCompletion threadid=${Thread.currentThread().id}")
@@ -115,4 +129,6 @@ suspend inline fun callOnMain(crossinline block: () -> Unit) {
         block()
     }
 }
+
+
 

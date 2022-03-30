@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import com.livefront.bridge.Bridge
 import com.livefront.bridge.SavedStateHandler
+import com.tencent.mmkv.MMKV
 import icepick.Icepick
 import me.jessyan.retrofiturlmanager.RetrofitUrlManager
 import net.wangyl.base.data.ApiResponse
@@ -31,7 +32,7 @@ class GoldApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
+        MMKV.initialize(this)
 //        startKoin {
 //            androidContext(this@GoldApp)
 //            modules(listOf(mainModule))
