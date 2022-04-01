@@ -14,27 +14,29 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.MODE_AUTO
+import com.google.android.material.tabs.TabLayout.MODE_FIXED
 import com.google.android.material.tabs.TabLayoutMediator
 import net.wangyl.base.data.FragmentData
 import net.wangyl.base.extension.createFragment
 import net.wangyl.base.extension.dp2px
 
-const val TAG_FRAGS = "tab_frags" //是否显示tabbar
-const val FLAG_TABBAR = 0x000001 //是否显示tabbar
-const val FLAG_TABBAR_BOTTOM = 0x000010 //是否在底部显示tabbar，默认为顶部
+const val TAG_TAB = "tab_state" //显示的fragment列表信息
+const val TAG_FRAGS = "tab_frags" //显示的fragment列表信息
+const val FLAG_TABBAR_TOP = 0x000001 //是否在顶部显示tabbar，默认为顶部
+const val FLAG_TABBAR_Botom = 0x000010 //是否在底部显示tabbar
 
 /**
  * 带有tablayout和viewpager2的简易fragment，tablayout 可在顶部、底部或不显示
  */
 class TabViewPagerFragment : BaseFragment() {
-    var tabBar = 0x000001  //tablayout在顶部
+    var tabBar = 0x000001  //tablayout在顶部 0为不显示 0x1为顶部 其他为底部
     val fragments = arrayListOf<FragmentData>()
     val offscreenCount = 40
 
     override fun initData(savedInstanceState: Bundle?) {
         super.initData(savedInstanceState)
         savedInstanceState?.apply {
-            tabBar = this.getInt("tab_state", tabBar)
+            tabBar = this.getInt(TAG_TAB, tabBar)
             fragments.clear()
             this.getParcelableArrayList<FragmentData>(TAG_FRAGS)?.let {
                 fragments.addAll(it)
@@ -54,7 +56,7 @@ class TabViewPagerFragment : BaseFragment() {
         val tabLayout = TabLayout(requireContext()).apply {
             id = R.id.base_tablayout
             visibility = if (isShowTab()) View.VISIBLE else View.GONE
-            background = ColorDrawable(ContextCompat.getColor(requireContext(), R.color.base_blue_500))
+            background = ColorDrawable(ContextCompat.getColor(requireContext(), R.color.base_white))
             tabMode = MODE_AUTO
         }
         val params: ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(MATCH_PARENT, 45.dp2px())
@@ -66,6 +68,7 @@ class TabViewPagerFragment : BaseFragment() {
         } else {
             params.bottomToBottom = PARENT_ID
         }
+        tabLayout.tabMode = if (fragments.size > 6) MODE_AUTO else MODE_FIXED
 //        params.topMargin = 18.dp()
 //        params.dimensionRatio = "h,16:9"
         tabLayout.layoutParams = params
@@ -110,6 +113,6 @@ class TabViewPagerFragment : BaseFragment() {
     }
 
 
-    private fun isShowTab() = tabBar and FLAG_TABBAR == 1
-    private fun isTabTop() = isShowTab() && (tabBar and FLAG_TABBAR_BOTTOM == 0)
+    private fun isShowTab() = tabBar > 0
+    private fun isTabTop() = isShowTab() && (tabBar == FLAG_TABBAR_TOP)
 }

@@ -56,6 +56,8 @@ class LoadingDialog : DialogFragment() {
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
+        contentView.preventCornerOverlap = true
+        contentView.useCompatPadding = true
         contentView.radius = 16.dp2px().toFloat()
         val margin = 20.dp2px()
         val color = resources.getColor(R.color.base_dimmer)

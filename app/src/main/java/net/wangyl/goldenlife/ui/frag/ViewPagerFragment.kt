@@ -14,7 +14,7 @@ import net.wangyl.base.BaseBindFragment
 import net.wangyl.goldenlife.databinding.FragmentViewpagerBinding
 import net.wangyl.goldenlife.ui.slideshow.SlideshowFragment
 
-class ViewPagerFragment : net.wangyl.base.BaseBindFragment<FragmentViewpagerBinding>() {
+class ViewPagerFragment : BaseBindFragment<FragmentViewpagerBinding>() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_viewpager

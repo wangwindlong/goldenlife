@@ -38,10 +38,7 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
-        val test = "{\"seq\":0,\"status\":0,\"content\":{\"session_id\":\"2ch1ssqq8kv1fbif4k7c6cmd64\",\"config\":{\"icons_dir\":\"feed-icons\",\"icons_url\":\"feed-icons\",\"daemon_is_running\":false,\"custom_sort_types\":[],\"num_feeds\":6},\"api_level\":18}}"
-        val jsonType = object : TypeToken<RSSData<UserSession>>() {}.type
-        val json: RSSData<UserSession> = getK<Gson>().fromJson(test, jsonType)
-        Timber.d("convert test json=$json")
+
 
         val navHostFragment =
             (supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment?)!!

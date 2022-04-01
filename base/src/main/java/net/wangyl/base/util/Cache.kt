@@ -10,7 +10,7 @@ import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 
 @OptIn(ExperimentalTime::class)
-class Cache<K : Any, V : Any>(
+class Cache<K : Any, V : Any> private constructor(
   maxSize: Int,
   private val entryLifetime: Duration,
   private val sizeOf: (key: K, value: V) -> Int = DefaultSizeCalculator,
@@ -49,37 +49,38 @@ class Cache<K : Any, V : Any>(
   }
 
   companion object {
-    data class RequestCacheKey(
-      val method: String,
-      val queryItems: Map<String, String>,
-    )
-
     val cache = Cache<RequestCacheKey, Any>(
       maxSize = Configs.API_MAX,
       entryLifetime = Configs.API_EXPIRE.seconds
     )
-
-    @JvmStatic
-    fun buildKey(method: String, queryItems: Map<String, Any?>): RequestCacheKey {
-      return RequestCacheKey(
-        method = method,
-        queryItems = queryItems.entries
-          .mapNotNull { (k, v) ->
-            if (v == null) null
-            else k to v.toString()
-          }
-          .toMap()
-      )
-    }
-
-    @JvmStatic
-    fun getCache() {
-
-    }
-
-    @JvmStatic
-    fun saveCache() {
-
-    }
   }
 }
+
+fun Cache.Companion.buildCache(method: String, queryItems: Map<String, Any?>) : RequestCacheKey {
+  return RequestCacheKey(
+    method = method,
+    queryItems = queryItems.entries
+      .mapNotNull { (k, v) ->
+        if (v == null) null
+        else k to v.toString()
+      }
+      .toMap()
+  )
+}
+
+fun Cache.Companion.getCache(method: String, queryItems: Map<String, Any?>): Any? {
+  return cache[buildCache(method, queryItems)]
+}
+
+fun Cache.Companion.getCache(requestCacheKey: RequestCacheKey): Any? {
+  return cache[requestCacheKey]
+}
+
+fun Cache.Companion.saveCache(requestCacheKey: RequestCacheKey, data: Any) {
+  cache[requestCacheKey] = data
+}
+
+data class RequestCacheKey(
+  val method: String,
+  val queryItems: Map<String, String>,
+)

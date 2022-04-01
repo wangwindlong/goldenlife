@@ -1,6 +1,7 @@
 package net.wangyl.base.extension
 
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
@@ -17,8 +18,10 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavOptions
 import net.wangyl.base.R
 import net.wangyl.base.SimpleActivity
+import net.wangyl.base.TAG_FRAGNAME
 import net.wangyl.base.data.FragmentData
 import net.wangyl.base.enums.LoadingState
+import net.wangyl.base.fragmentPage
 import org.koin.core.qualifier.Qualifier
 import org.koin.java.KoinJavaComponent
 import timber.log.Timber
@@ -38,12 +41,9 @@ fun NavOptions.Builder.setHorizontalSlide(): NavOptions.Builder {
         .setPopExitAnim(R.anim.base_h_slide_popexit)
 }
 
-fun goIntent(ctx: Context?, fragName: String, extra: Intent? = null): Intent {
-    Timber.d("goIntent fragName= $fragName")
-    return Intent(ctx, SimpleActivity::class.java).apply {
-        extra?.let { putExtras(it) }
-        putExtra(net.wangyl.base.TAG_FRAGNAME, fragName)
-    }
+inline fun<T> goIntent(c: Context, frag: Class<T>, init: Intent.() -> Unit): Intent {
+    Timber.d("goIntent fragName= ${frag.name}")
+    return Intent(c, SimpleActivity::class.java).apply { init() }.putExtra(TAG_FRAGNAME, frag.name)
 }
 
 
@@ -76,20 +76,22 @@ fun Int.dp2px(): Int {
     return this.toPx().toInt()
 }
 
-fun Activity.goActivity(frag: Class<Fragment>, extra: Intent? = null) {
-    startActivity(goIntent(this, frag.name, extra))
+fun checkContext(context: Context) {
+    if (context is Application)
+        throw IllegalStateException("please call this in activity or fragment or view")
 }
 
-fun Activity.goActivity(fragName: String, extra: Intent? = null) {
-    startActivity(goIntent(this, fragName, intent))
+fun<T: Fragment>  Context.goSimpleActivity(frag: Class<T>, extra: Intent? = null) {
+    checkContext(this)
+    startActivity(goIntent(this, frag) {
+        extra?.let { this.putExtras(it) }
+    })
 }
 
-fun Fragment.goActivity(frag: Class<Fragment>, extra: Intent? = null) {
-    startActivity(goIntent(context, frag.name, extra ?: Intent().replaceExtras(arguments)))
-}
-
-fun Fragment.goActivity(fragName: String, extra: Intent? = null) {
-    startActivity(goIntent(context, fragName, extra ?: Intent().replaceExtras(arguments)))
+fun<T: Fragment> Fragment.goSimpleActivity(frag: Class<T>, extra: Intent? = null) {
+    startActivity(goIntent(requireContext(), frag) {
+        extra?.let { this.putExtras(it) }
+    })
 }
 
 fun Fragment.toast(@StringRes message: Int, duration: Int = Toast.LENGTH_SHORT) {

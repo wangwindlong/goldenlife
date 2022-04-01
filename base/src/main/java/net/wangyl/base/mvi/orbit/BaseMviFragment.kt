@@ -7,10 +7,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.savedstate.SavedStateRegistryOwner
 import net.wangyl.base.BaseFragment
-import net.wangyl.base.data.BaseItem
 import net.wangyl.base.data.BaseModel
 
 private const val ARG_PARAM1 = "param1"
@@ -24,7 +22,7 @@ private const val ARG_PARAM2 = "param2"
 open class BaseMviFragment<Data : BaseModel> : BaseFragment() {
     private var param1: String? = null
     private var param2: String? = null
-    val vm by mviViewModel<BaseVM<Data>, Data>(this) {
+    val vm by mviViewModel<BaseMviVm<Data>, Data>(this) {
 //        this.onVMInit()
     }
 
@@ -53,7 +51,7 @@ open class BaseMviFragment<Data : BaseModel> : BaseFragment() {
     }
 }
 
-inline fun <reified VM : BaseVM<DataClass>, DataClass : Parcelable> Fragment.mviViewModel(
+inline fun <reified VM : BaseMviVm<DataClass>, DataClass : Parcelable> Fragment.mviViewModel(
     owner: SavedStateRegistryOwner,
     defaultArgs: Bundle? = null,
     noinline onCreate: (VM.() -> Unit)? = null,

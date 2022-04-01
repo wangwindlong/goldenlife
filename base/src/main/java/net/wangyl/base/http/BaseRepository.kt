@@ -25,8 +25,8 @@ open class BaseRepository {
     }
 }
 
-suspend inline fun <reified T> BaseRepository.apiCall(
-    crossinline request: suspend BaseRepository.() -> ApiResponse<T>,
+suspend inline fun <reified T> BaseRepository.Companion.apiCall(
+    crossinline request: suspend () -> ApiResponse<T>,
 ): ApiResponse<T> {
 
     return coroutineScope {

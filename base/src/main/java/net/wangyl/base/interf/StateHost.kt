@@ -9,11 +9,8 @@ import net.wangyl.base.data.ApiResponse
 import net.wangyl.base.data.ErrorMessage
 import net.wangyl.base.enums.LoadingState
 import net.wangyl.base.enums.LoginState
-import net.wangyl.base.extension.getK
 import net.wangyl.base.http.*
-import net.wangyl.base.util.Cache
-import net.wangyl.base.util.Cache.Companion.buildKey
-import net.wangyl.base.util.Cache.Companion.cache
+import net.wangyl.base.util.*
 import timber.log.Timber
 
 
@@ -61,50 +58,25 @@ interface StateHost {
     }
 }
 
-fun ViewModel.initDefault() = DefaultContainer(
-    MutableLiveData<LoadingState>(),
-    MutableLiveData<ErrorMessage>(),
-    MutableLiveData<LoginState>(),
-).apply {
-    //observe at init??
-}
+fun ViewModel.initDefault() = viewModelScope.stateHost()
 
-val StateHost.loading: LiveData<LoadingState>
-    get() = stateContainer.loadingState
-val StateHost.errored: LiveData<ErrorMessage>
-    get() = stateContainer.errorState
-val StateHost.isLogin : LiveData<LoginState>
-    get() = stateContainer.loginState
 
-class DefaultContainer(val loading: MutableLiveData<LoadingState>,
-                                val error: MutableLiveData<ErrorMessage>,
-                                val login: MutableLiveData<LoginState>
-) : StateContainer {
-    override val loadingState: MutableLiveData<LoadingState>
-        get() = loading
-    override val errorState: MutableLiveData<ErrorMessage>
-        get() = error
-    override val loginState: MutableLiveData<LoginState>
-        get() = login
-
-}
 
 /**
- * method用来做缓存
+ * method和参数用来做api缓存
  */
 inline fun <reified T> StateHost.apiCall(
-    repository: BaseRepository,
     method: String? = null, params: Map<String, Any?> = emptyMap(),
 //        handler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
 //            Timber.e("${javaClass.name} caught the exception ", throwable)
 //        },
     showDialog: Boolean = true,
-    crossinline block: suspend BaseRepository.(Map<String, Any?>) -> ApiResponse<T>
+    crossinline block: suspend (Map<String, Any?>) -> ApiResponse<T>
 ) = flow {
-    var cacheKey: Cache.Companion.RequestCacheKey? = null
+    var cacheKey: RequestCacheKey? = null
     if (method != null && params.isNotEmpty()) {
-        cacheKey = buildKey(method, params)
-        val data = cache[cacheKey]
+        cacheKey = Cache.buildCache(method, params)
+        val data = Cache.getCache(cacheKey)
         if (data is T) {
             emit(ApiResponse.ApiSuccess(data, true))
             return@flow
@@ -112,8 +84,8 @@ inline fun <reified T> StateHost.apiCall(
     }
     stateContainer.loadingState.value = if (showDialog) LoadingState.LOADING else LoadingState.IDLE
     //因为retrofit suspend时支持异步切换，所以直接在主线程调用
-    emit(repository.apiCall {  block(params) }.also {
-        cacheKey?.let { key -> cache[key] = it.data as Any }
+    emit(BaseRepository.apiCall { block(params) }.also {
+        cacheKey?.let { key -> Cache.saveCache(key, it.data as Any) }
     })
     stateContainer.loadingState.postValue(LoadingState.FINISHED)
 }.onCompletion {
@@ -122,6 +94,22 @@ inline fun <reified T> StateHost.apiCall(
 //    stateContainer.loadingState.postValue(LoadingState.FINISHED)
 }.flowOn(Dispatchers.Main)
 
+
+fun StateHost.api(
+    method: String? = null, params: Map<String, Any?> = emptyMap(),
+//        handler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+//            Timber.e("${javaClass.name} caught the exception ", throwable)
+//        },
+    showDialog: Boolean = true,
+    block: (Map<String, Any?>) -> Unit
+) {
+    stateContainer.launchApi {
+        block(params)
+    }
+//        stateContainer.launchApi {
+//            block(params) }
+//    BaseRepository.apiCall {  }
+}
 
 suspend inline fun callOnMain(crossinline block: () -> Unit) {
     withContext(Dispatchers.Main) {

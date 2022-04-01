@@ -12,7 +12,7 @@ import net.wangyl.goldenlife.api.repo.RSSRepository
 class LoginViewModel: ViewModel(), StateHost {
 
     fun login() {
-        apiCall(getK<RSSRepository>()) {
+        apiCall() {
             val stringMap = HashMap<String, String>()
             stringMap["op"] = "login"
             stringMap["user"] = "admin"

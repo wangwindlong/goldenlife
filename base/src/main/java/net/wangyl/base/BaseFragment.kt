@@ -1,6 +1,7 @@
 package net.wangyl.base
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import net.wangyl.base.data.FragmentData
 import net.wangyl.base.data.MsgEvent
 import net.wangyl.base.extension.gone
 import net.wangyl.base.extension.visible
@@ -19,10 +21,13 @@ open class BaseFragment : Fragment(), IBase, RefreshEvent {
     val TAG = javaClass.simpleName
     val MENU_ITEM_ITEM1 = 1
     private var _delegate: ILifeDelegate? = null
+
     // flag bit to determine whether the data is initialized
     private var isInitData: Boolean = false
+
     // flags to determine whether fragments are visible
     private var isVisibleToUser: Boolean = false
+
     // flag bit to determine that view has been loaded to avoid null pointer operations
     private var isPrepareView: Boolean = false
     var mToolbar: Toolbar? = null
@@ -138,3 +143,24 @@ open class BaseFragment : Fragment(), IBase, RefreshEvent {
 
     }
 }
+
+
+
+inline fun<T: Fragment> fragmentPage(
+    frag: Class<T>, title: String? = "",
+    initIntent: Intent.() -> Intent
+): FragmentData {
+    return FragmentData(frag.name, title, Intent().initIntent())
+}
+
+inline fun fragmentPages(
+    frags: List<Class<*>>, titles: List<String> = emptyList(),
+    initIntent: Intent.(Int) -> Intent
+): List<FragmentData> {
+    val result = arrayListOf<FragmentData>()
+    for ((index, frag) in frags.withIndex()) {
+        result.add(FragmentData(frag.name, titles[index], Intent().initIntent(index)))
+    }
+    return result
+}
+

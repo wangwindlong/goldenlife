@@ -12,18 +12,15 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.collect
-import net.wangyl.base.IBase
-import net.wangyl.base.TAG_FRAGS
-import net.wangyl.base.TabViewPagerFragment
-import net.wangyl.base.data.ApiResponse
+import net.wangyl.base.*
 import net.wangyl.base.data.FragmentData
 import net.wangyl.base.data.onError
 import net.wangyl.base.data.onSuccess
 import net.wangyl.base.extension.await
 import net.wangyl.base.extension.getK
-import net.wangyl.base.extension.goActivity
+import net.wangyl.base.extension.goSimpleActivity
 import net.wangyl.base.interf.StateHost
+import net.wangyl.base.interf.api
 import net.wangyl.base.interf.apiCall
 import net.wangyl.goldenlife.api.ApiService
 import net.wangyl.goldenlife.api.ErrorResponseMapper
@@ -32,8 +29,6 @@ import net.wangyl.goldenlife.startup.AnalyticsEvent
 import net.wangyl.goldenlife.startup.AnalyticsService
 import net.wangyl.goldenlife.startup.readChapter
 import net.wangyl.goldenlife.api.repo.RSSRepository
-import net.wangyl.goldenlife.model.RSSData
-import net.wangyl.goldenlife.model.UserSession
 import net.wangyl.goldenlife.ui.slideshow.SlideshowFragment
 import timber.log.Timber
 
@@ -61,8 +56,8 @@ class ReflowFragment : Fragment(), IBase {
 
         val textView: TextView = binding.textReflow
         textView.setOnClickListener {
-            goActivity(
-                TabViewPagerFragment::class.java.name,
+            goSimpleActivity(
+                TabViewPagerFragment::class.java,
                 Intent().putParcelableArrayListExtra(TAG_FRAGS, testFragments())
             )
         }
@@ -102,11 +97,10 @@ class ReflowFragment : Fragment(), IBase {
             stringMap["op"] = "login"
             stringMap["user"] = "admin"
             stringMap["password"] = "6629782"
-
-            viewModel.apiCall(getK<RSSRepository>(), method = "login", params = stringMap) { q ->
-                Timber.d("apicall params = ${q}")
-                val request1 = async {getK<ApiService>().login(q as Map<String, String>)}
-                val request2 = async {getK<ApiService>().login(q as Map<String, String>)}
+            viewModel.apiCall(method = "login", params = stringMap) { params ->
+                Timber.d("apicall params = ${params}")
+                val request1 = async { getK<ApiService>().login(params as Map<String, String>) }
+                val request2 = async { getK<ApiService>().login(params as Map<String, String>) }
 
                 val res = request1.await()
                 val res2 = request2.await()
@@ -174,10 +168,9 @@ class ReflowFragment : Fragment(), IBase {
         val list = arrayListOf<FragmentData>()
         for (i in 1..10) {
             list.add(
-                FragmentData(
-                    SlideshowFragment::class.java.name, "标题_$i",
-                    Intent().putExtra("args_1", "args1")
-                )
+                fragmentPage(SlideshowFragment::class.java, "标题_$i") {
+                    putExtra("args_1", "args1")
+                }
             )
         }
         return list
