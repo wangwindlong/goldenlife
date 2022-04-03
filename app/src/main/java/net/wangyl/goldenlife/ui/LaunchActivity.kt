@@ -17,16 +17,17 @@ class LaunchActivity : AppCompatActivity() {
             finish()
             return
         }
-//        goHome(
-//            TabViewPagerFragment::class.java, Intent().putParcelableArrayListExtra(TAG_FRAGS,
-//                arrayListOf(fragmentPage(SlideshowFragment::class.java, "标题1") {
-//                    putExtra("args_1", "args1")
-//                }, fragmentPage(SlideshowFragment::class.java, "标题2") {
-//                    putExtra("args_1", "args2")
-//                })
-//            ).putExtra(TAG_TAB, FLAG_TABBAR_Botom)
-//        )
-        startActivity(Intent(this, MainActivity::class.java))
+        goHome(
+            TabViewPagerFragment::class.java, Intent().putParcelableArrayListExtra(TAG_FRAGS,
+                arrayListOf(
+                    fragmentPage(SlideshowFragment::class.java, "标题1") {
+                        putExtra("args_1", "args1")
+                    }, fragmentPage(SlideshowFragment::class.java, "标题2") {
+                        putExtra("args_1", "args2")
+                    })
+            ).putExtra(TAG_TAB, FLAG_TABBAR_Botom)
+        )
+//        startActivity(Intent(this, MainActivity::class.java))
         finish()
     }
 }

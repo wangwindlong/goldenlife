@@ -51,10 +51,10 @@ open class BaseMviFragment<Data : BaseModel> : BaseFragment() {
     }
 }
 
-inline fun <reified VM : BaseMviVm<DataClass>, DataClass : Parcelable> Fragment.mviViewModel(
+inline fun <reified VM : BaseMviVm<DATA>, DATA> Fragment.mviViewModel(
     owner: SavedStateRegistryOwner,
     defaultArgs: Bundle? = null,
-    noinline onCreate: (VM.() -> Unit)? = null,
+    noinline onCreate: (ViewModel.() -> Unit)? = null,
 ): Lazy<VM> {
     return this.viewModels(factoryProducer = {
         object : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
@@ -66,10 +66,7 @@ inline fun <reified VM : BaseMviVm<DataClass>, DataClass : Parcelable> Fragment.
                 val clz = VM::class.java
                 val mCreate = clz.getDeclaredConstructor(handle::class.java)
                 mCreate.isAccessible = true
-                return mCreate.newInstance(handle) as T
-//                return VM(handle).apply {
-//                    onInit = onCreate
-//                } as T
+                return mCreate.newInstance(handle).apply { onInit = onCreate } as T
             }
         }
     })

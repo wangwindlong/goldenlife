@@ -59,7 +59,7 @@ class TabViewPagerFragment : BaseFragment() {
             background = ColorDrawable(ContextCompat.getColor(requireContext(), R.color.base_white))
             tabMode = MODE_AUTO
         }
-        val params: ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(MATCH_PARENT, 45.dp2px())
+        val params: ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(MATCH_PARENT, 56.dp2px())
         params.startToStart = PARENT_ID
         params.endToEnd = PARENT_ID
 //        params.marginStart = 18.dp()
