@@ -5,48 +5,40 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import by.kirich1409.viewbindingdelegate.viewBinding
 import net.wangyl.base.data.MsgEvent
+import net.wangyl.base.manager.postEvent
+import net.wangyl.base.mvi.orbit.BaseMviFragment
+import net.wangyl.goldenlife.R
 import net.wangyl.goldenlife.databinding.FragmentSettingsBinding
 import net.wangyl.goldenlife.model.PostData
-import net.wangyl.base.mvi.orbit.BaseMviFragment
-import net.wangyl.base.manager.postEvent
 import timber.log.Timber
 
 class SettingsFragment : BaseMviFragment<PostData>() {
 
-    private var _binding: FragmentSettingsBinding? = null
-//    private val args: SettingsFragmentArgs by navArgs()
+    val settingsViewModel by viewModels<SettingsViewModel>()
+    val binding by viewBinding<FragmentSettingsBinding>()
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val settingsViewModel =
-            ViewModelProvider(this).get(SettingsViewModel::class.java)
-
-        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
+    override fun initView(v: View?, savedInstanceState: Bundle?) {
+        super.initView(v, savedInstanceState)
         val textView: Button = binding.textSettings
         textView.setOnClickListener {
-            postEvent(MsgEvent("test", "${textView.text}"))
+            postEvent(MsgEvent("test", "发送登出事件"))
+            settingsViewModel.logout()
         }
         settingsViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
         Timber.d("onCreateView arguments itemId= ${arguments?.get("itemId")}, item= ${arguments?.get("item")}")
-//        Log.d(TAG, "onCreateView args itemId= ${args.itemId}, item= ${args.item}")
-        return root
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    override fun onReceiveMsg(data: MsgEvent<Any>) {
+        super.onReceiveMsg(data)
+        binding.textSettings.text = data.msg as? String
+    }
+
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_settings
     }
 }

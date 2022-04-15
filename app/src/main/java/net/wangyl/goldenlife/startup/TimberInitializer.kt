@@ -18,7 +18,7 @@ class TimberInitializer : Initializer<Unit> {
 //        } else {
 //            Timber.plant(CrashlyticsLogger())
 //        }
-        if (BuildConfig.DEBUG) Timber.plant(CrashlyticsLogger())
+        if (!BuildConfig.DEBUG) Timber.plant(CrashlyticsLogger())
         Timber.tag("Initializer").d("Timber initialized")
     }
 

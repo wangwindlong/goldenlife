@@ -1,14 +1,14 @@
 package net.wangyl.goldenlife.ui.slideshow
 
 import androidx.paging.PagingSource
-import net.wangyl.base.BasePagingFragment
+import net.wangyl.base.base.BasePagingFragment
 import net.wangyl.base.adapter.BasePagedAdapter
 import net.wangyl.goldenlife.api.Repository
 import net.wangyl.base.databinding.BaseItemTextViewBinding
 import net.wangyl.goldenlife.model.PostData
 import org.koin.android.ext.android.inject
 
-class SlideshowFragment : BasePagingFragment<PostData, BaseItemTextViewBinding>() {
+class SlideshowFragment : BasePagingFragment<Int, PostData, BaseItemTextViewBinding>() {
 
     val repo: Repository by inject()
 
@@ -51,7 +51,7 @@ class SlideshowFragment : BasePagingFragment<PostData, BaseItemTextViewBinding>(
 //    }
 
     override suspend fun fetchData(
-        position: Int,
+        position: Int?,
         params: PagingSource.LoadParams<Int>
     ): List<PostData> {
         return repo.getPosts()
@@ -64,4 +64,10 @@ class SlideshowFragment : BasePagingFragment<PostData, BaseItemTextViewBinding>(
     ) {
         holder.binding.tv.text = model?.getItemContent()
     }
+
+    override fun nextKey(position: Int?, dataList: List<PostData>): Int? {
+        if (dataList.isEmpty()) return null
+        return (position ?: 0) + 1
+    }
+
 }

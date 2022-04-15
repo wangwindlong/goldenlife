@@ -7,6 +7,9 @@ import retrofit2.Retrofit
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
+/**
+ * 将api返回值转化为flow
+ */
 class FlowCallAdapterFactory private constructor() : CallAdapter.Factory() {
     override fun get(
         returnType: Type,

@@ -1,5 +1,6 @@
 package net.wangyl.base.http.retro
 
+import net.wangyl.base.annotation.ErrorWith
 import net.wangyl.base.annotation.WrapWith
 import net.wangyl.base.data.ApiResponse
 import net.wangyl.base.util.checkNotPrimitive
@@ -9,6 +10,7 @@ import retrofit2.Call
 import retrofit2.CallAdapter
 import retrofit2.Converter
 import retrofit2.Retrofit
+import timber.log.Timber
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.util.*
@@ -16,7 +18,7 @@ import java.util.*
 /**
  * wrapClass 是每个服务端返回的固定格式内容,如果不传则为ApiResponse<Foo>中的Foo类，不进行包裹
  */
-class NetworkResponseAdapterFactory(val wrapClass: Class<*>? = null) : CallAdapter.Factory() {
+class ResponseAdapterFactory(val wrapClass: Class<*>? = null) : CallAdapter.Factory() {
 
     override fun get(
         returnType: Type,
@@ -56,10 +58,19 @@ class NetworkResponseAdapterFactory(val wrapClass: Class<*>? = null) : CallAdapt
 //        }
         //如果接口有注解WrapData 用这个类名包裹,否则使用注册时传的wrapclass来包裹Foo 如 RSSData<Foo>
         val wrapWith = (annotations.firstOrNull { it is WrapWith } as? WrapWith)?.wrapClass?.java ?: wrapClass
-        wrapWith?.let {
-            return NetworkResponseAdapter(ParameterizedTypeImpl(null, it, bodyType))
+        //错误数据和正确数据格式不一样时
+        val errorWith = annotations.firstOrNull { it is ErrorWith } as? ErrorWith
+        //如果有包裹类，则返回包裹后的类 如：RSSData<Foo>， 否则直接返回Foo数据类型
+        val type = if (wrapWith != null) ParameterizedTypeImpl(null, wrapWith, bodyType) else bodyType
+        Timber.d("ResponseAdapterFactory type=$type")
+        when {
+            errorWith?.isWrap == true && wrapWith != null -> ParameterizedTypeImpl(null, wrapWith, errorWith.errClass.java)
+            else -> errorWith?.errClass?.java
+        }?.let {
+            //如果有ErrorWith注解，则增加一个coverter，用于出错时返回值格式与正确时不同的场景
+            return NetworkResponseAdapter(bodyType, type, retrofit.nextResponseBodyConverter(null, it, annotations))
         }
-        return NetworkResponseAdapter(bodyType)
+        return NetworkResponseAdapter<Any>(bodyType, type)
     }
 
 }

@@ -53,4 +53,9 @@
 
         <!-- Spinner -->
     </style>
+
+    <style name="base_ToolbarTextAppearance" parent="base_ToolBarStyle">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/blue_700</item>
+    </style>
 </resources>

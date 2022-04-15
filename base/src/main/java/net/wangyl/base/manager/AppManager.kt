@@ -34,7 +34,7 @@ class AppManager private constructor() {
      * @param activity 作用说明 ：添加一个activity到管理里
      */
     fun pushActivity(activity: Activity) {
-        if(mActivitys.contains(activity))mActivitys.add(activity)
+        if(!mActivitys.contains(activity)) mActivitys.add(activity)
 //        LOGD(TAG, "activityList:size:" + mActivitys.size)
     }
 
@@ -42,8 +42,10 @@ class AppManager private constructor() {
      * @param activity 作用说明 ：删除一个activity在管理里
      */
     fun popActivity(activity: Activity) {
-        if (mActivitys.contains(activity)) {
-            mActivitys.remove(activity)
+        val index = mActivitys.indexOf(activity)
+        if (index != -1) {
+            mActivitys[index] = null
+            mActivitys.removeAt(index)
         }
 //        LOGD(TAG, "activityList:size:" + mActivitys.size)
     }
@@ -57,10 +59,17 @@ class AppManager private constructor() {
     }
 
     fun getTopActivity(): Activity? {
-        if (mActivitys == null) {
+        if (mActivitys.isEmpty()) {
             Timber.w("mActivityList == null when getTopActivity()")
             return null
         }
         return if (mActivitys.size > 0) mActivitys.get(mActivitys.size - 1) else null
+    }
+
+    fun clearAllActivity() {
+        for (activity in mActivitys) {
+            activity.finish()
+        }
+        mActivitys.clear()
     }
 }

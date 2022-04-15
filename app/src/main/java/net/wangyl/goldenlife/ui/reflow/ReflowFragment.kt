@@ -11,28 +11,26 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.async
-import net.wangyl.base.*
+import net.wangyl.base.base.*
 import net.wangyl.base.data.FragmentData
+import net.wangyl.base.data.onApiError
 import net.wangyl.base.data.onError
 import net.wangyl.base.data.onSuccess
 import net.wangyl.base.extension.await
 import net.wangyl.base.extension.getK
 import net.wangyl.base.extension.goSimpleActivity
-import net.wangyl.base.interf.StateHost
 import net.wangyl.base.interf.api
-import net.wangyl.base.interf.apiCall
 import net.wangyl.goldenlife.api.ApiService
 import net.wangyl.goldenlife.api.ErrorResponseMapper
 import net.wangyl.goldenlife.databinding.FragmentReflowBinding
+import net.wangyl.goldenlife.model.UserSession
 import net.wangyl.goldenlife.startup.AnalyticsEvent
 import net.wangyl.goldenlife.startup.AnalyticsService
 import net.wangyl.goldenlife.startup.readChapter
-import net.wangyl.goldenlife.api.repo.RSSRepository
 import net.wangyl.goldenlife.ui.slideshow.SlideshowFragment
 import timber.log.Timber
 
-class ReflowFragment : Fragment(), IBase {
+class ReflowFragment : Fragment(), IBase by BaseImpl()  {
 
     private var _binding: FragmentReflowBinding? = null
 
@@ -41,9 +39,7 @@ class ReflowFragment : Fragment(), IBase {
     private val binding get() = _binding!!
     private val viewModel by viewModels<ReflowViewModel>()
 
-    override fun uiState(): StateHost {
-        return viewModel
-    }
+    override val uiState = viewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,6 +65,24 @@ class ReflowFragment : Fragment(), IBase {
 //            viewModel.login("raheem", "android")
 //        }
         getK<AnalyticsService>().track(AnalyticsEvent.readChapter("clicked reflow", "click", 100))
+        val stringMap = HashMap<String, String>()
+        stringMap["op"] = "login"
+        stringMap["user"] = "admin"
+        stringMap["password"] = "66297823"
+        viewModel.api<UserSession> {
+            Timber.d("apicall login start = ${stringMap}")
+            val request2 = getK<ApiService>().login(stringMap)
+
+            Timber.d("login1 result = $request2")
+            request2.onSuccess { data ->
+                Timber.d("login2 success result =$data")
+            }.onApiError {
+                Timber.d("login2 apierror result =$this")
+            }.onError(ErrorResponseMapper) {
+                Timber.d("login2 error [Code: $code]: $message")
+            }
+            request2.data
+        }
 
         lifecycleScope.launchWhenCreated {
 //            val shouldContinueToMainScreen = showCreateUserDialog("Federico")
@@ -93,27 +107,7 @@ class ReflowFragment : Fragment(), IBase {
 //                }
 //            }
 
-            val stringMap = HashMap<String, String>()
-            stringMap["op"] = "login"
-            stringMap["user"] = "admin"
-            stringMap["password"] = "6629782"
-            viewModel.apiCall(method = "login", params = stringMap) { params ->
-                Timber.d("apicall params = ${params}")
-                val request1 = async { getK<ApiService>().login(params as Map<String, String>) }
-                val request2 = async { getK<ApiService>().login(params as Map<String, String>) }
 
-                val res = request1.await()
-                val res2 = request2.await()
-                Timber.d("login1 result =$res")
-                res2.onSuccess { data ->
-                    Timber.d("login2 success result =$data")
-                }.onError(ErrorResponseMapper) {
-                    Timber.d("login2 error [Code: $code]: $message")
-                }
-                res2
-            }.collect {
-                Timber.d("login1 and login2 success result =$it")
-            }
 
 //            getK<ApiService>().login(jsonBody(stringMap))
 //            getK<ApiService>().login2(stringMap)

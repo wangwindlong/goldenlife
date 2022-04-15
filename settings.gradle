@@ -22,3 +22,4 @@ include ":vbpd-noreflection"
 include ":vbpd-full"
 include ':base'
 include ':manager'
+include ':eventbus-flow'

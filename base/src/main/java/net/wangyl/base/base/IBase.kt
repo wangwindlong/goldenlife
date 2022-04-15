@@ -1,4 +1,4 @@
-package net.wangyl.base
+package net.wangyl.base.base
 
 import android.os.Bundle
 import androidx.appcompat.widget.Toolbar
@@ -16,12 +16,18 @@ interface IBase {
 
     //初始化arguments 数据，不加载数据
     fun initData(savedInstanceState: Bundle?) = Unit
-    fun useEventBus() : Boolean = true
-    fun showAction() : Boolean = true
+    var useEventBus : Boolean
+    var showAction : Boolean
     fun setupToolbar(toolbar: Toolbar?) = Unit
     fun setData(data: Any?) = Unit
-    fun baseDelegate(): ILifeDelegate? = null
-    fun uiState(): StateHost? = null
+    val baseDelegate: ILifeDelegate?
+    val uiState: StateHost?   //使用变量 by代理模式？
 //    fun initTitle(): CharSequence? = ""
+}
 
+class BaseImpl: IBase {
+    override var useEventBus: Boolean = true
+    override var showAction: Boolean = true
+    override val baseDelegate: ILifeDelegate? by LifeDelegate()
+    override val uiState: StateHost? = null
 }

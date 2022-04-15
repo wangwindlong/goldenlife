@@ -3,12 +3,11 @@ package net.wangyl.goldenlife.api
 import android.content.Context
 import android.content.pm.PackageManager
 import me.jessyan.retrofiturlmanager.RetrofitUrlManager
+import net.wangyl.base.annotation.ErrorWith
 import net.wangyl.base.annotation.WrapWith
 import net.wangyl.base.data.ApiResponse
 import net.wangyl.goldenlife.Constants.TEST_DOMAIN_NAME
-import net.wangyl.goldenlife.model.PostData
-import net.wangyl.goldenlife.model.RSSData
-import net.wangyl.goldenlife.model.UserSession
+import net.wangyl.goldenlife.model.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -40,7 +39,6 @@ interface ApiService {
     //@FieldMap Map<String, String> fields
 //    @Headers(HEADER_API_VERSION)
     @Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER + TEST_DOMAIN_NAME)
-//    @FormUrlEncoded
     @WrapWith(RSSData::class)
     @POST("api/")
     suspend fun login(
@@ -50,13 +48,21 @@ interface ApiService {
     ): ApiResponse<UserSession>
 
     @Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER + TEST_DOMAIN_NAME)
-//    @FormUrlEncoded
     @POST("api/")
     suspend fun login2(
         @Body  body: Map<String, String>,
 //        @Field("op") op: String, @Field("user") user: String?,
 //        @Field("password") password: String?
     ): Any
+
+    @Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER + TEST_DOMAIN_NAME)
+    @WrapWith(RSSData::class)
+    @POST("api/")
+    suspend fun headlines(
+        @Body  body: Map<String, String>,
+//        @Field("op") op: String, @Field("user") user: String?,
+//        @Field("password") password: String?
+    ): ApiResponse<List<Article>>
 
     companion object {
         operator fun invoke(retrofit: Retrofit) = retrofit.create<ApiService>()

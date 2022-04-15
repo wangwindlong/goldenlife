@@ -9,12 +9,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import net.wangyl.base.interf.StateContainer
+import net.wangyl.base.interf.StateDelegate
 import net.wangyl.base.interf.StateHost
 import net.wangyl.base.interf.initDefault
 
 class ReflowViewModel : ViewModel(), StateHost {
 
-    override val stateContainer: StateContainer = initDefault()
+    override val stateContainer: StateContainer by StateDelegate()
 
     private val _text = MutableLiveData<String>().apply {
         value = "This is reflow Fragment"

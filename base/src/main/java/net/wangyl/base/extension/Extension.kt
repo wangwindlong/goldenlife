@@ -7,25 +7,17 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.res.Resources
 import android.view.View
-import android.view.ViewManager
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavOptions
 import net.wangyl.base.R
 import net.wangyl.base.SimpleActivity
-import net.wangyl.base.TAG_FRAGNAME
+import net.wangyl.base.base.TAG_FRAGNAME
 import net.wangyl.base.data.FragmentData
-import net.wangyl.base.enums.LoadingState
-import net.wangyl.base.fragmentPage
 import org.koin.core.qualifier.Qualifier
 import org.koin.java.KoinJavaComponent
-import timber.log.Timber
-import java.time.Duration
 
 //</editor-fold>
 private val density = Resources.getSystem().displayMetrics.density
@@ -42,7 +34,6 @@ fun NavOptions.Builder.setHorizontalSlide(): NavOptions.Builder {
 }
 
 inline fun<T> goIntent(c: Context, frag: Class<T>, init: Intent.() -> Unit): Intent {
-    Timber.d("goIntent fragName= ${frag.name}")
     return Intent(c, SimpleActivity::class.java).apply { init() }.putExtra(TAG_FRAGNAME, frag.name)
 }
 
@@ -117,3 +108,5 @@ inline fun <reified T> Fragment.startActivity() {
 inline fun <reified T> Context.startActivity() {
     startActivity(Intent(this, T::class.java))
 }
+
+

@@ -1,14 +1,13 @@
 package net.wangyl.base.mvi.orbit
 
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
-import net.wangyl.base.BaseFragment
+import net.wangyl.base.base.BaseFragment
 import net.wangyl.base.data.BaseModel
 
 private const val ARG_PARAM1 = "param1"

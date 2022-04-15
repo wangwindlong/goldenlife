@@ -2,15 +2,14 @@ package net.wangyl.goldenlife.ui
 
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.ACTION_MAIN
 import androidx.fragment.app.Fragment
 import net.wangyl.base.extension.checkContext
+import net.wangyl.eventbus_flow.core.postEvent
+import net.wangyl.goldenlife.Constants.EVENT_LOGOUT
+import net.wangyl.goldenlife.GoldApp
+import net.wangyl.goldenlife.event.GlobalEvent
+import net.wangyl.goldenlife.obj.Global
 
 
-fun<T: Fragment> Context.goHome(frag : Class<T>, extra: Intent? = null) {
-    checkContext(this)
-    val intent = Intent(this, HomeActivity::class.java).apply {
-        putExtras(extra ?: Intent())
-        putExtra(net.wangyl.base.TAG_FRAGNAME, frag.name)
-    }
-    startActivity(intent)
-}
+

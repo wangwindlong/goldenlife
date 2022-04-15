@@ -13,15 +13,16 @@ import java.lang.reflect.Type
  * S  是接口请求成功时返回的类
  * E 是其他类型，如错误数据格式解析，适用于请求正确和错误返回不同数据格式的情况
  */
-class NetworkResponseAdapter(
+class NetworkResponseAdapter<out E: Any>(
+    private val targetType: Type,
     private val successType: Type,
-    private val errorConverter: Converter<ResponseBody, Type>? = null
+    private val errorConverter: Converter<ResponseBody, E>? = null
 ) : CallAdapter<Type, Call<ApiResponse<Type>>> {
 
     override fun responseType(): Type = successType
 
     override fun adapt(call: Call<Type>): Call<ApiResponse<Type>> {
-        return NetworkResponseCall(call, errorConverter)
+        return NetworkResponseCall(targetType, call, errorConverter)
     }
 }
 

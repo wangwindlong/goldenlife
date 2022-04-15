@@ -40,6 +40,8 @@ android {
 }
 
 dependencies {
+    api project(":vbpd-full")
+    api project(":eventbus-flow")
 //    api project(":ultimatebarx")
     api "com.jakewharton.timber:timber:5.0.1"
     api "androidx.core:core-ktx:$corektx_version"

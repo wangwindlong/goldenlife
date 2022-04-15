@@ -1,26 +1,32 @@
-package net.wangyl.base
+package net.wangyl.base.base
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import net.wangyl.base.Configs.APP_NAME
+import net.wangyl.base.R
 import net.wangyl.base.data.FragmentData
 import net.wangyl.base.data.MsgEvent
 import net.wangyl.base.extension.gone
 import net.wangyl.base.extension.visible
-import net.wangyl.base.interf.RefreshEvent
+import net.wangyl.base.widget.toolbar.LoadingImpl
+import net.wangyl.base.widget.toolbar.LoadingState
+import net.wangyl.base.widget.toolbar.NavBtnType
+import net.wangyl.base.widget.toolbar.setToolbar
 import org.greenrobot.eventbus.Subscribe
 import timber.log.Timber
 
-open class BaseFragment : Fragment(), IBase, RefreshEvent {
+
+open class BaseFragment : Fragment(), IBase by BaseImpl(), LoadingState by LoadingImpl()  {
     val TAG = javaClass.simpleName
     val MENU_ITEM_ITEM1 = 1
-    private var _delegate: ILifeDelegate? = null
 
     // flag bit to determine whether the data is initialized
     private var isInitData: Boolean = false
@@ -30,11 +36,13 @@ open class BaseFragment : Fragment(), IBase, RefreshEvent {
 
     // flag bit to determine that view has been loaded to avoid null pointer operations
     private var isPrepareView: Boolean = false
+    private var mTitle: String? = null
+
     var mToolbar: Toolbar? = null
         set(value) {
             if (value == field) return
             field = value
-            if (showAction() && requireActivity() is AppCompatActivity) {
+            if (showAction && requireActivity() is AppCompatActivity) {
                 (requireActivity() as AppCompatActivity).setSupportActionBar(value)
                 value?.visible()
             } else {
@@ -42,13 +50,6 @@ open class BaseFragment : Fragment(), IBase, RefreshEvent {
             }
             value?.setNavigationOnClickListener { requireActivity().onBackPressed() }
         }
-
-    override fun baseDelegate(): ILifeDelegate? {
-        return if (_delegate == null) {
-            _delegate = LifeDelegateIml(this)
-            _delegate
-        } else _delegate
-    }
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
@@ -61,6 +62,8 @@ open class BaseFragment : Fragment(), IBase, RefreshEvent {
 //        savedInstanceState?.apply {
 //            toolBar = this.getInt("toolbar_state", toolBar)
 //        }
+        mTitle = savedInstanceState?.getString(TAG_TITLE)
+        Timber.d("initData savedInstanceState=${savedInstanceState?.keySet()}")
     }
 
     override fun onAttach(context: Context) {
@@ -73,7 +76,17 @@ open class BaseFragment : Fragment(), IBase, RefreshEvent {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val bundle = savedInstanceState ?: arguments
+        isDecorated = bundle?.getBoolean(TAG_DECORATE) ?: false
+        setHasOptionsMenu(true)
+
         return createView(inflater, container)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        //do something with your id
+        return super.onOptionsItemSelected(item)
     }
 
     /**
@@ -85,6 +98,11 @@ open class BaseFragment : Fragment(), IBase, RefreshEvent {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        view.decorateWithLoadingState(isDecorated)
+        if (isDecorated)
+            setToolbar(mTitle ?: APP_NAME, NavBtnType.ICON_TEXT) {
+                navClickListener = View.OnClickListener { requireActivity().onBackPressed() }
+            }
         initView(view, savedInstanceState)
         isPrepareView = true // At this point the view has been loaded and set to true
     }
@@ -128,14 +146,16 @@ open class BaseFragment : Fragment(), IBase, RefreshEvent {
 //            .apply()
     }
 
-    override fun showAction(): Boolean {
-        return false
-    }
+    override var showAction = false
 
     open fun getLayoutId(): Int = R.layout.base_fragment_common_list
 
     @Subscribe
     open fun receiveMsg(data: MsgEvent<Any>) {
+        onReceiveMsg(data)
+    }
+
+    open fun onReceiveMsg(data: MsgEvent<Any>) {
         Timber.d("$TAG received data: ${data.from}， ${data.msg}")
     }
 
@@ -145,8 +165,7 @@ open class BaseFragment : Fragment(), IBase, RefreshEvent {
 }
 
 
-
-inline fun<T: Fragment> fragmentPage(
+inline fun <T : Fragment> fragmentPage(
     frag: Class<T>, title: String? = "",
     initIntent: Intent.() -> Intent
 ): FragmentData {

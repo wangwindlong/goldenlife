@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.appbar.MaterialToolbar xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@id/base_toolbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     android:background="?attr/colorPrimary"
     android:theme="@style/base_ToolBarStyle"
+    app:titleTextAppearance="@style/base_ToolbarTextAppearance"
     app:colorPrimaryDark="@color/base_black"
     app:contentInsetLeft="0dp"
     app:contentInsetStart="0dp"
@@ -19,4 +21,3 @@
     app:titleMargins="0dp"
     app:titleTextColor="@color/base_black" />
     <!-- app:titleTextAppearance="@style/Theme.IOSched.Sessions"-->
-

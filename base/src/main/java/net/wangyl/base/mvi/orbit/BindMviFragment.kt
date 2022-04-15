@@ -5,14 +5,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import androidx.fragment.app.Fragment
 import net.wangyl.base.data.BaseModel
 
 
 /**
- * A simple [Fragment] subclass.
- * Use the [BaseMviFragment.newInstance] factory method to
- * create an instance of this fragment.
+ * 是否可以直接通过代理方式 实现binding创建和传入contentview，见com.dylanc.viewbinding
  */
 open class BindMviFragment<Data : BaseModel, DB: ViewDataBinding> : BaseMviFragment<Data>() {
 

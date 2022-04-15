@@ -89,6 +89,9 @@
             <meta-data
                 android:name="net.wangyl.goldenlife.startup.TimberInitializer"
                 android:value="androidx.startup" />
+            <meta-data
+                android:name="net.wangyl.goldenlife.startup.AppModelInitializer"
+                android:value="androidx.startup" />
         </provider>
     </application>
 

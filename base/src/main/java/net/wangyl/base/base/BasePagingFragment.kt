@@ -1,4 +1,4 @@
-package net.wangyl.base
+package net.wangyl.base.base
 
 import android.os.Bundle
 import android.text.TextUtils
@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import net.wangyl.base.R
 import net.wangyl.base.adapter.BasePagedAdapter
 import net.wangyl.base.adapter.ErrorLoadStateAdapter
 import net.wangyl.base.data.BaseModel
@@ -28,15 +29,22 @@ import net.wangyl.base.data.MsgEvent
 import net.wangyl.base.extension.gone
 import net.wangyl.base.extension.toast
 import net.wangyl.base.extension.visible
-import org.greenrobot.eventbus.EventBus
+import net.wangyl.base.paging.PageSource
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import retrofit2.HttpException
-import java.io.IOException
 
 
 interface FetchAction<Key : Any, Model> {
-    suspend fun fetchData(position: Key, params: PagingSource.LoadParams<Key>): List<Model>?
+    suspend fun fetchData(position: Key?, params: PagingSource.LoadParams<Key>): List<Model>?
+    fun nextKey(position: Key?, dataList: List<Model>): Key? {
+        return when (position) {
+            is Int -> (if (dataList.isNotEmpty()) position + 1 else null) as Key
+            else -> position
+        }
+    }
+    fun prevKey(position: Key?, dataList: List<Model>): Key? {
+        return null
+    }
 }
 
 /**
@@ -48,11 +56,13 @@ interface FetchAction<Key : Any, Model> {
 /**
  * paging3 列表基类 BD为item的binding
  */
-abstract class BasePagingFragment<Model : BaseModel, BD : ViewDataBinding> : BaseFragment(), FetchAction<Int, Model> {
-    val diffCallback = object : DiffUtilItemCallback<Model>() {}
+abstract class BasePagingFragment<K : Any, T : BaseModel, BD : ViewDataBinding>(startKey: K? = null) :
+    BaseFragment(),
+    FetchAction<K, T> {
+    val diffCallback = object : DiffUtilItemCallback<T>() {}
     val mViewModel: PagingViewModel by activityViewModels()
 
-    var page: Int = 1
+    var initKey: K? = startKey
     var pageSize: Int = 20
     var recyclerView: RecyclerView? = null
     var errorGroup: View? = null
@@ -97,9 +107,9 @@ abstract class BasePagingFragment<Model : BaseModel, BD : ViewDataBinding> : Bas
     }
 
 
-    open fun initAdapter(): BasePagedAdapter<Model, BD> {
-        return object : BasePagedAdapter<Model, BD>(object : DiffUtilItemCallback<Model>() {}) {
-            override fun bindItem(holder: BaseHolder<BD>, model: Model?, position: Int) {
+    open fun initAdapter(): BasePagedAdapter<T, BD> {
+        return object : BasePagedAdapter<T, BD>(object : DiffUtilItemCallback<T>() {}) {
+            override fun bindItem(holder: BaseHolder<BD>, model: T?, position: Int) {
                 super.bindItem(holder, model, position)
                 bindData(holder, model, position)
             }
@@ -107,7 +117,7 @@ abstract class BasePagingFragment<Model : BaseModel, BD : ViewDataBinding> : Bas
     }
 
     //绑定item布局
-    open fun bindData(holder: BasePagedAdapter.BaseHolder<BD>, model: Model?, position: Int) {
+    open fun bindData(holder: BasePagedAdapter.BaseHolder<BD>, model: T?, position: Int) {
 
     }
 
@@ -128,14 +138,7 @@ abstract class BasePagingFragment<Model : BaseModel, BD : ViewDataBinding> : Bas
 //        LoadingTip(mActivity).apply { setOnClickListener { loadData() } }
 //    }
 
-    override fun getLayoutId(): Int {
-        return R.layout.base_paging
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (eventBusEnable()) EventBus.getDefault().register(this)
-    }
+    override fun getLayoutId(): Int = R.layout.base_paging
 
     override fun initView(v: View?, savedInstanceState: Bundle?) {
         super.initView(v, savedInstanceState)
@@ -165,7 +168,7 @@ abstract class BasePagingFragment<Model : BaseModel, BD : ViewDataBinding> : Bas
     override fun loadData() {
         smartRefresh?.isRefreshing = true
         lifecycleScope.launchWhenStarted {
-            mViewModel.loadData(page, pageSize, this@BasePagingFragment).cachedIn(this)
+            mViewModel.loadData(initKey, pageSize, this@BasePagingFragment)
                 .collectLatest { pagingData ->
                     adapter.submitData(pagingData)
                     smartRefresh?.isRefreshing = false
@@ -179,13 +182,6 @@ abstract class BasePagingFragment<Model : BaseModel, BD : ViewDataBinding> : Bas
 
     open fun eventBusEnable(): Boolean {
         return false
-    }
-
-    override fun onDestroy() {
-        if (eventBusEnable()) {
-            EventBus.getDefault().unregister(this)
-        }
-        super.onDestroy()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -238,59 +234,22 @@ abstract class BasePagingFragment<Model : BaseModel, BD : ViewDataBinding> : Bas
     }
 }
 
-@Suppress("UNCHECKED_CAST")
 open class PagingViewModel : ViewModel() {
-    fun <Key : Any, T: BaseModel> loadData(
-        page: Key, pageSize: Int, fetchAction: FetchAction<Key, T>
-    ): Flow<PagingData<T>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = pageSize,
-                initialLoadSize = pageSize,
-                enablePlaceholders = true,
-                prefetchDistance = 2,
-            ),
-            pagingSourceFactory = {
-                object : PagingSource<Key, T>() {
-                    override fun getRefreshKey(state: PagingState<Key, T>): Key? {
-                        return null
-                    }
 
-                    fun getPrevKey(position: Key): Key? {
-                        return when (position) {
-                            is Int -> (if (position == page) null else position - 1) as Key?
-                            else -> null
-                        }
-                    }
 
-                    fun getNextvKey(position: Key, dataList: List<T>): Key? {
-                        return when (position) {
-                            is Int -> (if (dataList.isNotEmpty()) position + 1 else null) as Key?
-                            else -> null
-                        }
-                    }
+}
 
-                    override suspend fun load(params: LoadParams<Key>): LoadResult<Key, T> {
-                        val position = params.key ?: page
-                        return try {
-                            val dataList = fetchAction.fetchData(position, params) ?: emptyList()
-                            LoadResult.Page(
-                                data = dataList,
-                                prevKey = getPrevKey(position),
-                                nextKey = getNextvKey(position, dataList)
-                            )
-                        } catch (exception: IOException) {
-                            LoadResult.Error(exception)
-                        } catch (exception: HttpException) {
-                            LoadResult.Error(exception)
-                        } catch (exception: Exception) {
-                            LoadResult.Error(exception)
-                        }
-                    }
-                }
-            }
-        ).flow.cachedIn(viewModelScope)
-    }
+fun <K : Any, T : BaseModel> ViewModel.loadData(page: K?, pageSize: Int, fetchAction: FetchAction<K, T>): Flow<PagingData<T>> {
+    return Pager(
+        config = PagingConfig(
+            pageSize = pageSize,
+            initialLoadSize = pageSize * 2,
+            enablePlaceholders = true,
+            prefetchDistance = 2,
+        )
+    ) {
+        PageSource(page, fetchAction)
+    }.flow.cachedIn(viewModelScope)
 }
 
 open class DiffUtilItemCallback<T : BaseModel> : DiffUtil.ItemCallback<T>() {

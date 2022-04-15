@@ -47,3 +47,10 @@ fun typeEquals(a: Type?, b: Type?): Boolean {
         false // This isn't a type we support!
     }
 }
+
+fun isSameWrapClass(a: Type?, b: Type?):Boolean {
+    if (a == null || b == null) return false
+    val a1 = if (a is ParameterizedType) a.rawType else a
+    val b1 = if (b is ParameterizedType) b.rawType else b
+    return a1 == b1
+}

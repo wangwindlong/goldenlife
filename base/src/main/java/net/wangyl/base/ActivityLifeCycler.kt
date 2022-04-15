@@ -2,17 +2,24 @@ package net.wangyl.base
 
 import android.app.Activity
 import android.app.Application.ActivityLifecycleCallbacks
+import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentActivity
+import com.livefront.bridge.Bridge
+import net.wangyl.base.base.IBase
 import net.wangyl.base.extension.getK
 import net.wangyl.base.manager.AppManager
 import timber.log.Timber
+import java.util.*
 
 
 class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
-
+    //埋点信息，参考 https://juejin.cn/post/6844903734686777357
+    // https://github.com/Liberuman/Tracker
+    private val durationMap = WeakHashMap<Context, Long>()
+    private val resumeTimeMap = WeakHashMap<Context, Long>()
     companion object {
         val instance = ActivityLifeCycler.holder
     }
@@ -41,33 +48,29 @@ class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
 
 
     override fun onActivityCreated(f: Activity, savedInstanceState: Bundle?) {
+        durationMap[f] = 0L
         Timber.d("onActivityCreated $f")
         AppManager.get().pushActivity(f)
         //mFragmentLifecycle 为 Fragment 生命周期实现类, 用于框架内部对每个 Fragment 的必要操作, 如给每个 Fragment 配置 FragmentDelegate
         //注册框架内部已实现的 Fragment 生命周期逻辑
         (f as? FragmentActivity)?.supportFragmentManager?.registerFragmentLifecycleCallbacks(getK(), true)
-        (f as? IBase)?.baseDelegate()?.let {
-            it.onCreate(savedInstanceState)
-//            if (f.fullScreen()) {
-//                statusBar { transparent() }
-//                navigationBar { transparent() }
-//            }
-        }
-
+        (f as? IBase)?.baseDelegate?.onCreate(savedInstanceState)
+        //使用https://github.com/livefront/bridge 加载保存的状态
+        Bridge.restoreInstanceState(f, savedInstanceState)
     }
 
     override fun onActivityStarted(f: Activity) {
         val toolbar: Toolbar? = f.findViewById(R.id.base_toolbar)
-        (f as? IBase)?.baseDelegate()?.let {
+        (f as? IBase)?.baseDelegate?.let {
             it.onStart()
-            if (f.showAction()) {
+            if (f.showAction) {
                 f.setupToolbar(toolbar)
-                toolbar?.let {
-                    (f as? AppCompatActivity)?.setSupportActionBar(it)
+                toolbar?.let { tool ->
+                    (f as? AppCompatActivity)?.setSupportActionBar(tool)
                     (f as? AppCompatActivity)?.supportActionBar?.setDisplayShowTitleEnabled(true)
 //                it.setTitle(f.title)
                     //初始化其他事件，返回，actionbar等
-                    it.setNavigationOnClickListener {
+                    tool.setNavigationOnClickListener {
                         f.onBackPressed()
                     }
                 }
@@ -79,31 +82,41 @@ class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
 
     override fun onActivityResumed(f: Activity) {
         AppManager.get().setCurrentActivity(f)
-        (f as? IBase)?.baseDelegate()?.onResume()
+        (f as? IBase)?.baseDelegate?.onResume()
         Timber.d("onActivityResumed")
+        resumeTimeMap[f] = System.currentTimeMillis()
     }
 
     override fun onActivityPaused(f: Activity) {
-        (f as? IBase)?.baseDelegate()?.onPause()
+        (f as? IBase)?.baseDelegate?.onPause()
         Timber.d("onActivityPaused")
+        durationMap[f] = (durationMap[f]!! + (System.currentTimeMillis() - resumeTimeMap[f]!!))
     }
 
     override fun onActivityStopped(f: Activity) {
         if (AppManager.get().getCurrentActivity() === f) {
             AppManager.get().setCurrentActivity(null)
         }
-        (f as? IBase)?.baseDelegate()?.onStop()
+        (f as? IBase)?.baseDelegate?.onStop()
         Timber.d("onActivityStopped")
     }
 
     override fun onActivitySaveInstanceState(f: Activity, outState: Bundle) {
-        (f as? IBase)?.baseDelegate()?.onSaveInstanceState(outState)
+        (f as? IBase)?.baseDelegate?.onSaveInstanceState(outState)
         Timber.d("onActivitySaveInstanceState")
+        Bridge.saveInstanceState(f, outState)
     }
 
     override fun onActivityDestroyed(f: Activity) {
         AppManager.get().popActivity(f)
-        (f as? IBase)?.baseDelegate()?.onDestroy()
+        (f as? IBase)?.baseDelegate?.onDestroy()
         Timber.d("onActivityDestroyed ")
+        durationMap[f]?.let {
+            // 将事件添加到数据库
+
+            durationMap.remove(f)
+
+        }
+        resumeTimeMap.remove(f)
     }
 }

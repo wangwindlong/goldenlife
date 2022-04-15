@@ -2,16 +2,17 @@ package net.wangyl.base.interf
 
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.*
 import net.wangyl.base.data.ApiResponse
 import net.wangyl.base.data.ErrorMessage
-import net.wangyl.base.enums.LoadingState
-import net.wangyl.base.enums.LoginState
+import net.wangyl.base.enums.StateFinished
+import net.wangyl.base.enums.StateIdle
+import net.wangyl.base.enums.StateLoading
 import net.wangyl.base.http.*
 import net.wangyl.base.util.*
 import timber.log.Timber
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
 
 /**
@@ -60,7 +61,14 @@ interface StateHost {
 
 fun ViewModel.initDefault() = viewModelScope.stateHost()
 
+class StateDelegate: ReadOnlyProperty<ViewModel, StateContainer> {
+    private var _delegate: StateContainer? = null
 
+    override fun getValue(thisRef: ViewModel, property: KProperty<*>): StateContainer {
+        return _delegate ?: thisRef.viewModelScope.stateHost()
+    }
+
+}
 
 /**
  * method和参数用来做api缓存
@@ -70,45 +78,109 @@ inline fun <reified T> StateHost.apiCall(
 //        handler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
 //            Timber.e("${javaClass.name} caught the exception ", throwable)
 //        },
-    showDialog: Boolean = true,
+    showDialog: Boolean = true, useCache: Boolean = true,
     crossinline block: suspend (Map<String, Any?>) -> ApiResponse<T>
 ) = flow {
-    var cacheKey: RequestCacheKey? = null
-    if (method != null && params.isNotEmpty()) {
-        cacheKey = Cache.buildCache(method, params)
-        val data = Cache.getCache(cacheKey)
-        if (data is T) {
-            emit(ApiResponse.ApiSuccess(data, true))
-            return@flow
+    hasCache<T>(method, params, useCache) {
+        emit(ApiResponse.ApiSuccess(it, true))
+        return@flow
+    }.noCache {
+        stateContainer.loadingState.value = if (showDialog) StateLoading else StateIdle
+        try {
+            emit(BaseRepository.apiCall {
+                block(params)
+            }.also {
+                Timber.d("emit apicall result = $it")
+                if (it !is ApiResponse.ApiSuccess || !useCache) return@also
+                Cache.saveCache(this, it.data)
+            })
+            stateContainer.launchApi {
+
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
+        stateContainer.loadingState.postValue(StateFinished)
     }
-    stateContainer.loadingState.value = if (showDialog) LoadingState.LOADING else LoadingState.IDLE
-    //因为retrofit suspend时支持异步切换，所以直接在主线程调用
-    emit(BaseRepository.apiCall { block(params) }.also {
-        cacheKey?.let { key -> Cache.saveCache(key, it.data as Any) }
-    })
-    stateContainer.loadingState.postValue(LoadingState.FINISHED)
-}.onCompletion {
-    Timber.d("apiCall onCompletion threadid=${Thread.currentThread().id}")
-//    emit(xxx)
-//    stateContainer.loadingState.postValue(LoadingState.FINISHED)
-}.flowOn(Dispatchers.Main)
+}
 
+//类型别名
+typealias LaunchBlock = suspend CoroutineScope.() -> Unit
 
-fun StateHost.api(
-    method: String? = null, params: Map<String, Any?> = emptyMap(),
+typealias EmitBlock<T> = suspend LiveDataScope<T>.() -> T
+
+typealias Cancel = (e: Exception) -> Unit
+
 //        handler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
 //            Timber.e("${javaClass.name} caught the exception ", throwable)
-//        },
+//        }
+
+
+inline fun StateHost.launch(
+    scope: CoroutineScope,
     showDialog: Boolean = true,
-    block: (Map<String, Any?>) -> Unit
-) {
-    stateContainer.launchApi {
-        block(params)
+    noinline cancel: Cancel? = null,
+    crossinline block: LaunchBlock
+)  {
+    scope.launch {
+        stateContainer.loadingState.value = if (showDialog) StateLoading else StateIdle
+        try {
+            block()
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+            cancel?.invoke(e)
+            stateContainer.errorState.postValue(ErrorMessage(e, e.message))
+        }
+        stateContainer.loadingState.postValue(StateFinished)
     }
-//        stateContainer.launchApi {
-//            block(params) }
-//    BaseRepository.apiCall {  }
+
+}
+
+inline fun <reified T> StateHost.api(
+    showDialog: Boolean = true,
+    noinline cancel: Cancel? = null,
+    crossinline block: EmitBlock<T?>
+): LiveData<T?> = liveData {
+    stateContainer.loadingState.value = if (showDialog) StateLoading else StateIdle
+    try {
+        emit(block())
+    } catch (e: java.lang.Exception) {
+        e.printStackTrace()
+        cancel?.invoke(e)
+        stateContainer.errorState.postValue(ErrorMessage(e, e.message))
+    }
+    stateContainer.loadingState.postValue(StateFinished)
+}
+
+//fun StateHost.api(
+//    method: String? = null, params: Map<String, Any?> = emptyMap(),
+////        handler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+////            Timber.e("${javaClass.name} caught the exception ", throwable)
+////        },
+//    showDialog: Boolean = true,
+//    block: (Map<String, Any?>) -> Unit
+//) {
+//    stateContainer.launchApi {
+//        block(params)
+//    }
+////        stateContainer.launchApi {
+////            block(params) }
+////    BaseRepository.apiCall {  }
+//}
+
+inline fun <T> Flow<T>.safeCollect(
+    lifecycleOwner: LifecycleOwner,
+    crossinline callback: (T) -> Unit
+) {
+    lifecycleOwner.lifecycleScope.launch {
+        // See https://medium.com/androiddevelopers/a-safer-way-to-collect-flows-from-android-uis-23080b1f8bda
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            collect {
+                callback(it)
+            }
+        }
+    }
 }
 
 suspend inline fun callOnMain(crossinline block: () -> Unit) {

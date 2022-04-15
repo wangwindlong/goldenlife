@@ -24,10 +24,14 @@ import net.wangyl.base.enums.HttpError
 import net.wangyl.base.http.mapper.ApiErrorMapper
 import net.wangyl.base.interf.Converter
 import net.wangyl.base.interf.HttpErrorHandler
+import net.wangyl.base.util.isSameWrapClass
+import net.wangyl.base.util.typeToString
+import okhttp3.ResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
 import java.io.IOException
+import java.lang.reflect.Type
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -35,30 +39,50 @@ import java.util.*
 import kotlin.coroutines.cancellation.CancellationException
 
 
-sealed class ApiResponse<T>: BaseResponse<T>() {
+sealed class ApiResponse<T> : BaseResponse<T>() {
 
-    data class ApiSuccess<T>(override val data : T, override val success : Boolean = true,
-            override val msg : String = "",override val status : String = "", ) : ApiResponse<T>() {
+    data class ApiSuccess<T>(
+        override val data: T, override val success: Boolean = true,
+        override val msg: String = "", override val status: String = "",
+    ) : ApiResponse<T>() {
 //        override val nextKey: Int?
 //            get() = TODO("Not yet implemented")
     }
 
     //Failure response with body
-    data class ApiError<T>(val exception: Exception) : ApiResponse<T>() {
-    }
+    data class ApiError<T>(val exception: Exception) : ApiResponse<T>()
+
+    //条件错误，返回服务端定义的错误码
+    data class CondError<T>(
+        override val data: T?, override val success: Boolean = false,
+        override val msg: String? = "", override val status: String = ""
+    ) : ApiResponse<T>()
 
     data class NetworkError<T>(val error: Throwable?) : ApiResponse<T>()
 
     companion object {
+
         @JvmStatic
-        inline fun <T, R> of(crossinline f: () -> Response<T>, e: R? = null): ApiResponse<*> = try {
-            val response = f()
+        fun <T, E> of(
+            targetType: Type,
+            response: Response<T>,
+            errorConverter: retrofit2.Converter<ResponseBody, E>? = null
+        ): ApiResponse<T> = try {
             val code = response.code()
+            val error = response.errorBody()
+            val e = when {
+                error == null -> null
+                error.contentLength() == 0L -> null
+                else -> try {
+                    errorConverter?.convert(error)
+                } catch (ex: Exception) {
+                    null
+                }
+            }
             if (response.isSuccessful) {
                 val data = response.body()
-                Timber.d("response.body()=${data}")
                 if (data != null) {
-                    if (data is Converter<*>) {
+                    if (data is Converter<*> && !isSameWrapClass(data.javaClass, targetType)) {
                         data.convert()
                     } else {
                         ApiSuccess(data)
@@ -68,9 +92,9 @@ sealed class ApiResponse<T>: BaseResponse<T>() {
                 }
             } else {
                 NetworkError(ErrorMessage(code = code, error = "服务器错误: $e"))
-            }
+            } as ApiResponse<T>
         } catch (ex: Exception) {
-            ApiError<Nothing>(ex)
+            ApiError(ex)
         }
     }
 }
@@ -86,7 +110,19 @@ inline fun <T> ApiResponse<T>.successOr(fallback: () -> T): T {
 suspend inline fun <T> ApiResponse<T>.onSuccess(
     crossinline onResult: suspend ApiResponse.ApiSuccess<T>.(T) -> Unit
 ): ApiResponse<T> {
+    Timber.d("ApiResponse onSuccess this=${this}")
     if (this is ApiResponse.ApiSuccess) {
+        onResult(this.data)
+    }
+    return this
+}
+//用于需要处理服务端提示的错误信息
+@JvmSynthetic
+suspend inline fun <T> ApiResponse<T>.onApiError(
+    crossinline onResult: suspend ApiResponse.CondError<T>.(T?) -> Unit
+): ApiResponse<T> {
+    Timber.d("onApiError onSuccess this=${this}")
+    if (this is ApiResponse.CondError) {
         onResult(this.data)
     }
     return this
@@ -104,7 +140,6 @@ inline fun <T, V> ApiResponse<T>.onError(
 }
 
 
-
 data class ErrorMessage(
     val id: Long = UUID.randomUUID().mostSignificantBits,
     val code: Int? = 0, val errorMsg: String? = "",
@@ -112,9 +147,9 @@ data class ErrorMessage(
 ) : Exception(error) {
 
     constructor(response: BaseResponse<*>?) : this(
-        code = response?.code,
-        errorMsg = response?.msg,
-        error = response?.msg
+        code = response?.parseCode(),
+        errorMsg = response?.parseMsg(),
+        error = response?.parseMsg()
     )
 
     constructor(httpError: HttpError, error: String?) : this(
@@ -145,6 +180,24 @@ open class BaseResponse<out T> {
 
 }
 
+fun <T> BaseResponse<T>.parseCode(): Int {
+    return when (this) {
+        is ApiResponse.ApiError<*> -> if (exception is ErrorMessage) exception.code ?: -1 else -1
+        is ApiResponse.CondError<*> -> this.code
+        else -> code
+
+    }
+}
+
+fun <T> BaseResponse<T>.parseMsg(): String? {
+    return when (this) {
+        is ApiResponse.ApiError<*> -> if (exception is ErrorMessage) exception.error else exception.toString()
+        is ApiResponse.CondError<*> -> this.msg
+        else -> msg
+
+    }
+}
+
 //typealias ErrorHandler = (Throwable) -> ErrorMessage?
 fun handleException(throwable: Throwable, handler: HttpErrorHandler? = null) = when (throwable) {
     is UnknownHostException -> ErrorMessage(HttpError.NETWORK_ERROR, throwable.message)
@@ -152,7 +205,11 @@ fun handleException(throwable: Throwable, handler: HttpErrorHandler? = null) = w
 //        val errorModel = throwable.response()?.errorBody()?.string()?.run {
 //            Gson().fromJson(this, ErrorMessage::class.java)
 //        } ?: ErrorMessage()
-        ErrorMessage(code = throwable.code(), errorMsg = throwable.message, error = throwable.message)
+        ErrorMessage(
+            code = throwable.code(),
+            errorMsg = throwable.message,
+            error = throwable.message
+        )
     }
     is ConnectException -> ErrorMessage(HttpError.CONNECT_ERROR, throwable.message)
     is SocketTimeoutException -> ErrorMessage(HttpError.TIMEOUT_ERROR, throwable.message)

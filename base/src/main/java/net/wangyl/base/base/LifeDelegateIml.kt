@@ -1,21 +1,22 @@
-package net.wangyl.base
+package net.wangyl.base.base
 
 import android.content.Context
 import android.os.Bundle
 import android.view.View
 import net.wangyl.base.manager.EventBusManager
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
 /**
  * 生命周期的默认代理实现类，添加eventbus之类
  */
 class LifeDelegateIml(private var iBase: IBase?) : ILifeDelegate {
-
     override fun onAttach(context: Context) {
 
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (iBase?.useEventBus() == true) {
+        if (iBase?.useEventBus == true) {
             EventBusManager.get().register(iBase)
         }
     }
@@ -45,7 +46,7 @@ class LifeDelegateIml(private var iBase: IBase?) : ILifeDelegate {
     }
 
     override fun onDestroy() {
-        if (iBase?.useEventBus() == true) {
+        if (iBase?.useEventBus == true) {
             EventBusManager.get().unregister(iBase)
         }
         iBase = null
@@ -55,3 +56,12 @@ class LifeDelegateIml(private var iBase: IBase?) : ILifeDelegate {
     }
 
 }
+
+class LifeDelegate : ReadOnlyProperty<IBase, ILifeDelegate> {
+    private var _delegate: ILifeDelegate? = null
+
+    override fun getValue(thisRef: IBase, property: KProperty<*>): ILifeDelegate {
+        return _delegate ?: LifeDelegateIml(thisRef)
+    }
+}
+

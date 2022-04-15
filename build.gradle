@@ -11,27 +11,28 @@ buildscript {
         ultimatebarx_version = "0.8.0"
         ux_versionCode = 23
         ux_versionName = "0.8.0"
-        kotlin_version = "1.6.10"
+        kotlin_version = "1.6.20"
         gradle_version = "7.1.2"
         appcompat_version = "1.4.1"
         fragment_version = "1.4.1"
+        activity_version = "1.4.0"
         corektx_version = "1.7.0"
         material_version = "1.5.0"
         recyclerview_version = "1.2.1"
         lifecycle_version = "2.4.1"
-        nav_version = "2.4.1"
+        nav_version = "2.4.2"
         orbit_mvi_version = "4.3.2"
         epoxyVersion = "5.0.0-beta05"
         koin_version = "3.1.5"
         paging_version = "3.1.1"
         gms_version = "4.3.10"
-        okhttp_version = "5.0.0-alpha.2"
+        okhttp_version = "4.9.3"
         startup_version = "1.1.1"
 
         dependencies = [:]
         dependencies.coreKtx = "androidx.core:core-ktx:$corektx_version"
         dependencies.fragmentKtx = "androidx.fragment:fragment-ktx:$fragment_version"
-        dependencies.viewBinding = "androidx.databinding:viewbinding:7.1.2"
+        dependencies.viewBinding = "androidx.databinding:viewbinding:$gradle_version"
         dependencies.lifecycleCommonJava8 = "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
         dependencies.recyclerview = "androidx.recyclerview:recyclerview:$recyclerview_version"
     }
@@ -55,7 +56,7 @@ buildscript {
 plugins {
     id "com.android.application" version "$gradle_version" apply false
     id "com.android.library" version "$gradle_version" apply false
-    id "org.jetbrains.kotlin.android" version "$kotlin_version" apply false
+    id "org.jetbrains.kotlin.android" version '1.6.20' apply false
 }
 
 

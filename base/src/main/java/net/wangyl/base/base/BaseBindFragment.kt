@@ -1,4 +1,4 @@
-package net.wangyl.base
+package net.wangyl.base.base
 
 import android.view.LayoutInflater
 import android.view.View

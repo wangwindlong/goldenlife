@@ -1,6 +1,7 @@
 package net.wangyl.goldenlife
 
 import android.app.Application
+import android.content.Context
 import androidx.fragment.app.FragmentManager
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
@@ -13,22 +14,21 @@ import net.wangyl.base.FragmentLifecycle
 import net.wangyl.base.extension.getK
 import net.wangyl.base.http.GlobalHttpHandler
 import net.wangyl.base.http.GlobalHttpHandlerImpl
-import net.wangyl.base.http.retro.NetworkResponseAdapterFactory
+import net.wangyl.base.http.retro.ResponseAdapterFactory
 import net.wangyl.base.http.retro.converter.GsonConverterFactory
 import net.wangyl.goldenlife.api.ApiService
 import net.wangyl.goldenlife.api.ApiService.Companion.getUserAgent
 import net.wangyl.goldenlife.api.Repository
 import net.wangyl.goldenlife.api.repo.RSSRepository
-import net.wangyl.goldenlife.model.RSSData
 import net.wangyl.goldenlife.startup.AnalyticsService
 import net.wangyl.goldenlife.startup.AnalyticsServiceImpl
+import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
 import retrofit2.Retrofit
-import timber.log.Timber
 import java.io.IOException
 import java.lang.reflect.Modifier
 import java.util.concurrent.TimeUnit
@@ -50,10 +50,10 @@ val mainModule = module {
 //    single { provideMoshi() }
     single { provideGson() }
     single {
-        provideOkHttpClient(0, get())
+        provideOkHttpClient(0, get(), get())
     }
     single(BASE_URL_QUALIFIER) {
-        provideOkHttpClient(1, get())
+        provideOkHttpClient(1, get(), get())
     }
     single {
         provideRetrofit(
@@ -73,7 +73,7 @@ val mainModule = module {
     //此处可以用 bind FragmentLifecycle::class，就不需要自己实现单例模式了
     single<FragmentManager.FragmentLifecycleCallbacks> { FragmentLifecycle.instance }
 //    single<ActivityLifeCycler>(named("test")) bind ActivityLifeCycler::class //此时不需要实现单例模式
-    single<Application.ActivityLifecycleCallbacks> { ActivityLifeCycler.instance }
+//    single<Application.ActivityLifecycleCallbacks> { ActivityLifeCycler.instance }
 
 //        viewModel { (oncreate : () -> Unit) -> BaseListVM(get(), get(), onCreate = oncreate) }
 //        viewModel { (itemName: String) -> DetailViewModel(get(), itemName, get()) }
@@ -93,14 +93,18 @@ val mainModule = module {
 private const val LOG_TAG_HTTP_REQUEST = "okhttp_request"
 private const val LOG_TAG_HTTP_RESULT = "okhttp_result"
 private const val TIME_OUT_LENGTH = 20L
-private fun provideOkHttpClient(type: Int = 0, customIntercept: Interceptor): OkHttpClient {
+private fun provideOkHttpClient(type: Int = 0, customIntercept: Interceptor, context: Context): OkHttpClient {
     //RetrofitUrlManager 初始化
+    val cacheSize = 10 * 1024 * 1024L // 10 MB
+    val cache = Cache(context.cacheDir, cacheSize)
     val builder = RetrofitUrlManager.getInstance().with(OkHttpClient.Builder())
+        .cache(cache)
         .connectTimeout(TIME_OUT_LENGTH, TimeUnit.SECONDS)
         .callTimeout(TIME_OUT_LENGTH, TimeUnit.SECONDS)
         .readTimeout(TIME_OUT_LENGTH, TimeUnit.SECONDS)
         .writeTimeout(TIME_OUT_LENGTH, TimeUnit.SECONDS)
         .addInterceptor(customIntercept)
+
 //            LoggingInterceptor
 //                .Builder()
 //                .setLevel(if (BuildConfig.DEBUG) Level.HEADERS else Level.NONE)
@@ -189,7 +193,7 @@ private fun provideGson(): Gson {
 private fun provideRetrofit(baseUrl: String, gson: Gson, client: OkHttpClient): Retrofit {
     return Retrofit.Builder()
         .client(client)
-        .addCallAdapterFactory(NetworkResponseAdapterFactory())
+        .addCallAdapterFactory(ResponseAdapterFactory())
         .addConverterFactory(GsonConverterFactory.create(gson))
         .baseUrl(baseUrl)
 //        .validateEagerly(BuildConfig.DEBUG)

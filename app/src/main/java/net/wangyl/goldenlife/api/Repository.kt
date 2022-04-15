@@ -3,7 +3,7 @@ package net.wangyl.goldenlife.api
 import net.wangyl.base.http.BaseRepository
 import net.wangyl.goldenlife.model.PostData
 
-class Repository(private val apiService: ApiService) : BaseRepository() {
+class Repository(val apiService: ApiService) : BaseRepository {
 
 //    suspend fun getPost(id: Int): Status<PostData> {
 //        return try {

@@ -1,4 +1,4 @@
-package net.wangyl.base
+package net.wangyl.base.base
 
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -13,17 +13,18 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayout.MODE_AUTO
-import com.google.android.material.tabs.TabLayout.MODE_FIXED
+import com.google.android.material.tabs.TabLayout.*
 import com.google.android.material.tabs.TabLayoutMediator
+import net.wangyl.base.R
 import net.wangyl.base.data.FragmentData
 import net.wangyl.base.extension.createFragment
 import net.wangyl.base.extension.dp2px
+import timber.log.Timber
 
 const val TAG_TAB = "tab_state" //显示的fragment列表信息
 const val TAG_FRAGS = "tab_frags" //显示的fragment列表信息
 const val FLAG_TABBAR_TOP = 0x000001 //是否在顶部显示tabbar，默认为顶部
-const val FLAG_TABBAR_Botom = 0x000010 //是否在底部显示tabbar
+const val FLAG_TABBAR_BTM = 0x000010 //是否在底部显示tabbar
 
 /**
  * 带有tablayout和viewpager2的简易fragment，tablayout 可在顶部、底部或不显示
@@ -87,9 +88,12 @@ class TabViewPagerFragment : BaseFragment() {
             if (isTabTop()) {
                 topToBottom = R.id.base_tablayout
                 bottomToBottom = PARENT_ID
+                tabLayout.setSelectedTabIndicatorGravity(INDICATOR_GRAVITY_BOTTOM)
             } else {
                 topToTop = PARENT_ID
                 bottomToTop = R.id.base_tablayout
+                tabLayout.setSelectedTabIndicatorGravity(INDICATOR_GRAVITY_TOP)
+//                tabLayout.setSelectedTabIndicator(null)
             }
         }
         viewPager2.adapter = object : FragmentStateAdapter(this) {

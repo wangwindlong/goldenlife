@@ -71,7 +71,7 @@ dependencies {
     kapt("com.squareup.moshi:moshi-kotlin-codegen:1.13.0")
 
 //    implementation "io.insert-koin:koin-annotations:$koin_version"
-    implementation 'com.tencent:mmkv-static:1.2.10'
+    implementation 'com.tencent:mmkv-static:1.2.13'
     implementation 'com.vmadalin:easypermissions-ktx:1.0.0'
 //    implementation("com.github.lisawray.groupie:groupie:2.10.0")
 //    implementation("com.github.lisawray.groupie:groupie-kotlin-android-extensions:2.10.0")
@@ -93,8 +93,6 @@ dependencies {
 //    def smart_version = "2.0.5"
 //    implementation "io.github.scwang90:refresh-layout-kernel:$smart_version"
 //    implementation "io.github.scwang90:refresh-header-classics:$smart_version"
-
-
 
 
     testImplementation "junit:junit:4.13.2"
