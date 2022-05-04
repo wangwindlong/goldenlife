@@ -1,11 +1,14 @@
 package net.wangyl.base.manager
 
 import android.app.Activity
+import android.content.Intent
+import net.wangyl.base.extension.NON_INTENT
+import net.wangyl.base.extension.goIntent
 import timber.log.Timber
 import java.util.*
 
 class AppManager private constructor() {
-    companion object {
+    companion object m {
         private var instance: AppManager? = null
             get() {
                 if (field == null) {
@@ -15,7 +18,7 @@ class AppManager private constructor() {
             }
 
         @Synchronized
-        fun get(): AppManager{
+        fun get(): AppManager {
             return instance!!
         }
     }
@@ -34,7 +37,7 @@ class AppManager private constructor() {
      * @param activity 作用说明 ：添加一个activity到管理里
      */
     fun pushActivity(activity: Activity) {
-        if(!mActivitys.contains(activity)) mActivitys.add(activity)
+        if (!mActivitys.contains(activity)) mActivitys.add(activity)
 //        LOGD(TAG, "activityList:size:" + mActivitys.size)
     }
 
@@ -71,5 +74,12 @@ class AppManager private constructor() {
             activity.finish()
         }
         mActivitys.clear()
+    }
+
+}
+
+fun AppManager.m.startFragment(frag: Class<*>, intent: Intent.() -> Unit = NON_INTENT) {
+    get().getTopActivity()?.let {
+        it.startActivity(goIntent(it, frag, intent))
     }
 }

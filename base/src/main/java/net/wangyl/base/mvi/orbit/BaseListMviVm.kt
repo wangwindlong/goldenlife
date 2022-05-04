@@ -31,11 +31,11 @@ class BaseListMviVm<DataClass : Parcelable>(
                     //如果长度为0，则返回已加载完成
                     //如果不为0，则添加到原数据后面
                     state.values.addAll(status.data)
-                    state.copy(values = state.values, isFrist = false)
+                    state.copy(values = state.values)
                 }
                 //如果加载失败,返回错误信息
                 is ApiResponse.ApiError -> state.copy(error = status.exception)
-                else -> state.copy(isFrist = true, error = null)
+                else -> state.copy(error = null)
             }
 //            state.copy(values = when(datas) {
 //

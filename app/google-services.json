@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "380519853593",
-    "project_id": "goldenlife-f415a",
-    "storage_bucket": "goldenlife-f415a.appspot.com"
+    "project_number": "591014819028",
+    "project_id": "goldenlife-6a173",
+    "storage_bucket": "goldenlife-6a173.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:380519853593:android:4a0d4a0d1de7f349768488",
+        "mobilesdk_app_id": "1:591014819028:android:d4f774a721e31c1133f741",
         "android_client_info": {
-          "package_name": "net.wangyl.goldenlife"
+          "package_name": "net.wangyl.life"
         }
       },
       "oauth_client": [
         {
-          "client_id": "380519853593-6imtgha2a32d53ragc5hdpm8tfhblv58.apps.googleusercontent.com",
+          "client_id": "591014819028-ur0p5uj8nhvekg7tuq9bcnft32hlfsvg.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDU75ye4I5PyMEZB7E790BSVqF4W0ofXBY"
+          "current_key": "AIzaSyCgUSN7_jGBDvACNwy9ZrO-l9HK3WDnBRM"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "380519853593-6imtgha2a32d53ragc5hdpm8tfhblv58.apps.googleusercontent.com",
+              "client_id": "591014819028-ur0p5uj8nhvekg7tuq9bcnft32hlfsvg.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

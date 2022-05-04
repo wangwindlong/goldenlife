@@ -20,5 +20,17 @@ interface BaseItem : BaseModel {
     fun getItemType(): Int = defaultItem
 }
 
+interface BaseEntity {
+    val localid: Long
+}
+
+interface IdEntity : BaseEntity {
+    val id: Long
+}
+
+interface PaginatedEntry : IdEntity {
+    val page: Int
+}
+
 interface ListModel2<T> : BaseListModel<String, T> {}
 interface ListModel<Data> : BaseListModel<Int, Data> {}

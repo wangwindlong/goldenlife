@@ -46,6 +46,11 @@ class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
         }
     }
 
+    override fun onActivityPreCreated(f: Activity, savedInstanceState: Bundle?) {
+//        Timber.d("onActivityPreCreated $f , savedInstanceState= ${savedInstanceState}")
+//        Bridge.restoreInstanceState(f, savedInstanceState)
+
+    }
 
     override fun onActivityCreated(f: Activity, savedInstanceState: Bundle?) {
         durationMap[f] = 0L
@@ -56,7 +61,6 @@ class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
         (f as? FragmentActivity)?.supportFragmentManager?.registerFragmentLifecycleCallbacks(getK(), true)
         (f as? IBase)?.baseDelegate?.onCreate(savedInstanceState)
         //使用https://github.com/livefront/bridge 加载保存的状态
-        Bridge.restoreInstanceState(f, savedInstanceState)
     }
 
     override fun onActivityStarted(f: Activity) {
@@ -101,10 +105,12 @@ class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
         Timber.d("onActivityStopped")
     }
 
+
+
     override fun onActivitySaveInstanceState(f: Activity, outState: Bundle) {
         (f as? IBase)?.baseDelegate?.onSaveInstanceState(outState)
         Timber.d("onActivitySaveInstanceState")
-        Bridge.saveInstanceState(f, outState)
+//        Bridge.saveInstanceState(f, outState)
     }
 
     override fun onActivityDestroyed(f: Activity) {

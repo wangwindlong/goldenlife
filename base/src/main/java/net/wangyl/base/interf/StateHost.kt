@@ -4,8 +4,7 @@ import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.wangyl.base.data.ApiResponse
-import net.wangyl.base.data.ErrorMessage
-import net.wangyl.base.enums.StateFinished
+import net.wangyl.base.enums.StateError
 import net.wangyl.base.enums.StateIdle
 import net.wangyl.base.enums.StateLoading
 import net.wangyl.base.http.*
@@ -18,8 +17,8 @@ import kotlin.reflect.KProperty
 /**
  * 用来标记一些状态，加载框、是否登录状态、加载错误信息框等
  */
-interface StateHost {
-    val stateContainer: StateContainer
+interface StateHost<T : State> {
+    val stateContainer: StateContainer<T>
 
 //    inline fun <reified T : BaseModel> ViewModel.fire(
 //        context: CoroutineContext = Dispatchers.IO,
@@ -59,21 +58,24 @@ interface StateHost {
     }
 }
 
-fun ViewModel.initDefault() = viewModelScope.stateHost()
+//提供两种方式 简便地初始化默认 stateContainer = initDefault() 或 by StateDelegate()
+fun ViewModel.initDefault(initial: State) = viewModelScope.stateHost(initial)
 
-class StateDelegate: ReadOnlyProperty<ViewModel, StateContainer> {
-    private var _delegate: StateContainer? = null
+inline fun <reified T : State> stateOf(initial: T): ReadOnlyProperty<ViewModel, StateContainer<T>> {
+    return object : ReadOnlyProperty<ViewModel, StateContainer<T>> {
+        private var _delegate: StateContainer<T>? = null
 
-    override fun getValue(thisRef: ViewModel, property: KProperty<*>): StateContainer {
-        return _delegate ?: thisRef.viewModelScope.stateHost()
+        override fun getValue(thisRef: ViewModel, property: KProperty<*>): StateContainer<T> {
+            return _delegate ?: thisRef.viewModelScope.stateHost(initial)
+        }
+
     }
-
 }
 
 /**
  * method和参数用来做api缓存
  */
-inline fun <reified T> StateHost.apiCall(
+inline fun <reified T> StateHost<State>.apiCall(
     method: String? = null, params: Map<String, Any?> = emptyMap(),
 //        handler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
 //            Timber.e("${javaClass.name} caught the exception ", throwable)
@@ -85,7 +87,7 @@ inline fun <reified T> StateHost.apiCall(
         emit(ApiResponse.ApiSuccess(it, true))
         return@flow
     }.noCache {
-        stateContainer.loadingState.value = if (showDialog) StateLoading else StateIdle
+//        stateContainer.loadingState.value = if (showDialog) StateLoading else StateIdle
         try {
             emit(BaseRepository.apiCall {
                 block(params)
@@ -94,14 +96,14 @@ inline fun <reified T> StateHost.apiCall(
                 if (it !is ApiResponse.ApiSuccess || !useCache) return@also
                 Cache.saveCache(this, it.data)
             })
-            stateContainer.launchApi {
-
-            }
+//            stateContainer.launchApi {
+//
+//            }
 
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        stateContainer.loadingState.postValue(StateFinished)
+//        stateContainer.loadingState.postValue(StateFinished)
     }
 }
 
@@ -117,40 +119,42 @@ typealias Cancel = (e: Exception) -> Unit
 //        }
 
 
-inline fun StateHost.launch(
+inline fun StateHost<*>.launch(
     scope: CoroutineScope,
     showDialog: Boolean = true,
+    showError: Boolean = false,
     noinline cancel: Cancel? = null,
     crossinline block: LaunchBlock
-)  {
+) {
     scope.launch {
-        stateContainer.loadingState.value = if (showDialog) StateLoading else StateIdle
+        stateContainer.updateLoading(if (showDialog) StateLoading else StateIdle)
         try {
             block()
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
             cancel?.invoke(e)
-            stateContainer.errorState.postValue(ErrorMessage(e, e.message))
+            if (showError) stateContainer.updateLoading(StateError(e))
         }
-        stateContainer.loadingState.postValue(StateFinished)
+        stateContainer.updateLoading(StateIdle)
     }
 
 }
 
-inline fun <reified T> StateHost.api(
+inline fun <reified T> StateHost<*>.api(
     showDialog: Boolean = true,
+    showError: Boolean = false,
     noinline cancel: Cancel? = null,
     crossinline block: EmitBlock<T?>
 ): LiveData<T?> = liveData {
-    stateContainer.loadingState.value = if (showDialog) StateLoading else StateIdle
+    stateContainer.updateLoading(if (showDialog) StateLoading else StateIdle)
     try {
         emit(block())
     } catch (e: java.lang.Exception) {
         e.printStackTrace()
         cancel?.invoke(e)
-        stateContainer.errorState.postValue(ErrorMessage(e, e.message))
+        if (showError) stateContainer.updateLoading(StateError(e))
     }
-    stateContainer.loadingState.postValue(StateFinished)
+    stateContainer.updateLoading(StateIdle)
 }
 
 //fun StateHost.api(

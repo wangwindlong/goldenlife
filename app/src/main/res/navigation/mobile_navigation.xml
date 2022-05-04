@@ -7,25 +7,25 @@
 
     <fragment
         android:id="@+id/nav_transform"
-        android:name="net.wangyl.goldenlife.ui.transform.TransformFragment"
+        android:name="net.wangyl.life.ui.transform.TransformFragment"
         android:label="@string/menu_transform"
         tools:layout="@layout/fragment_transform" />
 
     <fragment
         android:id="@+id/nav_reflow"
-        android:name="net.wangyl.goldenlife.ui.reflow.ReflowFragment"
+        android:name="net.wangyl.life.ui.reflow.ReflowFragment"
         android:label="@string/menu_reflow"
         tools:layout="@layout/fragment_reflow" />
 
     <fragment
         android:id="@+id/nav_slideshow"
-        android:name="net.wangyl.goldenlife.ui.slideshow.SlideshowFragment"
+        android:name="net.wangyl.life.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="net.wangyl.goldenlife.ui.settings.SettingsFragment"
+        android:name="net.wangyl.life.ui.settings.SettingsFragment"
         android:label="@string/menu_settings"
         tools:layout="@layout/fragment_settings" >
         <argument
@@ -35,7 +35,7 @@
             android:defaultValue="@null" />
         <argument
             android:name="item"
-            app:argType="net.wangyl.goldenlife.model.PostData" />
+            app:argType="net.wangyl.life.model.PostData" />
     </fragment>
 
 </navigation>

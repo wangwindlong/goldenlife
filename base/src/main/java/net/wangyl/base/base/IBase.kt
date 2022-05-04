@@ -21,7 +21,7 @@ interface IBase {
     fun setupToolbar(toolbar: Toolbar?) = Unit
     fun setData(data: Any?) = Unit
     val baseDelegate: ILifeDelegate?
-    val uiState: StateHost?   //使用变量 by代理模式？
+    val uiState: StateHost<*>?   //使用变量 by代理模式？
 //    fun initTitle(): CharSequence? = ""
 }
 
@@ -29,5 +29,5 @@ class BaseImpl: IBase {
     override var useEventBus: Boolean = true
     override var showAction: Boolean = true
     override val baseDelegate: ILifeDelegate? by LifeDelegate()
-    override val uiState: StateHost? = null
+    override val uiState: StateHost<*>? = null
 }

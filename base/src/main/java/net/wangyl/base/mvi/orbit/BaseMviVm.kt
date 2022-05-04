@@ -36,7 +36,7 @@ open class BaseMviVm<Data : Parcelable>(savedStateHandle: SavedStateHandle) : Vi
         Timber.e("orbit caught the exception ", throwable)
     }
     open var onInit: (ViewModel.() -> Unit)? = null
-    private val _container: Container<BaseState<Data>, Event> = container<BaseState<Data>, Event>(
+    override val container: Container<BaseState<Data>, Event> = container<BaseState<Data>, Event>(
         initialState = BaseState(),
         savedStateHandle = savedStateHandle,
         settings = Container.Settings(exceptionHandler = exceptionHandler)
@@ -45,11 +45,6 @@ open class BaseMviVm<Data : Parcelable>(savedStateHandle: SavedStateHandle) : Vi
         onInit?.invoke(this)
     }
 
-    init {
-        Timber.d("init BaseVM _container = $_container")
-    }
-
-    override val container: Container<BaseState<Data>, Event> = _container
 
     //增加封装过的参数？确定加载第几页数据，是否要加载下一页数据
 //    private fun loadList() = intent {

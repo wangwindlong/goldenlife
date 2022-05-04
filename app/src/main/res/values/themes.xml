@@ -1,9 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.GoldenLife" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.GoldenLife" parent="android:Theme.Material.Light">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimaryVariant">@color/dimmer</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -13,10 +13,31 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
-
+    <style name="Theme.Jetnews" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/purple_700</item>
+        <item name="colorAccent">@color/purple_500</item>
+        <item name="android:statusBarColor">@color/transparent</item>
+        <item name="android:background">@color/transparent</item>
+    </style>
     <style name="Theme.GoldenLife.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+<!--        <item name="android:statusBarColor">@color/status_bar</item>-->
+<!--        <item name="android:background">@color/status_bar</item>-->
+    </style>
+
+
+    <style name="Theme.GoldenLife.Immerse" parent="Theme.GoldenLife.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/system_ui_scrim_dark</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">@bool/use_light_nav_bar</item>
+    </style>
+
+    <style name="Theme.GoldenLife.Home" parent="Theme.GoldenLife.Immerse">
+        <item name="android:windowLightStatusBar" tools:targetApi="m">@bool/use_light_status_bar</item>
     </style>
 
     <style name="Theme.GoldenLife.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

@@ -1,6 +1,5 @@
 package net.wangyl.base.model
 
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
@@ -23,5 +22,7 @@ class EventViewModel : ViewModel() {
     fun showToast(msg: String?) {
         toastLiveData.value = msg
     }
+
+
 
 }

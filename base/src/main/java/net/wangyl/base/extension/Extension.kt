@@ -33,8 +33,9 @@ fun NavOptions.Builder.setHorizontalSlide(): NavOptions.Builder {
         .setPopExitAnim(R.anim.base_h_slide_popexit)
 }
 
-inline fun<T> goIntent(c: Context, frag: Class<T>, init: Intent.() -> Unit): Intent {
-    return Intent(c, SimpleActivity::class.java).apply { init() }.putExtra(TAG_FRAGNAME, frag.name)
+val NON_INTENT: Intent.() -> Unit = {}
+fun<T> goIntent(c: Context, frag: Class<T>, init: (Intent.() -> Unit) = NON_INTENT): Intent {
+    return Intent(c, SimpleActivity::class.java).also(init).putExtra(TAG_FRAGNAME, frag.name)
 }
 
 
@@ -101,6 +102,10 @@ fun Activity.toast(message: String?, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(applicationContext, message, duration).show()
 }
 
+fun Context.toast(message: String?, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(applicationContext, message, duration).show()
+}
+
 inline fun <reified T> Fragment.startActivity() {
     startActivity(Intent(context, T::class.java))
 }
@@ -108,5 +113,6 @@ inline fun <reified T> Fragment.startActivity() {
 inline fun <reified T> Context.startActivity() {
     startActivity(Intent(this, T::class.java))
 }
+
 
 

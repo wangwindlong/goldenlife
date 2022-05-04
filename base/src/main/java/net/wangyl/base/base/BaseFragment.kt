@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import icepick.State
 import net.wangyl.base.Configs.APP_NAME
 import net.wangyl.base.R
 import net.wangyl.base.data.FragmentData
@@ -36,7 +37,8 @@ open class BaseFragment : Fragment(), IBase by BaseImpl(), LoadingState by Loadi
 
     // flag bit to determine that view has been loaded to avoid null pointer operations
     private var isPrepareView: Boolean = false
-    private var mTitle: String? = null
+    @State
+    @JvmField var mTitle: String? = null
 
     var mToolbar: Toolbar? = null
         set(value) {
@@ -63,7 +65,7 @@ open class BaseFragment : Fragment(), IBase by BaseImpl(), LoadingState by Loadi
 //            toolBar = this.getInt("toolbar_state", toolBar)
 //        }
         mTitle = savedInstanceState?.getString(TAG_TITLE)
-        Timber.d("initData savedInstanceState=${savedInstanceState?.keySet()}")
+        Timber.d("initData savedInstanceState=${savedInstanceState?.keySet()} TAG=$TAG")
     }
 
     override fun onAttach(context: Context) {

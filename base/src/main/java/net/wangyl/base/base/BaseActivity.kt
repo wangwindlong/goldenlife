@@ -6,6 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import icepick.State
 import net.wangyl.base.Configs.APP_NAME
 import net.wangyl.base.R
 import net.wangyl.base.data.MsgEvent
@@ -23,19 +24,21 @@ const val TAG_TITLE = "tag_title"
 
 open class BaseActivity : AppCompatActivity(), IBase by BaseImpl(), LoadingState by LoadingImpl() {
     val TAG = javaClass.simpleName
-    var fragName: String? = ""
+    @State
+    @JvmField var fragName: String? = ""
     private var mBackListener: OnBackPressedListener? = null
     private var mToolbar: Toolbar? = null
-    private var mArgs: Bundle? = null
+    @State
+    @JvmField var mArgs: Bundle? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val bundle = savedInstanceState ?: intent.extras
-        fragName = bundle?.getString(TAG_FRAGNAME)
-        isDecorated = bundle?.getBoolean(TAG_DECORATE) ?: false
+        val bundle = intent.extras ?: savedInstanceState
+        fragName = intent.extras?.getString(TAG_FRAGNAME)
+        isDecorated = intent.extras?.getBoolean(TAG_DECORATE) ?: false
         mArgs = intent.getBundleExtra(TAG_ARGS)
         Timber.d("onCreate fragName= $fragName, intent.extras=${intent.extras} , " +
-                    "isDecorated = $isDecorated, mArgs=${mArgs?.getBoolean(TAG_DECORATE)}, intent.extras=${intent.extras?.getBundle(TAG_ARGS)?.keySet()} savedInstanceState=$savedInstanceState")
+                    "isDecorated = $isDecorated, mArgs=${mArgs?.getInt(TAG_TAB)}, intent.extras=${intent.extras?.getBundle(TAG_ARGS)} savedInstanceState=$savedInstanceState")
         setContentView(initLayoutId())
 
         findViewById<View>(R.id.fragment_container)?.let { _ ->

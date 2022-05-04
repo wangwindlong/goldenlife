@@ -1,10 +1,12 @@
 package net.wangyl.base.enums
 
+
 sealed class StateEvent
 
 object StateIdle : StateEvent()
 object StateLoading : StateEvent()
-object StateFinished : StateEvent()
+//object StateFinished : StateEvent()
+data class StateError(val throwable: Throwable) : StateEvent()
 
 enum class LoginState(val state: Int) {
     UNLOGIN(0),

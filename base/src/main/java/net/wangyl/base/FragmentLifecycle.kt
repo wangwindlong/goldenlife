@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentManager
 import com.livefront.bridge.Bridge
 import net.wangyl.base.base.IBase
 import net.wangyl.base.dialog.LoadingDialog
+import net.wangyl.base.enums.StateError
 import net.wangyl.base.enums.StateLoading
 import net.wangyl.base.interf.loading
 import timber.log.Timber
@@ -30,20 +31,32 @@ class FragmentLifecycle private constructor(): FragmentManager.FragmentLifecycle
         Timber.d("FragmentLifecycle onFragmentAttached $f")
     }
 
-    override fun onFragmentCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
+    override fun onFragmentPreCreated(
+        fm: FragmentManager,
+        f: Fragment,
+        savedInstanceState: Bundle?
+    ) {
+//        Timber.d("FragmentLifecycle onFragmentPreCreated f=$f  savedInstanceState=$savedInstanceState")
+//        Bridge.restoreInstanceState(f, savedInstanceState)
+    }
+
+    override fun onFragmentCreated(fm: FragmentManager, f: Fragment, s: Bundle?) {
         (f as? IBase)?.apply {
             uiState?.loading?.observe(f) {
-                if (it is StateLoading) {
+                if (it is StateError) {
+                    //show error msg
+
+                } else if (it is StateLoading) {
                     LoadingDialog.show(f)
                 } else {
                     LoadingDialog.dismiss(f)
                 }
             }
-            baseDelegate?.onCreate(savedInstanceState)
-            initData(savedInstanceState ?: f.arguments)
+            baseDelegate?.onCreate(s)
+            Timber.d("FragmentLifecycle onFragmentCreated savedInstanceState=$s arguments=${f.arguments}")
+            initData(s ?: f.arguments)
         }
         Timber.d("FragmentLifecycle onFragmentCreated $f")
-        Bridge.restoreInstanceState(f, savedInstanceState)
     }
 
     override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
@@ -76,7 +89,7 @@ class FragmentLifecycle private constructor(): FragmentManager.FragmentLifecycle
     override fun onFragmentSaveInstanceState(fm: FragmentManager, f: Fragment, outState: Bundle) {
         (f as? IBase)?.baseDelegate?.onSaveInstanceState(outState)
         Timber.d("FragmentLifecycle onFragmentSaveInstanceState $f")
-        Bridge.saveInstanceState(f, outState)
+//        Bridge.saveInstanceState(f, outState)
     }
 
     override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {

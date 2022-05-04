@@ -4,7 +4,7 @@ plugins {
     id "kotlin-parcelize"
     id "kotlin-kapt"
     id 'androidx.navigation.safeargs.kotlin'
-    id("com.google.devtools.ksp").version("1.6.10-1.0.4")
+//    id("com.google.devtools.ksp").version("1.6.21-1.0.5")
 }
 
 android {
@@ -60,9 +60,9 @@ dependencies {
     api "com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7"
     api "com.squareup.retrofit2:retrofit:2.9.0"
     api "com.squareup.retrofit2:converter-gson:2.9.0"
-//    api("com.squareup.moshi:moshi-kotlin:1.12.0")
-//    ksp("com.squareup.moshi:moshi-kotlin-codegen:1.13.0")
-//    api("com.squareup.retrofit2:converter-moshi:2.9.0")
+    api("com.squareup.moshi:moshi-kotlin:1.13.0")
+    kapt("com.squareup.moshi:moshi-kotlin-codegen:1.13.0")
+    api("com.squareup.retrofit2:converter-moshi:2.9.0")
 
     api("com.squareup.okhttp3:logging-interceptor:$okhttp_version")
 
@@ -70,8 +70,10 @@ dependencies {
     api "androidx.paging:paging-runtime:$paging_version"
     api "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
     api "androidx.legacy:legacy-support-v4:1.0.0"
-    api("com.github.bumptech.glide:glide:4.13.0")
+    api("com.github.bumptech.glide:glide:4.13.1")
     api "org.greenrobot:eventbus:3.3.1"
+
+    api("androidx.datastore:datastore-core:1.0.0")
 
 //    api "com.airbnb.android:mavericks:2.6.1"
     api("org.orbit-mvi:orbit-viewmodel:$orbit_mvi_version")

@@ -11,7 +11,6 @@ open class BaseBindFragment<T : ViewBinding> : BaseFragment() {
     lateinit var binding: T
 
     override fun createView(inflater: LayoutInflater, container: ViewGroup?): View {
-        Timber.d("createView inflater=$inflater ，getLayoutId()=${getLayoutId()}, container=$container")
        binding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false)
         return binding.root
     }

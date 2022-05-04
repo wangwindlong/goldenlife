@@ -21,7 +21,7 @@
 #-renamesourcefileattribute SourceFile
 
 
--keepnames class net.wangyl.goldenlife.model.*
+-keepnames class net.wangyl.life.model.*
 
 
 -keepattributes *Annotation*
@@ -40,13 +40,5 @@
 -keep class org.greenrobot.eventbus.android.AndroidComponentsImpl
 
 
-#icepick https://github.com/frankiesardo/icepick
--dontwarn icepick.**
--keep class icepick.** { *; }
--keep class **$$Icepick { *; }
--keepclasseswithmembernames class * {
-    @icepick.* <fields>;
-}
--keepnames class * { @icepick.State *;}
 
 

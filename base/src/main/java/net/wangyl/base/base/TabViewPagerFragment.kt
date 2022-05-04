@@ -36,6 +36,7 @@ class TabViewPagerFragment : BaseFragment() {
 
     override fun initData(savedInstanceState: Bundle?) {
         super.initData(savedInstanceState)
+        Timber.d("TabViewPagerFragment initData arguments=$arguments, savedInstanceState=$savedInstanceState")
         savedInstanceState?.apply {
             tabBar = this.getInt(TAG_TAB, tabBar)
             fragments.clear()
@@ -69,6 +70,7 @@ class TabViewPagerFragment : BaseFragment() {
         } else {
             params.bottomToBottom = PARENT_ID
         }
+        Timber.d("TabViewPagerFragment createView fragments=${fragments.size}")
         tabLayout.tabMode = if (fragments.size > 6) MODE_AUTO else MODE_FIXED
 //        params.topMargin = 18.dp()
 //        params.dimensionRatio = "h,16:9"
