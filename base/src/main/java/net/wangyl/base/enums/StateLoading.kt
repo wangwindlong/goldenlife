@@ -8,6 +8,8 @@ object StateLoading : StateEvent()
 //object StateFinished : StateEvent()
 data class StateError(val throwable: Throwable) : StateEvent()
 
+fun StateEvent.isLoading() = this is StateLoading
+
 enum class LoginState(val state: Int) {
     UNLOGIN(0),
     LOGEDIN(1),

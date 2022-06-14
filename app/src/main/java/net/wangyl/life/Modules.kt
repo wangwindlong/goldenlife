@@ -35,6 +35,8 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.GlobalContext.get
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -59,10 +61,10 @@ val mainModule = module {
     single { provideMoshi() }
     single { provideGson() }
     single {
-        provideOkHttpClient(0, get(), get())
+        provideOkHttpClient(0, get(), androidContext())
     }
     single(BASE_URL_QUALIFIER) {
-        provideOkHttpClient(1, get(), get())
+        provideOkHttpClient(1, get(), androidContext())
     }
     single {
         provideRetrofit(
@@ -133,7 +135,7 @@ private fun provideOkHttpClient(type: Int = 0, customIntercept: Interceptor, con
 
 //        .addInterceptor(customIntercept)
     println("provideOkHttpClient called type=$type")
-    if (type == 0) builder.addInterceptor(RSSInterceptor())
+    if (type == 0) builder.addInterceptor(RSSInterceptor(context))
     if (type == 1) builder.addInterceptor(FilterInterceptor())
     return builder.build()
 }
@@ -151,10 +153,10 @@ class FilterInterceptor : Interceptor {
 
 }
 
-class RSSInterceptor : Interceptor {
+class RSSInterceptor(val context: Context) : Interceptor {
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
-        val userAgent = getUserAgent(getK())
+        val userAgent = getUserAgent(context)
 //        Timber.d("intercept userAgent=$userAgent")
         val request = chain.request()
             .newBuilder()

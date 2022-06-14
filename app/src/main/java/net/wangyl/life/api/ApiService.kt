@@ -58,17 +58,20 @@ interface ApiService {
     @POST("api/")
     suspend fun headlines(
         @Body  body: Map<String, String>,
-//        @Field("op") op: String, @Field("user") user: String?,
-//        @Field("password") password: String?
     ): ApiResponse<List<Article>>
+
+    @Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER + RSS_DOMAIN_NAME)
+    @WrapWith(RSSData::class)
+    @POST("api/")
+    suspend fun headlines2(
+        @Body  body: Map<String, String>,
+    ): ApiResponse<List<Feed>>
 
     @Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER + RSS_DOMAIN_NAME)
     @WrapWith(RSSData::class)
     @POST("api/")
     suspend fun categories(
         @Body  body: Map<String, String>,
-//        @Field("op") op: String, @Field("user") user: String?,
-//        @Field("password") password: String?
     ): ApiResponse<List<CategoryEntity>>
 
     companion object {

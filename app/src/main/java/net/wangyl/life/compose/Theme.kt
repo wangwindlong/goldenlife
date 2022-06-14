@@ -1,6 +1,7 @@
 package net.wangyl.life.compose
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,7 +24,7 @@ private val DefaultShape = Shapes(
 )
 
 private val LightColorPalette = MyComposeColors(
-  statusBarBg = white1.convert(ColorSpaces.Acescg),
+  statusBarBg = white1,
   bottomBar = white1,
   background = white2,
   listItem = white,
@@ -44,7 +45,7 @@ private val LightColorPalette = MyComposeColors(
   chatPageBgAlpha = 0f,
 )
 private val DarkColorPalette = MyComposeColors(
-  statusBarBg = black1.convert(ColorSpaces.Acescg),
+  statusBarBg = black1,
   bottomBar = black1,
   background = black2,
   listItem = black3,
@@ -65,7 +66,7 @@ private val DarkColorPalette = MyComposeColors(
   chatPageBgAlpha = 0f,
 )
 private val NewYearColorPalette = MyComposeColors(
-  statusBarBg = red4.convert(ColorSpaces.Acescg),
+  statusBarBg = red4,
   bottomBar = red4,
   background = red5,
   listItem = red2,
@@ -98,7 +99,7 @@ private val LocalTypography = compositionLocalOf {
   DefaultTypoGraphy
 }
 
-object MyComposeTheme {
+object AppTheme {
   val colors: MyComposeColors
     @Composable
     get() = LocalMyComposeColors.current
@@ -185,31 +186,36 @@ class MyComposeColors(
 }
 
 @Composable
-fun MyComposeTheme(theme: MyComposeTheme.Theme = MyComposeTheme.Theme.Light, content: @Composable () -> Unit) {
+fun animateColorState(color: Color, animate: AnimationSpec<Color> = TweenSpec(600)) : State<Color> {
+   return animateColorAsState(color, animate)
+}
+
+@Composable
+fun AppTheme(theme: AppTheme.Theme = AppTheme.Theme.Light, content: @Composable () -> Unit) {
   val targetColors = when (theme) {
-    MyComposeTheme.Theme.Light -> LightColorPalette
-    MyComposeTheme.Theme.Dark -> DarkColorPalette
-    MyComposeTheme.Theme.Custom -> NewYearColorPalette
+    AppTheme.Theme.Light -> LightColorPalette
+    AppTheme.Theme.Dark -> DarkColorPalette
+    AppTheme.Theme.Custom -> NewYearColorPalette
   }
 
-  val statusBarBg = animateColorAsState(targetColors.statusBarBg, TweenSpec(600))
-  val bottomBar = animateColorAsState(targetColors.bottomBar, TweenSpec(600))
-  val background = animateColorAsState(targetColors.background, TweenSpec(600))
-  val listItem = animateColorAsState(targetColors.listItem, TweenSpec(600))
-  val chatListDivider = animateColorAsState(targetColors.chatListDivider, TweenSpec(600))
-  val chatPage = animateColorAsState(targetColors.chatPage, TweenSpec(600))
-  val textPrimary = animateColorAsState(targetColors.textPrimary, TweenSpec(600))
-  val textPrimaryMe = animateColorAsState(targetColors.textPrimaryMe, TweenSpec(600))
-  val textSecondary = animateColorAsState(targetColors.textSecondary, TweenSpec(600))
-  val onBackground = animateColorAsState(targetColors.onBackground, TweenSpec(600))
-  val icon = animateColorAsState(targetColors.icon, TweenSpec(600))
-  val iconCurrent = animateColorAsState(targetColors.iconSelected, TweenSpec(600))
-  val badge = animateColorAsState(targetColors.badge, TweenSpec(600))
-  val onBadge = animateColorAsState(targetColors.onBadge, TweenSpec(600))
-  val bubbleMe = animateColorAsState(targetColors.bubbleMe, TweenSpec(600))
-  val bubbleOthers = animateColorAsState(targetColors.bubbleOthers, TweenSpec(600))
-  val textFieldBackground = animateColorAsState(targetColors.textFieldBackground, TweenSpec(600))
-  val more = animateColorAsState(targetColors.more, TweenSpec(600))
+  val statusBarBg = animateColorState(targetColors.statusBarBg, )
+  val bottomBar = animateColorState(targetColors.bottomBar)
+  val background = animateColorState(targetColors.background)
+  val listItem = animateColorState(targetColors.listItem)
+  val chatListDivider = animateColorState(targetColors.chatListDivider)
+  val chatPage = animateColorState(targetColors.chatPage)
+  val textPrimary = animateColorState(targetColors.textPrimary)
+  val textPrimaryMe = animateColorState(targetColors.textPrimaryMe)
+  val textSecondary = animateColorState(targetColors.textSecondary)
+  val onBackground = animateColorState(targetColors.onBackground)
+  val icon = animateColorState(targetColors.icon)
+  val iconCurrent = animateColorState(targetColors.iconSelected)
+  val badge = animateColorState(targetColors.badge)
+  val onBadge = animateColorState(targetColors.onBadge)
+  val bubbleMe = animateColorState(targetColors.bubbleMe)
+  val bubbleOthers = animateColorState(targetColors.bubbleOthers)
+  val textFieldBackground = animateColorState(targetColors.textFieldBackground)
+  val more = animateColorState(targetColors.more)
   val chatPageBgAlpha = animateFloatAsState(targetColors.chatPageBgAlpha, TweenSpec(600))
 
   val colors = MyComposeColors(
@@ -236,8 +242,8 @@ fun MyComposeTheme(theme: MyComposeTheme.Theme = MyComposeTheme.Theme.Light, con
 
   CompositionLocalProvider(LocalMyComposeColors provides colors) {
     MaterialTheme(
-      shapes = MyComposeTheme.shapes,
-      typography = MyComposeTheme.typography,
+      shapes = AppTheme.shapes,
+      typography = AppTheme.typography,
       content = content
     )
   }

@@ -5,6 +5,11 @@ import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import net.wangyl.base.extension.dp2px
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
+import java.net.Socket
 import kotlin.math.max
 
 class TextDrawable(res: Resources, icon: Drawable? = null, text: CharSequence? = "") : Drawable() {
@@ -45,6 +50,9 @@ class TextDrawable(res: Resources, icon: Drawable? = null, text: CharSequence? =
         //计算baseline
         val fontMetrics: Paint.FontMetrics = mPaint.fontMetrics
         mTextDistance = (fontMetrics.bottom + fontMetrics.top) / 2
+
+
+
     }
 
     override fun draw(canvas: Canvas) {

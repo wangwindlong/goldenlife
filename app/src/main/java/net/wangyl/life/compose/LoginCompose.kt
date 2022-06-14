@@ -40,7 +40,7 @@ class LoginCompose : Fragment() {
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel) {
-    MyComposeTheme(Global.theme) {
+    AppTheme(Global.theme) {
         val navController = rememberNavController()
         val navigationActions = remember(navController) {
             NavigationActions(navController)
@@ -53,7 +53,7 @@ fun LoginScreen(viewModel: LoginViewModel) {
         Button(onClick = {
             viewModel.login {
                 Timber.d(" $it")
-                Global.userSession = it
+                Global.updateUserData(it)
 //                    .launchMain()
 //                navigationActions.navigateToHome
             }

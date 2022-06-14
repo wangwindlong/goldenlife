@@ -9,6 +9,7 @@ import net.wangyl.base.extension.checkContext
 import net.wangyl.base.extension.toast
 import net.wangyl.eventbus_flow.core.observeEvent
 import net.wangyl.life.Constants.EVENT_LOGOUT
+import net.wangyl.life.compose.ui.MainActivity
 import net.wangyl.life.event.GlobalEvent
 import net.wangyl.life.obj.Global.relaunchApp
 import net.wangyl.life.ui.frag.HeadlinesFragment
@@ -47,7 +48,7 @@ fun Context.launchMain() {
             putInt(TAG_TAB, FLAG_TABBAR_BTM)
         }
     }
-//        startActivity(Intent(this, MainActivity::class.java))
+        startActivity(Intent(this, MainActivity::class.java))
 }
 
 fun Intent.putBundle(argTag: String, extra: Bundle.() -> Unit) : Intent {

@@ -9,7 +9,10 @@ import net.wangyl.base.data.IdEntity
 
 @Entity(
     tableName = "last_requests",
-    indices = [Index(value = ["request", "entity_id"], unique = true)]
+    indices = [Index(value = ["request", "entity_id"], unique = true),
+        Index(value = ["id"]),
+        Index(value = ["localid"])
+    ]
 )
 data class LastRequest(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "localid") override val localid: Long,

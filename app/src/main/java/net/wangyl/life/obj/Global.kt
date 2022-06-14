@@ -1,23 +1,13 @@
 package net.wangyl.life.obj
 
 import android.content.Intent
-import android.os.Debug
 import androidx.compose.runtime.*
-import androidx.room.Room
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableSharedFlow
-import net.wangyl.base.extension.getK
 import net.wangyl.base.manager.AppManager
-import net.wangyl.base.model.EventViewModel
 import net.wangyl.base.util.fromJson
 import net.wangyl.base.util.json
-import net.wangyl.eventbus_flow.core.observeEvent
-import net.wangyl.eventbus_flow.core.postEvent
-import net.wangyl.life.Constants
 import net.wangyl.life.GoldApp
-import net.wangyl.life.compose.MyComposeTheme.Theme
-import net.wangyl.life.data.RSSDatabase
-import net.wangyl.life.event.GlobalEvent
+import net.wangyl.life.compose.AppTheme.Theme
 import net.wangyl.life.model.UserSession
 import net.wangyl.life.obj.Global.TAG_THEME
 import net.wangyl.life.ui.LaunchActivity
@@ -33,21 +23,25 @@ object Global {
     const val LOGIN = 1
 
 //    val globalVm = getK<EventViewModel>()
-    var userSession = fromJson<UserSession>(PrefManager.get().getString(TAG_USER, UN_LOGIN) ?: UN_LOGIN)
+    val userSession by lazy {
+    fromJson<UserSession>(PrefManager.get().getString(TAG_USER, UN_LOGIN) ?: UN_LOGIN)
+}
 //    var userSession: UserSession = getK<Gson>().fromJson(
 //        PrefManager.get().getString(TAG_USER, UN_LOGIN),
 //        UserSession::class.java
 //    )
-        set(value) {
-            if (field == value) return
-            field = value
-            PrefManager.get().putString(TAG_USER, value.json)
-        }
+
 
     fun isLogin() = userSession?.session_id?.isNotEmpty() == true
 
+    fun updateUserData(value: UserSession) {
+        if (userSession == value) return
+        PrefManager.get().putString(TAG_USER, value.json)
+        userSession?.clear()
+    }
+
     fun clearUserData() {
-        userSession = UserSession()
+        userSession?.clear()
     }
 
     val sessionId: String?

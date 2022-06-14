@@ -25,12 +25,10 @@ import net.wangyl.base.http.mapper.ApiErrorMapper
 import net.wangyl.base.interf.Converter
 import net.wangyl.base.interf.HttpErrorHandler
 import net.wangyl.base.util.isSameWrapClass
-import net.wangyl.base.util.typeToString
 import okhttp3.ResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
-import java.io.IOException
 import java.lang.reflect.Type
 import java.net.ConnectException
 import java.net.SocketTimeoutException
@@ -49,7 +47,7 @@ sealed class ApiResponse<T> : BaseResponse<T>() {
 //            get() = TODO("Not yet implemented")
     }
 
-    //Failure response with body
+    //服务端报错 502
     data class ApiError<T>(val exception: Exception) : ApiResponse<T>()
 
     //条件错误，返回服务端定义的错误码
@@ -88,7 +86,7 @@ sealed class ApiResponse<T> : BaseResponse<T>() {
                         ApiSuccess(data)
                     }
                 } else {
-                    NetworkError(ErrorMessage(code = code, error = "服务器错误: $e"))
+                    CondError(data, false,  "数据异常", "-1")
                 }
             } else {
                 NetworkError(ErrorMessage(code = code, error = "服务器错误: $e"))
@@ -98,6 +96,7 @@ sealed class ApiResponse<T> : BaseResponse<T>() {
         }
     }
 }
+
 
 //用于不需要回调的情形，直接获取返回的数据
 @JvmSynthetic

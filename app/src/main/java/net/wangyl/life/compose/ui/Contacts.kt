@@ -18,9 +18,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.wangyl.life.R
-import net.wangyl.life.compose.MyComposeTheme
+import net.wangyl.life.compose.AppTheme
 import net.wangyl.life.model.User
-
+import timber.log.Timber
+val buttons = listOf(
+    User("contact_add", "新的朋友", R.drawable.ic_chat_filled),
+    User("contact_chat", "仅聊天", R.drawable.ic_chat_filled),
+    User("contact_group", "群聊", R.drawable.ic_chat_filled),
+    User("contact_tag", "标签", R.drawable.ic_chat_filled),
+    User("contact_official", "公众号", R.drawable.ic_chat_filled),
+    User("contact_official", "公众号", R.drawable.ic_chat_filled),
+    User("contact_official", "公众号", R.drawable.ic_chat_filled),
+    User("contact_official", "公众号", R.drawable.ic_chat_filled),
+    User("contact_official", "公众号", R.drawable.ic_chat_filled),
+    User("contact_official", "公众号", R.drawable.ic_chat_filled),
+    User("contact_official", "公众号", R.drawable.ic_chat_filled),
+    User("contact_official", "公众号", R.drawable.ic_chat_filled),
+    User("contact_official", "公众号", R.drawable.ic_chat_filled),
+    User("contact_official", "公众号", R.drawable.ic_chat_filled),
+)
 @Composable
 fun ContactListTopBar() {
     TopBar(title = "通讯录")
@@ -57,79 +73,25 @@ fun ContactListItem(
                 .weight(1f)
                 .align(Alignment.CenterVertically),
             fontSize = 17.sp,
-            color = MyComposeTheme.colors.textPrimary
+            color = AppTheme.colors.textPrimary
         )
     }
 }
 
+@Preview
 @Composable
-fun ContactList() {
-    val contacts by remember {
-        mutableStateOf(
-            listOf(
-                User("gaolaoshi", "高老师", R.drawable.ic_chat_filled),
-                User("diuwuxian", "丢物线", R.drawable.ic_chat_filled),
-                User("diuwuxian", "丢物线", R.drawable.ic_chat_filled),
-                User("diuwuxian", "丢物线", R.drawable.ic_chat_filled),
-                User("diuwuxian", "丢物线", R.drawable.ic_chat_filled),
-                User("diuwuxian", "丢物线", R.drawable.ic_chat_filled),
-                User("diuwuxian", "丢物线", R.drawable.ic_chat_filled),
-                User("diuwuxian", "丢物线", R.drawable.ic_chat_filled),
-                User("diuwuxian", "丢物线", R.drawable.ic_chat_filled),
-                User("diuwuxian", "丢物线", R.drawable.ic_chat_filled),
-                User("diuwuxian", "丢物线", R.drawable.ic_chat_filled),
-                User("diuwuxian", "丢物线", R.drawable.ic_chat_filled),
-                User("diuwuxian", "丢物线", R.drawable.ic_chat_filled),
-                User("diuwuxian", "丢物线", R.drawable.ic_chat_filled),
-                User("diuwuxian", "丢物线", R.drawable.ic_chat_filled),
-                User("diuwuxian", "丢物线", R.drawable.ic_chat_filled)
-            )
-        )
-    }
-
-//    val drawer = LocalDrawer.current
-    val scope = rememberCoroutineScope()
-    Scaffold(
-        scaffoldState = rememberScaffoldState(),
-        topBar = {
-            TopBar(title = stringResource(id = R.string.app_name)) {
-//                scope.launch { drawer?.open() }
-            }
-        },
-    ) { innerPadding ->
-        val contentModifier = Modifier.padding(innerPadding)
-
-        Column() {
-            Box(contentModifier
-
-            ) {
-                ContactList(contacts)
-            }
-        }
-    }
-
-}
-
-@Composable
-fun ContactList(contacts: List<User>) {
+fun ContactList(contacts: List<User> = emptyList(), modifier: Modifier = Modifier) {
     LazyColumn(
-        Modifier
-            .background(MyComposeTheme.colors.listItem)
+        modifier
+            .background(AppTheme.colors.listItem)
             .fillMaxWidth()
     ) {
-        val buttons = listOf(
-            User("contact_add", "新的朋友", R.drawable.ic_chat_filled),
-            User("contact_chat", "仅聊天", R.drawable.ic_chat_filled),
-            User("contact_group", "群聊", R.drawable.ic_chat_filled),
-            User("contact_tag", "标签", R.drawable.ic_chat_filled),
-            User("contact_official", "公众号", R.drawable.ic_chat_filled),
-        )
         itemsIndexed(buttons) { index, contact ->
             ContactListItem(contact)
             if (index < buttons.size - 1) {
                 Divider(
                     startIndent = 56.dp,
-                    color = MyComposeTheme.colors.chatListDivider,
+                    color = AppTheme.colors.chatListDivider,
                     thickness = 0.8f.dp
                 )
             }
@@ -138,11 +100,11 @@ fun ContactList(contacts: List<User>) {
             Text(
                 "朋友",
                 Modifier
-                    .background(MyComposeTheme.colors.background)
+                    .background(AppTheme.colors.background)
                     .fillMaxWidth()
                     .padding(12.dp, 8.dp),
                 fontSize = 14.sp,
-                color = MyComposeTheme.colors.onBackground
+                color = AppTheme.colors.onBackground
             )
         }
         itemsIndexed(contacts) { index, contact ->
@@ -150,7 +112,7 @@ fun ContactList(contacts: List<User>) {
             if (index < contacts.size - 1) {
                 Divider(
                     startIndent = 56.dp,
-                    color = MyComposeTheme.colors.chatListDivider,
+                    color = AppTheme.colors.chatListDivider,
                     thickness = 0.8f.dp
                 )
             }
@@ -161,7 +123,7 @@ fun ContactList(contacts: List<User>) {
 @Preview(showBackground = true)
 @Composable
 fun ContactListItemPreview() {
-    MyComposeTheme {
+    AppTheme {
         Box {
             ContactListItem(
                 User("gaolaoshi", "高老师", R.drawable.ic_chat_filled)

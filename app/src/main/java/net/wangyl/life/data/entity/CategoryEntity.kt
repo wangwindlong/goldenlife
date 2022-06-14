@@ -18,6 +18,7 @@ data class CategoryEntity(
     @ColumnInfo(name = "order_id") val order_id: Long = 0, //对应服务端排序
     @ColumnInfo(name = "title") val title: String = "",//对应服务端表title
     @ColumnInfo(name = "unread") val unread: String = "",//未读条数
+    @ColumnInfo(name = "isshow") val isshow: Boolean = true,//是否显示
 
     ) : BaseEntity, IdEntity {
 }

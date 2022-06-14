@@ -7,9 +7,13 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentActivity
-import com.livefront.bridge.Bridge
+import androidx.lifecycle.LifecycleOwner
 import net.wangyl.base.base.IBase
+import net.wangyl.base.dialog.LoadingDialog
+import net.wangyl.base.enums.StateError
+import net.wangyl.base.enums.StateLoading
 import net.wangyl.base.extension.getK
+import net.wangyl.base.interf.loading
 import net.wangyl.base.manager.AppManager
 import timber.log.Timber
 import java.util.*
@@ -65,8 +69,8 @@ class ActivityLifeCycler private constructor() : ActivityLifecycleCallbacks {
 
     override fun onActivityStarted(f: Activity) {
         val toolbar: Toolbar? = f.findViewById(R.id.base_toolbar)
-        (f as? IBase)?.baseDelegate?.let {
-            it.onStart()
+        (f as? IBase)?.let {
+            it.baseDelegate?.onStart()
             if (f.showAction) {
                 f.setupToolbar(toolbar)
                 toolbar?.let { tool ->

@@ -19,6 +19,9 @@ import kotlin.reflect.KProperty
  */
 interface StateHost<T : State> {
     val stateContainer: StateContainer<T>
+    //加载数据使用 stateContainer.launchApi {}
+    //是否正在加载，监听loadingFlow: Flow<StateEvent>
+    //获取加载数据，监听dataFlow: StateFlow<T : State>，有上次的缓存
 
 //    inline fun <reified T : BaseModel> ViewModel.fire(
 //        context: CoroutineContext = Dispatchers.IO,
@@ -61,11 +64,11 @@ interface StateHost<T : State> {
 //提供两种方式 简便地初始化默认 stateContainer = initDefault() 或 by StateDelegate()
 fun ViewModel.initDefault(initial: State) = viewModelScope.stateHost(initial)
 
-inline fun <reified T : State> stateOf(initial: T): ReadOnlyProperty<ViewModel, StateContainer<T>> {
-    return object : ReadOnlyProperty<ViewModel, StateContainer<T>> {
+inline fun <reified VM: ViewModel,  T : State> stateOf(initial: T): ReadOnlyProperty<VM, StateContainer<T>> {
+    return object : ReadOnlyProperty<VM, StateContainer<T>> {
         private var _delegate: StateContainer<T>? = null
 
-        override fun getValue(thisRef: ViewModel, property: KProperty<*>): StateContainer<T> {
+        override fun getValue(thisRef: VM, property: KProperty<*>): StateContainer<T> {
             return _delegate ?: thisRef.viewModelScope.stateHost(initial)
         }
 

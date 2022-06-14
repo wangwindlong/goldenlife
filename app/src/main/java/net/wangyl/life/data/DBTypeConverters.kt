@@ -1,6 +1,9 @@
 package net.wangyl.life.data
 
 import androidx.room.TypeConverter
+import net.wangyl.base.util.fromJson
+import net.wangyl.base.util.json
+import net.wangyl.life.model.Attachment
 import org.threeten.bp.*
 import org.threeten.bp.format.DateTimeFormatter
 
@@ -52,5 +55,30 @@ object DBTypeConverters {
     @TypeConverter
     @JvmStatic
     fun fromLocalTime(value: LocalTime?) = value?.format(DateTimeFormatter.ISO_LOCAL_TIME)
+
+
+    @TypeConverter
+    @JvmStatic
+    fun toAttachment(value: String?) = value?.let { fromJson<List<Attachment>>(it) }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromAttachment(value: List<Attachment>?) = value?.json
+
+    @TypeConverter
+    @JvmStatic
+    fun toList(value: String?) = value?.let { fromJson<List<String>>(it) }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromList(value: List<String>?) = value?.json
+
+    @TypeConverter
+    @JvmStatic
+    fun toList2(value: String?) = value?.let { fromJson<List<List<String>>>(it) }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromList2(value: List<List<String>>?) = value?.json
 
 }

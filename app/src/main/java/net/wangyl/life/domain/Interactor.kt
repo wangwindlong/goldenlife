@@ -5,22 +5,36 @@ import androidx.paging.PagingData
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import net.wangyl.base.enums.StateError
 import net.wangyl.base.enums.StateEvent
 import net.wangyl.base.enums.StateIdle
 import net.wangyl.base.enums.StateLoading
+import net.wangyl.life.obj.AppDispatchers
 import java.util.concurrent.TimeUnit
 
+typealias Work<P> = suspend (params: P) -> Unit
+fun <P> createInteractor(timeoutMs: Long = Interactor.defaultTimeoutMs,
+                         doWork: Work<P>): Interactor<P> {
+    return object : Interactor<P>() {
+        override suspend fun doWork(params: P) {
+            doWork(params)
+        }
+    }
+}
+
 //获取远程接口数据的封装，不直接获取返回值，增加加载、结束和错误状态发送，同时有超时机制
-// 冷流 ui层collect才会执行dowork操作
+// 冷流 ui层collect才会执行dowork操作, 默认在io线程，也可以直接调用executeSync执行任务
 abstract class Interactor<in P> {
 
     open fun load(params: P, timeoutMs: Long = defaultTimeoutMs) = flow {
         try {
             withTimeout(timeoutMs) {
                 emit(StateLoading)
-                doWork(params)
+                withContext(AppDispatchers.io) {
+                    doWork(params)
+                }
                 emit(StateIdle)
             }
         } catch (t: TimeoutCancellationException) {
@@ -36,7 +50,7 @@ abstract class Interactor<in P> {
     protected abstract suspend fun doWork(params: P)
 
     companion object {
-        private val defaultTimeoutMs = TimeUnit.MINUTES.toMillis(25)
+        val defaultTimeoutMs = TimeUnit.MINUTES.toMillis(25)
     }
 }
 

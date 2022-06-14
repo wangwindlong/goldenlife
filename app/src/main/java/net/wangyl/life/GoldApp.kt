@@ -24,10 +24,6 @@ class GoldApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-//        startKoin {
-//            androidContext(this@GoldApp)
-//            modules(listOf(mainModule))
-//        }
         sInstance = this
 
         registerActivityLifecycleCallbacks(ActivityLifeCycler.instance)
@@ -35,13 +31,5 @@ class GoldApp : Application() {
     }
 
 }
-
-//private inline fun <T:Parcelable>Scope.BaseListVM(
-//    loader: suspend () -> Status<Any>,
-//    savedStateHandle: SavedStateHandle,
-//    repository: Repository
-//): Any {
-//
-//}
 
 

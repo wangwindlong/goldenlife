@@ -16,16 +16,16 @@
 
 package net.wangyl.life.data.entity
 
-import net.wangyl.base.data.BaseEntity
 import net.wangyl.base.data.IdEntity
+import net.wangyl.life.model.Feed
 import java.util.Objects
 
 interface EntryWithArticle<ET : IdEntity> {
     var entry: ET
-    var relations: List<FeedsEntity>
+    var relations: List<Feed>
 //    var images: List<ShowTmdbImage>
 
-    val show: FeedsEntity
+    val show: Feed
         get() {
             check(relations.size == 1)
             return relations[0]

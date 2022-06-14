@@ -16,14 +16,28 @@ import net.wangyl.base.R
 import net.wangyl.base.SimpleActivity
 import net.wangyl.base.base.TAG_FRAGNAME
 import net.wangyl.base.data.FragmentData
+import org.koin.core.context.GlobalContext
+import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 import org.koin.java.KoinJavaComponent
+import org.koin.mp.KoinPlatformTools
 
 //</editor-fold>
 private val density = Resources.getSystem().displayMetrics.density
 
-inline fun <reified T> getK(qualifier: Qualifier? = null): T {
+//封装koin 避免样本代码
+inline fun <reified T: Any> getK(qualifier: Qualifier? = null,
+                                 noinline parameters: ParametersDefinition? = null): T {
+//    GlobalContext.get().get<T>(qualifier, parameters)
     return KoinJavaComponent.get(T::class.java, qualifier)
+}
+
+inline fun <reified T : Any> inject(
+    qualifier: Qualifier? = null,
+    mode: LazyThreadSafetyMode = KoinPlatformTools.defaultLazyMode(),
+    noinline parameters: ParametersDefinition? = null
+): Lazy<T> {
+    return GlobalContext.get().inject(qualifier, mode, parameters)
 }
 
 fun NavOptions.Builder.setHorizontalSlide(): NavOptions.Builder {

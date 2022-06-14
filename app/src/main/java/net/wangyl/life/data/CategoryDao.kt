@@ -13,6 +13,12 @@ abstract class CategoryDao : EntityDao<CategoryEntity>() {
     abstract fun entriesCategory(): Flow<List<CategoryEntity>>
 
 
+    @Query("DELETE FROM categories WHERE id = :id")
+    abstract suspend fun delete(id: Long)
+
+    @Query("DELETE FROM categories")
+    abstract suspend fun deleteAll()
+
     companion object {
         private const val ENTRY_QUERY_CATEGORIES =
             """

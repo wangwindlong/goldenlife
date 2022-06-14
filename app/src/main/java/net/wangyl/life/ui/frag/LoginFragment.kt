@@ -24,7 +24,7 @@ class LoginFragment: BindMviFragment<UserSession, FragmentLoginBinding>() {
         binding.mSignInBt.setOnClickListener {
             viewModel.login {
                 Timber.d(" $it")
-                Global.userSession = it
+                Global.updateUserData(it)
                 requireContext().launchMain()
             }
         }

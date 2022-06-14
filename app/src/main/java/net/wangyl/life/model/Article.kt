@@ -1,12 +1,23 @@
 package net.wangyl.life.model
 
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 import net.wangyl.base.data.BaseModel
+import net.wangyl.base.data.IdEntity
 
-
+@Entity(
+    tableName = "articles",
+    indices = [
+        Index(value = ["id"], unique = true),
+        Index(value = ["feed_id"])
+    ]
+)
 @Parcelize
-open class Article(
-    var id: Long = 0,
+data class Article(
+    @PrimaryKey(autoGenerate = true) override val localid: Long,
+    override var id: Long = 0,
     var unread: Boolean = false,
     var marked: Boolean = false,
     var published: Boolean = false,
@@ -20,7 +31,7 @@ open class Article(
     var attachments: List<Attachment>? = null,
     var content: String? = null,
     var excerpt: String? = null,
-    var labels: List<List<String>>? = null,
+//    var labels: List<List<String>>? = null,
     var feed_title: String? = null,
     var comments_count: Int = 0,
     var comments_link: String? = null,
@@ -31,7 +42,7 @@ open class Article(
     var flavor_image: String? = null,
     var flavor_stream: String? = null,
     var flavor_kind: Int = 0
-) : BaseModel {
+) : BaseModel, IdEntity {
 
     override fun getItemId(): String {
         return "$id"

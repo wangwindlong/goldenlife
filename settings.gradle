@@ -23,3 +23,6 @@ include ":vbpd-full"
 include ':base'
 include ':manager'
 include ':eventbus-flow'
+include ':ptr'
+
+include ':benchmark'

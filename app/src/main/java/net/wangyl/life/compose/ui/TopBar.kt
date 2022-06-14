@@ -10,13 +10,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import net.wangyl.life.compose.MyComposeTheme
+import net.wangyl.life.compose.AppTheme
 import net.wangyl.life.obj.Global
 import net.wangyl.life.R
 
 @Composable
 fun TopBar(title: String, onBack: (() -> Unit)? = null) {
-    Box(Modifier.background(MyComposeTheme.colors.background).statusBarsPadding().fillMaxWidth()) {
+    Box(Modifier.background(AppTheme.colors.background).statusBarsPadding().fillMaxWidth()) {
         Row(Modifier.height(48.dp)) {
             if (onBack != null) {
                 Icon(
@@ -27,7 +27,7 @@ fun TopBar(title: String, onBack: (() -> Unit)? = null) {
                     .align(Alignment.CenterVertically)
                     .size(36.dp)
                     .padding(8.dp),
-                    tint = MyComposeTheme.colors.icon
+                    tint = AppTheme.colors.icon
                 )
             }
             Spacer(Modifier.weight(1f))
@@ -43,7 +43,7 @@ fun TopBar(title: String, onBack: (() -> Unit)? = null) {
               .align(Alignment.CenterVertically)
               .size(36.dp)
               .padding(8.dp),
-            tint = MyComposeTheme.colors.icon
+            tint = AppTheme.colors.icon
           )
             Icon(
                 painterResource(R.drawable.ic_palette),
@@ -51,17 +51,17 @@ fun TopBar(title: String, onBack: (() -> Unit)? = null) {
               Modifier
                 .clickable {
                   Global.theme = when (Global.theme) {
-                    MyComposeTheme.Theme.Light -> MyComposeTheme.Theme.Dark
-                    MyComposeTheme.Theme.Dark -> MyComposeTheme.Theme.Custom
-                    MyComposeTheme.Theme.Custom -> MyComposeTheme.Theme.Light
+                    AppTheme.Theme.Light -> AppTheme.Theme.Dark
+                    AppTheme.Theme.Dark -> AppTheme.Theme.Custom
+                    AppTheme.Theme.Custom -> AppTheme.Theme.Light
                   }
                 }
                 .align(Alignment.CenterVertically)
                 .size(36.dp)
                 .padding(8.dp),
-                tint = MyComposeTheme.colors.icon
+                tint = AppTheme.colors.icon
             )
         }
-        Text(title, Modifier.align(Alignment.Center), color = MyComposeTheme.colors.textPrimary)
+        Text(title, Modifier.align(Alignment.Center), color = AppTheme.colors.textPrimary)
     }
 }

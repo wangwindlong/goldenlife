@@ -13,7 +13,7 @@ import net.wangyl.base.enums.StateEvent
 /**
  * 监听通用状态的类，方便ui层按需展示
  */
-interface StateContainer<T : State>: LoadingState {
+interface StateContainer<T : State> : LoadingState {
     val stateFlow: StateFlow<T>  //返回的数据
     val settings: Settings
 
@@ -30,8 +30,9 @@ interface StateContainer<T : State>: LoadingState {
 }
 
 interface LoadingState {
-    val loadingState : Flow<StateEvent>  //加载状态
-//    val loadingState: MutableLiveData<StateEvent>  //加载状态
+    val loadingState: Flow<StateEvent>  //加载状态
+
+    //    val loadingState: MutableLiveData<StateEvent>  //加载状态
 //    val errorState : MutableLiveData<ErrorMessage>   //错误码 ErrorMessage
     fun updateLoading(event: StateEvent) {
 
@@ -40,7 +41,6 @@ interface LoadingState {
 }
 
 interface State {
-
 }
 
 

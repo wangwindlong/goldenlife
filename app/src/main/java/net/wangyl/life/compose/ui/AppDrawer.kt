@@ -45,7 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import net.wangyl.life.R
-import net.wangyl.life.compose.MyComposeTheme
+import net.wangyl.life.compose.AppTheme
 
 @Composable
 fun AppDrawer(
@@ -56,7 +56,7 @@ fun AppDrawer(
     val navController = LocalNavController.current
     Column(modifier = modifier.fillMaxSize()) {
         AppLogo(Modifier.padding(16.dp))
-        Divider(color = MyComposeTheme.colors.chatListDivider.copy(alpha = .2f))
+        Divider(color = AppTheme.colors.chatListDivider.copy(alpha = .2f))
         DrawerButton(
             icon = Icons.Filled.Home,
             label = stringResource(id = R.string.news),
@@ -84,7 +84,7 @@ fun LogoIcon(modifier: Modifier = Modifier) {
     Image(
         painter = painterResource(R.drawable.ic_book_outlined),
         contentDescription = null, // decorative
-        colorFilter = ColorFilter.tint(MyComposeTheme.colors.iconSelected),
+        colorFilter = ColorFilter.tint(AppTheme.colors.iconSelected),
         modifier = modifier
     )
 }
@@ -105,9 +105,9 @@ fun NavigationIcon(
     }
 
     val iconTintColor = tintColor ?: if (isSelected) {
-        MyComposeTheme.colors.bubbleMe
+        AppTheme.colors.bubbleMe
     } else {
-        MyComposeTheme.colors.textPrimary.copy(alpha = 0.6f)
+        AppTheme.colors.textPrimary.copy(alpha = 0.6f)
     }
 
     Image(
@@ -128,7 +128,7 @@ private fun AppLogo(modifier: Modifier = Modifier) {
         Image(
             painter = painterResource(R.drawable.ic_book_outlined),
             contentDescription = stringResource(R.string.app_name),
-            colorFilter = ColorFilter.tint(MyComposeTheme.colors.iconSelected)
+            colorFilter = ColorFilter.tint(AppTheme.colors.iconSelected)
         )
     }
 }
@@ -141,7 +141,7 @@ private fun DrawerButton(
     action: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = MyComposeTheme.colors
+    val colors = AppTheme.colors
     val textIconColor = if (isSelected) {
         colors.more
     } else {
@@ -159,7 +159,7 @@ private fun DrawerButton(
     Surface(
         modifier = surfaceModifier,
         color = backgroundColor,
-        shape = MyComposeTheme.shapes.small
+        shape = AppTheme.shapes.small
     ) {
         TextButton(
             onClick = action,
@@ -179,7 +179,7 @@ private fun DrawerButton(
                 Spacer(Modifier.width(16.dp))
                 Text(
                     text = label,
-                    style = MyComposeTheme.typography.body2,
+                    style = AppTheme.typography.body2,
                     color = textIconColor
                 )
             }
@@ -191,7 +191,7 @@ private fun DrawerButton(
 @Preview("Drawer contents (dark)", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewAppDrawer() {
-    MyComposeTheme {
+    AppTheme {
         Surface {
             AppDrawer(
                 currentRoute = AppScreen.News.route,

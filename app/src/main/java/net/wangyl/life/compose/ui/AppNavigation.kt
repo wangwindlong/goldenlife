@@ -9,7 +9,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.*
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.dialog
@@ -71,7 +70,7 @@ private fun NavGraphBuilder.addNewsTopLevel(navController: NavHostController) {
     navigation(route = AppScreen.News.route,
         startDestination = LeafScreen.Feeds.createRoute(AppScreen.News)) {
         composable(LeafScreen.Feeds.createRoute(AppScreen.News)) {
-            HeadlinesList()
+            CategoriesPager()
         }
     }
 }

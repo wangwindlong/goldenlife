@@ -16,6 +16,7 @@ import net.wangyl.base.enums.*
 import org.orbitmvi.orbit.Container
 import retrofit2.HttpException
 import java.io.IOException
+import java.lang.Exception
 import kotlin.coroutines.EmptyCoroutineContext
 
 //默认的viewmodel scope实现
@@ -36,6 +37,8 @@ fun StateHost<*>.collectError() {
 val <T : State> StateHost<T>.dataFlow: StateFlow<T>
     get() = stateContainer.stateFlow
 
+val StateHost<*>.loadingFlow: Flow<StateEvent>
+    get() = stateContainer.loadingState
 val StateHost<*>.loading: LiveData<StateEvent>
     get() = stateContainer.loadingState.asLiveData()
 //val StateHost<*>.errored: LiveData<ErrorMessage>
@@ -48,7 +51,8 @@ class DefaultContainer<T : State>(
     initial: T, override val settings: StateContainer.Settings
 ) : StateContainer<T> {
     private val _state = MutableStateFlow(initial)
-    private val _loadingState = MutableSharedFlow<StateEvent>(replay = 1) //记录上一次的加载状态
+    //记录上一次的加载状态 并增加一个额外的缓存
+    private val _loadingState = MutableSharedFlow<StateEvent>(replay = 1, extraBufferCapacity = 1)
     val error = MutableLiveData<ErrorMessage>()
     private val mutex = Mutex()
 
@@ -56,7 +60,7 @@ class DefaultContainer<T : State>(
         get() = _state.asStateFlow()
 
     override val loadingState: Flow<StateEvent>
-        get() = _loadingState.asSharedFlow()
+        get() = _loadingState
 //    override val errorState: LiveData<ErrorMessage>
 //        get() = error
 
@@ -66,7 +70,11 @@ class DefaultContainer<T : State>(
             withRetry(settings.apiDelay, settings.maxAttempts) {
                 supervisorScope {
                     mutex.withLock {
-                        _state.value = vmScope.api()
+                        try {
+                            _state.value = vmScope.api()
+                        } catch (e: Exception) {
+                            _loadingState.tryEmit(StateError(e))
+                        }
                     }
                 }
             }
